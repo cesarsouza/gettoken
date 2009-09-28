@@ -1,0 +1,34 @@
+// Copyright © 2009 César Roberto de Souza, Leonardo Sameshima Taba
+// ----------------------------------------------------------------
+
+
+// A classe Error encompassa erros não tokenizáveis, como por exemplo, 
+//   final de arquivo não esperado encontrado ou delimitador direito
+//   de comentário não encontrado. Durante a análise léxica, comentários
+//   são simplesmente descartados, assim como espaços em branco, e não
+//   constituem tokens.
+function Error(mensagem, linha) {
+
+    var msg = mensagem;   // Mensagem do erro identificado
+    var lin = linha;      // Linha em que aparece o erro
+
+
+    this.message = function() {
+       return msg;
+    }
+
+    this.line = function() {
+       return lin;
+    }
+
+
+    this.toString = function() {
+        var mensagem = msg;
+
+        if (!msg || msg == "")
+            mensagem = "Erro desconhecido";
+
+        return "Erro na linha " + lin + ": " + mensagem;
+    }
+}
+

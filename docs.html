@@ -1,0 +1,157 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Template Design by TheWebhub.com | http://www.thewebhub.com | Released for free under a Creative Commons Attribution-Share Alike 3.0 Philippines -->
+
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+  <title>getToken(); - JavaScript-Based Hypothetical Programming Language Compiler</title>
+  <meta name="keywords" content="javascript compilador web analise lexica sintatica semantica" />
+  <meta name="description" content="" />
+  <link href='images/favicon.ico' rel='icon' type='image/x-icon'/>
+  <link href='images/favicon.ico' rel='shortcut icon' type='image/x-icon'/>
+  <link href="style.css" rel="stylesheet" type="text/css" media="screen" />
+  <script type="text/javascript" src="scripts/motion.js"></script>
+</head>
+
+<body>
+    <div id="header">
+        <h1>getToken();</h1>
+    </div>
+    <div id="menu">
+        <ul>
+		<li class="first"><a href="./">Home</a></li>
+              <li><a href="download.html">Download</a></li>
+              <li><a href="docs.html">Documentação</a></li>
+              <li><a href="./source/" target="_blank">Source</a></li>
+		<li><a href="sobre.html">Sobre</a></li>
+        </ul>
+    </div>
+    <div id="page">
+	<div id="page-top">
+
+          <div class="adsense">
+              <script type="text/javascript"><!--
+                   google_ad_client = "pub-7710724268302172";
+                   google_ad_slot = "3994626956";
+                   google_ad_width = 728;
+                   google_ad_height = 15;
+                   //-->
+              </script>
+              <script type="text/javascript" src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+              </script>
+           </div>
+
+           <div id="page-bottom">
+                <div>
+			<div id="sidebar">
+				<h2>Documentação</h2>
+				<ul>
+				   <li>
+                                  Esta página contém informações sobre a elaboração e desenvolvimento
+                                  deste projeto. Clique em um dos tópicos à direita para expandir mais
+                                  informações a respeito de cada item ou veja os <a href="./docs/" target="_blank">relat&oacute;rios</a>
+                                  da disciplina de <b>Construção de Compiladores II</b>.
+                               </li>
+				   <li>
+                                  A última versão deste aplicativo e seu demo online estão disponíveis
+                                  em <a href="http://go.crsouza.com/cc2">http://go.crsouza.com/cc2</a>.
+                               </li>
+				</ul>
+			</div>
+			<div id="content">
+			    <h2><a href="javascript:;" onMouseDown="toggleSlide('content-objetivos');">
+                             Objetivos
+                         </a></h2>
+                         <div id="content-objetivos" style="display: normal; overflow:hidden; height:330px;">
+			    <p>
+                            O objetivo deste trabalho é desenvolver um <a href="http://pt.wikipedia.org/wiki/Compilador">compilador-tradutor</a> de uma linguagem hipotética para
+                            codigo em <a href="http://pt.wikipedia.org/wiki/C_(linguagem_de_programação)" target="_blank">linguagem C</a>, implementado inteiramente em Client-Side <a href="http://pt.wikipedia.org/wiki/Javascript" target="_blank">Javascript</a>. A tecnologia Javascript permite
+                            que nosso compilador seja executado em qualquer plataforma, desde que para tal plataforma exista
+                            um navegador web que ofereça suporte a esta linguagem.
+                         </p>
+                         <p>
+                            A linguagem Javascript é particularmente interessante pois é uma <a href="http://en.wikipedia.org/wiki/Dynamic_programming_language" target="_blank">linguagem dinâmica</a>, e, como tal,
+                            permite uma maior liberdade em implementação ao custo de uma certa perda em eficiência. Desvantagem
+                            esta que, com o advento das últimas tecnologias incorporadas nos <a href="http://pt.wikipedia.org/wiki/Google_Chrome" target="_blank">navegadores mais recentes</a>, tem se
+                            tornado cada vez menos relevante, tendo em vista que as <A href="http://en.wikipedia.org/wiki/V8_(JavaScript_engine)" target="_blank">novas máquinas virtuais JavaScript</a> aceleram
+                            e otimizam código transformando-o em código de máquina nativo antes de sua execução.
+                         </p>
+                         <p>
+                            Toda implementação foi feita utilizando-se <A href="http://pt.wikipedia.org/wiki/Orientação_a_objetos" target="_blank">Orientação a Objetos</a>, facilitando o desenvolvimento e ao mesmo
+                            tempo fornecendo um exemplo de como aplicar esta tecnica na linguagem JavaScript.
+                         </p>
+                         </div>
+
+
+			    <h2><a href="javascript:;" onMouseDown="toggleSlide('content-linguagem');">
+                             Linguagem
+                         </a></h2>
+                         <div id="content-linguagem" style="display:none; overflow:hidden; height:100px;">
+			    <p>
+                            A linguagem ALG é uma linguagem hipotética com estrutura similar ao Pascal, procedural, sem muitos
+                            recursos, porém com instruções suficientes para criação de algoritmos simples. A especificação da
+                            linguagem através de uma <A href="http://pt.wikipedia.org/wiki/Gramática_livre_de_contexto" target="_blank">gramática livre de contexto</a> será disponibilizada em breve.
+                         </p>
+                         </div>
+
+			             <h2><a href="javascript:;" onMouseDown="toggleSlide('content-analise-lexica');">
+                             Análise Léxica
+                         </a></h2>
+                         <div id="content-analise-lexica" style="display:none; overflow:hidden; height:370px;">
+			             <p>
+                            O principal componente responsável por conduzir a <A href="http://pt.wikipedia.org/wiki/Análise_léxica" target="_blank">analise lexicográfica</a> é a classe <a href="source/Analise/AnalisadorLexico.js" target="_blank">AnaliseLexica.js</a>. A partir
+                            de uma entrada em texto qualquer, esta classe é responsavel por identificar os tokens presentes nesta
+                            entrada na ordem em que aparecem, utilizando seu método principal <b>getToken()</b>.
+                         </p>
+                         <p>
+                            Cada <a href="source/Analise/Token.js" target="_blank">Token</a> consiste basicamente num par contendo um <a href="http://pt.wiktionary.org/wiki/semantema" target="_blank">lexema</a> (ou semantema) e a categoria do lexema
+                            identificado, como, por exemplo, <b>(42,numero_inteiro)</b> ou <b>(myVar,identificador)</b>. Posteriormente, informações adicionais como a linha em que o lexema foi encontrado terão de ser adicionadas para as próximas análises.
+                         </p>
+                         <p>
+                            A tabela de palavras reservadas é implementada na classe <a href="source/Analise/Keywords.js" target="_blank">Keywords</a>. Como internamente, todo objeto em
+                            JavaScript é <a href="http://en.wikipedia.org/wiki/Associative_array" target="_blank">implementado como uma hashtable</a>, pudemos contar com este dinamismo
+                            da linguagem como vantagem para implementar a tabela de palavras reservadas como um simples objeto e ainda assim obter a eficiência de busca desejada.
+                         </p>
+                         <p>
+                            Mais informações sobre a <a href="http://pt.wikiversity.org/wiki/Introdução_à_Teoria_dos_Compiladores/Análise_Léxica" target="_blank">análise léxica</a> em compiladores podem ser encontradas na <a href="http://pt.wikiversity.org" target="_blank">Wikiversidade, a universidade livre</a>.
+                            Clique no primeiro link para ir direto ao tópico.
+                         </p>
+                         </div>
+
+
+                         <h2><a href="javascript:;" onMouseDown="toggleSlide('content-analise-sintatica');">
+                             Análise Sintática
+                         </a></h2>
+                         <div id="content-analise-sintatica" style="display:none; overflow:hidden; height:100px;">
+			             <p>
+			                A classe responsável por conduzir a análise sintática é a <a href="source/Analise/AnalisadorSemantico.js" target="_blank">AnalisadorSintatico.js</a>.
+			                A partir de uma entrada qualquer, esta classe instancia um analisador léxico e começa a utilizá-lo para identificar a sintaxe do texto, a partir das
+			                regras sintáticas da linguagem ALG, implementadas a partir de gráfos sintáticos.
+                         </p>
+                         </div>
+
+                     </div>
+                 </div>
+              </form>
+           <div style="clear: both;">&nbsp;</div>
+	  </div>
+      </div>
+   </div>
+   <div id="footer">
+       <p>
+           Copyright © 2009 <a href="http://crsouza.com" target="_blank">César Roberto de Souza</a>, <a href="http://www.comp.ufscar.br/~leotaba/" target="_blank">Leonardo Sameshima Taba</a>. Template originally designed by <a href="http://www.thewebhub.com" target="_blank">TheWebHub.com</a>.
+       </p>
+   </div>
+
+  <script type="text/javascript">
+     var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+     document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+  </script>
+  <script type="text/javascript">
+     try {
+     var pageTracker = _gat._getTracker("UA-3115261-1");
+     pageTracker._trackPageview();
+     } catch(err) {}
+  </script>
+</body>
+</html>

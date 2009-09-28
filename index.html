@@ -1,0 +1,219 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- Template Design by TheWebhub.com | http://www.thewebhub.com | Released for free under a Creative Commons Attribution-Share Alike 3.0 Philippines -->
+
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+  <title>getToken(); - JavaScript-Based Hypothetical Programming Language Compiler</title>
+  <meta name="keywords" content="javascript compilador web analise lexica sintatica semantica" />
+  <meta name="description" content="" />
+  <link href='images/favicon.ico' rel='icon' type='image/x-icon'/>
+  <link href='images/favicon.ico' rel='shortcut icon' type='image/x-icon'/>
+  <link href="style.css" rel="stylesheet" type="text/css" media="screen" />
+  <script type="text/javascript" src="source/Main.js"></script>
+  <script type="text/javascript" src="source/Exemplos.js"></script>
+  <script type="text/javascript">
+
+      function onLoad() {
+          cbOutput_Click();
+          // Carrega o primeiro exemplo no campo de entrada
+          setInput(exemplo[1]);
+      }
+
+      // apenas muda o titulo do campo (analise lexica, sintatica, etc.)
+      function cbOutput_Click() {
+
+        var cbOutput = document.getElementById("cbOutput");
+        var lbTitle  = document.getElementById("lbOutputTitle");
+        var type = cbOutput[cbOutput.selectedIndex].value;
+
+        switch (type) {
+
+          case "analiseLexica":
+            lbTitle.innerHTML = "analisador léxico";
+            break;
+
+          case "analiseSintatica":
+            lbTitle.innerHTML = "analisador sintático";
+            break;
+
+          case "analiseSemantica":
+            break;
+
+          default:
+            break;
+
+        }
+
+      }
+
+      function btnProcessar_Click() {
+
+            var tbInput  = document.mainForm.txtInput;
+            var tbOutput = document.mainForm.txtOutput;
+            var cbOutput = document.getElementById("cbOutput");
+            var lbTitle  = document.getElementById("lbOutputTitle");
+
+            // Pega o tipo do processamento a ser executado
+            var type = cbOutput[cbOutput.selectedIndex].value;
+
+            switch (type) {
+              case "analiseLexica":
+                tbOutput.value = Main(tbInput.value);
+                break;
+
+              case "analiseSintatica":
+                tbOutput.value = Main2(tbInput.value);
+                break;
+
+              case "analiseSemantica":
+                break;
+
+              default:
+                break;
+            }
+      }
+
+      function selectOutput(type)
+      {
+            var cbOutput = document.getElementById("cbOutput");
+            var lbTitle  = document.getElementById("lbOutputTitle");
+            var option   = document.getElementById("option_" + type);         
+            option.selected = true;
+
+            switch (type) {
+              case "analiseLexica":
+                lbTitle.innerHTML = "analisador léxico";
+                break;
+
+              case "analiseSintatica":
+                lbTitle.innerHTML = "analisador sintático";
+                break;
+
+              case "analiseSemantica":
+                break;
+
+              default:
+                alert("Saida nao suportada");
+                break;
+            }
+      }
+
+      function setInput(text) {
+           document.mainForm.txtInput.value = text;
+      }
+
+      function setOutput(text) {
+          document.mainForm.txtOutput.value = text; 
+      }
+
+  </script>
+
+
+</head>
+
+<body onload="onLoad();">
+    <div id="header">
+        <h1>getToken();</h1>
+    </div>
+    <div id="menu">
+        <ul>
+		<li class="first"><a href="./">Home</a></li>
+              <li><a href="download.html">Download</a></li>
+              <li><a href="docs.html">Documentação</a></li>
+              <li><a href="./source/" target="_blank">Source</a></li>
+		<li><a href="sobre.html">Sobre</a></li>
+        </ul>
+    </div>
+    <div id="page">
+	<div id="page-top">
+
+          <div class="adsense">
+              <script type="text/javascript"><!--
+                   google_ad_client = "pub-7710724268302172";
+                   google_ad_slot = "3994626956";
+                   google_ad_width = 728;
+                   google_ad_height = 15;
+                   //-->
+              </script>
+              <script type="text/javascript" src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+              </script>
+           </div>
+
+           <div id="page-bottom">
+              <form name="mainForm">
+		  <div>
+			<div id="sidebar">
+				<h2>Web-Based <b>Compiler</b></h2>
+				<ul>
+				    <li>getToken é um compilador de linguagem hipotética implementado inteiramente em <a href="http://en.wikipedia.org/wiki/Client-side_JavaScript" target="_blank">client side javascript</a>.</li>
+				    <li>
+                                  Saida: <select id="cbOutput" style="width: 200px; margin-left:5px;" onClick="cbOutput_Click();">
+                                     <option id="option_analiseLexica" value="analiseLexica">
+                                         Analise Lexica</option>
+                                     <option id="option_analiseSintatica" value="analiseSintatica" selected="selected">
+                                         Analise Sintática</option>
+                                     <option id="option_analiseSemantica" value="analiseSemantica" disabled="disabled">
+                                         Analise Semantica</option>
+                                     <option id="option_geracaoIntermediaria" value="geracaoIntermediaria" disabled="disabled">
+                                         Codigo Intermediario</option>
+                                     <option id="option_geracaoOtimizada" value="geracaoOtimizada" disabled="disabled">
+                                         Codigo Intermediario Otimizado</option>
+                                     <option id="option_geracaoAlvo" value="geracaoAlvo" disabled="disabled">
+                                         Codigo Alvo (ANSI C)</option>
+                                  </select>
+                               </li>
+				</ul>
+                           <input id="btnProcessar" type="button" style="width: 245px; height: 100px; margin-top:5px;"
+                               value="Processar" onClick="btnProcessar_Click();"/>
+			</div>
+			<div id="content">
+			    <h2>Código de <strong>entrada:</strong></h2>
+			    <p>
+                         <textarea id="txtInput" cols="20" name="S1" rows="2" style="width: 100%; height: 200px"></textarea>
+                         </p>
+			        <div class="bottomline">
+                            <div style="float: left">
+                               [ <a href="javascript:;" onClick="setInput(exemplo[1]);">Exemplo 1</a> 
+                               | <a href="javascript:;" onClick="setInput(exemplo[2]);">Exemplo 2</a> 
+                               | <a href="javascript:;" onClick="setInput(exemplo[3]);">Exemplo 3</a>
+                               | <a href="javascript:;" onClick="setInput(exemplo[4]);">Exemplo 4</a> ]
+                            </div>
+                            [ <a href="javascript:;" onClick="setInput('');">limpar</a> ]
+                         </div>
+
+                         
+                        
+                         <h2>Saída do <span id="lbOutputTitle" style="font-weight: bold;">analisador léxico</span></h2>
+                         <p>
+                             <textarea id="txtOutput" cols="20" name="S2" rows="2" style="width: 100%; height: 200px"></textarea>
+                         </p>
+                         <div class="bottomline">
+                            [ <a href="javascript:;" onClick="setOutput('');">limpar</a> ]
+                         </div>
+                         
+                     </div>
+                 </div>
+              </form>
+           <div style="clear: both;">&nbsp;</div>
+	  </div>
+      </div>
+   </div>
+   <div id="footer">
+       <p>
+           Copyright © 2009 <a href="http://crsouza.com" target="_blank">César Roberto de Souza</a>, <a href="http://www.comp.ufscar.br/~leotaba/" target="_blank">Leonardo Sameshima Taba</a>. Template originally designed by <a href="http://www.thewebhub.com" target="_blank">TheWebHub.com</a>.
+       </p>
+   </div>
+
+  <script type="text/javascript">
+     var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+     document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+  </script>
+  <script type="text/javascript">
+     try {
+     var pageTracker = _gat._getTracker("UA-3115261-1");
+     pageTracker._trackPageview();
+     } catch(err) {}
+  </script>
+</body>
+</html>

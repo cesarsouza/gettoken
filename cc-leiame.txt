@@ -1,0 +1,38 @@
+     
+     getToken();
+        JavaScript Based Hypothetical Programming Language Compiler
+
+     Copyright © 2009 César Roberto de Souza, Leonardo Sameshima Taba
+    ==================================================================
+
+
+
+ 1. Execução  
+
+    Para executar o compilador, basta clicar duas vezes na página index.html.
+    Para uma melhor execucão, recomendamos o uso do navegador Google Chrome.
+
+
+ 2. Documentação
+
+    A documentação pode ser acessada navegando-se, a partir da página principal, para
+    a página "Documentação", localizada no menu superior do site. Adicionalmente, os
+    relatórios para a disciplina podem ser encontrados contidos na pasta /docs conforme
+    citado no item "Conteúdo" abaixo.
+
+    Obs: para melhor visualizar o código fonte, deve-se utilizar um editor de textos
+    compatível com quebras de linha UNIX ou acessar os fontes no browser através do site.
+
+
+ 3. Conteúdo
+
+    /docs       Contém os relatórios da disciplina Construção de Compiladores II.
+    /images     Contém imagens utilizadas no layout do site.
+    /release    Contém versões anteriores deste compilador.
+    /resources  Contém recursos adicionais como imagens utilizadas nos relatórios.
+    /scripts    Contém scripts utilizadas na interface do site.
+    /source     Contém o código fonte em JavaScript do compilador implementado.
+
+
+
+

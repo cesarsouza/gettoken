@@ -1,0 +1,152 @@
+
+          Especificação da Linguagem ALG
+           Gramática Livre de Contexto
+
+
+    01. <programa>      ::= programa ident ; <corpo> .
+    02. <corpo>         ::= <dc> inicio <comandos> fim
+    03. <dc>            ::= <dc_v> <dc_p>
+    04. <dc_v>          ::= var <variaveis> : <tipo_var> ; <dc_v> | ?
+    05. <tipo_var>      ::= real | inteiro
+    06. <variaveis>     ::= ident <mais_var>
+    07. <mais_var>      ::= , <variaveis> | ?
+    08. <dc_p>          ::= procedimento ident <parametros> ; <corpo_p> <dc_p> | ?
+    09. <parametros>    ::= ( <lista_par> ) | ?
+    10. <lista_par>     ::= <variaveis> : <tipo_var> <mais_par>
+    11. <mais_par>      ::= ; <lista_par> | ?
+    12. <corpo_p>       ::= <dc_loc> inicio <comandos> fim ;
+    13. <dc_loc>        ::= <dc_v>
+    14. <lista_arg>     ::= ( <argumentos> ) | ?
+    15. <argumentos>    ::= ident <mais_ident>
+    16. <mais_ident>    ::= ; <argumentos> | ?
+    17. <comandos>      ::= <cmd> ; <comandos> | ?
+    18. <cmd>           ::= le ( <variaveis> ) |
+                              escreve ( <variaveis> ) |
+                              enquanto <condicao> faca <cmd> |
+                              se <condicao> entao <cmd> fim | 
+                              se <condicao> entao <cmd> senao <cmd> |
+                              ident := <expressao> |
+                              ident <lista_arg> |
+                              inicio <comandos> fim
+    19. <condicao>      ::= <expressao> <relacao> <expressao>
+    20. <relacao>       ::= = | <> | >= | <= | > | <
+    21. <expressao>     ::= <termo> <outros_termos>
+    22. <op_un>         ::= + | - | ?
+    23. <outros_termos> ::= <op_ad> <termo> <outros_termos> | ?
+    24. <op_ad>         ::= + | -
+    25. <termo>         ::= <op_un> <fator> <mais_fatores>
+    26. <mais_fatores>  ::= <op_mul> <fator> <mais_fatores> | ?
+    27. <op_mul>        ::= * | /
+    28. <fator>         ::= ident | numero_int | numero_real | ( <expressao> )
+    
+    
+    
+    
+
+                  Gramática LL(1)
+
+
+    01. <programa>      ::= programa ident ; <corpo> .
+    02. <corpo>         ::= <dc> inicio <comandos> fim
+    03. <dc>            ::= <dc_v> <dc_p>
+    04. <dc_v>          ::= var <variaveis> : <tipo_var> ; <dc_v> | ?
+    05. <tipo_var>      ::= real | inteiro
+    06. <variaveis>     ::= ident <mais_var>
+    07. <mais_var>      ::= , <variaveis> | ?
+    08. <dc_p>          ::= procedimento ident <parametros> ; <corpo_p> <dc_p> | ?
+    09. <parametros>    ::= ( <lista_par> ) | ?
+    10. <lista_par>     ::= <variaveis> : <tipo_var> <mais_par>
+    11. <mais_par>      ::= ; <lista_par> | ?
+    12. <corpo_p>       ::= <dc_loc> inicio <comandos> fim ;
+    13. <dc_loc>        ::= <dc_v>
+    14. <lista_arg>     ::= ( <argumentos> ) | ?
+    15. <argumentos>    ::= ident <mais_ident>
+    16. <mais_ident>    ::= ; <argumentos> | ?
+    17. <comandos>      ::= <cmd> ; <comandos> | ?
+    18. <cmd>           ::= le ( <variaveis> ) |
+                              escreve ( <variaveis> ) |
+                              enquanto <condicao> faca <cmd> |`
+                              se <condicao> entao <cmd> <cont_se> |
+                              ident <cont_ident>
+                              inicio <comandos> fim
+   '18. <cont_se>       ::= fim | senao <cmd>
+   "18. <cont_ident>    ::= := <expressao> | <lista_arg>
+    19. <condicao>      ::= <expressao> <relacao> <expressao>
+    20. <relacao>       ::= = | <> | >= | <= | > | <
+    21. <expressao>     ::= <termo> <outros_termos>
+    22. <op_un>         ::= + | - | ?
+    23. <outros_termos> ::= <op_ad> <termo> <outros_termos> | ?
+    24. <op_ad>         ::= + | -
+    25. <termo>         ::= <op_un> <fator> <mais_fatores>
+    26. <mais_fatores>  ::= <op_mul> <fator> <mais_fatores> | ?
+    27. <op_mul>        ::= * | /
+    28. <fator>         ::= ident | numero_int | numero_real | ( <expressao> )
+    
+    
+    
+            Tabela de Primeiros e Seguidores
+            
+            Regra                 Primeiros
+              <programa>             programa  
+              <corpo>                var, ? 
+              <dc>                   var, ?
+              <dc_v>                 var, ?
+              <tipo_var>             real, inteiro
+              <variaveis>            ident
+              <mais_var>             ,
+              <dc_p>                 procedimento, ?
+              <parametros>           (, ?
+              <lista_par>            ident
+              <mais_par>             ;, ?
+              <corpo_p>              var, ?
+              <dc_loc>               var, ?
+              <lista_arg>            (, ?
+              <argumentos>           ident
+              <mais_ident>           ;, ?
+              <comandos>             le, escreve, enquanto, se, ident, inicio, ?
+              <cmd>                  le, escreve, enquanto, se, ident, inicio
+              <cont_se>              fim, senao
+              <cont_ident>           :=, (, ?
+              <condicao>             +, -, ?
+              <relacao>              =, <>, >=, <=, >, <
+              <expressao>            +, -, ?
+              <op_un>                +, -, ?
+              <outros_termos>        +, -, ?
+              <op_ad>                +, -
+              <termo>                +, -, ?
+              <mais_fatores>         *, /, ?
+              <op_mul>               *, /
+              <fator>                ident, numero_int, numero_real, (
+
+
+            Regra                 Seguidores    
+              <programa>             $
+              <corpo>                .
+              <dc>                   inicio
+              <dv_v>                 procedimento, Seguidor(dc_loc), var
+              <tipo_var>             ;
+              <variaveis>            :, seguidores(mais_var), ), 
+              <mais_var>             seguidores(variaveis)         
+              <dc_p>                 seguidores(dc),      
+              <parametros>           ;
+              <lista_par>            ), seguidores(mais_par)
+              <mais_par>             seguidores(lista_par)
+              <corpo_p>              primeiro(dc_p)
+              <dc_loc>               inicio
+              <lista_arg>            seguidores(cont_ident)
+              <argumentos>           seguidores(mais_ident), )
+              <mais_ident>           seguidores(argumentos)
+              <comandos>             fim
+              <cmd>                  ;, fim, senao, seguidores(cont_se)
+              <cont_se>              seguidores(cmd)
+              <cont_ident>           seguidores(cmd)
+              <condicao>             faca, entao
+              <relacao>              primeiros(expressao)
+              <expressao>            primeiro(relacao), seguidores(condicao)
+              <op_un>                primeiro(fator),
+              <outros_termos>        seguidor(expressao)
+              <op_ad>                primeiro(termo)
+              <termo>                primeiro(outros_termos)
+              <mais_fatores>         seguidores(termo)
+              <op_mul>               primeiro(fator)
+              <fator>                primeiro(mais_fatores)
