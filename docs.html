@@ -78,7 +78,7 @@
                          </p>
                          <p>
                             Toda implementação foi feita utilizando-se <A href="http://pt.wikipedia.org/wiki/Orientação_a_objetos" target="_blank">Orientação a Objetos</a>, facilitando o desenvolvimento e ao mesmo
-                            tempo fornecendo um exemplo de como aplicar esta tecnica na linguagem JavaScript.
+                            tempo fornecendo um exemplo de como aplicar esta t<span lang="pt-br">é</span>cnica na linguagem JavaScript.
                          </p>
                          </div>
 
@@ -122,11 +122,16 @@
                          <h2><a href="javascript:;" onMouseDown="toggleSlide('content-analise-sintatica');">
                              Análise Sintática
                          </a></h2>
-                         <div id="content-analise-sintatica" style="display:none; overflow:hidden; height:100px;">
+                         <div id="content-analise-sintatica" style="display:none; overflow:hidden; height:200px;">
 			             <p>
 			                A classe responsável por conduzir a análise sintática é a <a href="source/Analise/AnalisadorSemantico.js" target="_blank">AnalisadorSintatico.js</a>.
 			                A partir de uma entrada qualquer, esta classe instancia um analisador léxico e começa a utilizá-lo para identificar a sintaxe do texto, a partir das
 			                regras sintáticas da linguagem ALG, implementadas a partir de gráfos sintáticos.
+                         </p>
+                         <p>
+                            Uma das maiores dificuldades encontrada nesta fase é o tratamento de erros. A estratégia implementada
+                            é o modo pânico, que consiste em não tentar corrigir o erro e tentar seguir a análise adiante apenas
+                            relatando o erro encontrado.
                          </p>
                          </div>
 

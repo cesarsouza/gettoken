@@ -3,6 +3,7 @@
 
 
 /// <reference path="Analise\AnalisadorLexico.js" />
+/// <reference path="Analise\AnalisadorSintatico.js" />
 
 
 include("source/Analise/Error.js");
