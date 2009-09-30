@@ -1,6 +1,9 @@
 // Copyright © 2009 César Roberto de Souza, Leonardo Sameshima Taba
 // ----------------------------------------------------------------
 
+var TRACE = true;
+var DEBUG = true;
+
 
 /// <reference path="Analise\AnalisadorLexico.js" />
 /// <reference path="Analise\AnalisadorSintatico.js" />
@@ -89,4 +92,19 @@ function include(file) {
     scriptNode.type = 'text/javascript';
     scriptNode.src = file;
     document.getElementsByTagName("head")[0].appendChild(scriptNode);
+}
+
+
+// Função auxiliar para tracing - mensagens só serão exibidas
+//   se a variável global TRACE estiver setada como true.
+function trace(msg) {
+    if (TRACE)
+        alert(msg);
+}
+
+// Função auxiliar para debugging - mensagens só serão exibidas
+//   se a variável global DEBUG estiver setada como true.
+function debug(msg) {
+    if (DEBUG)
+        alert(msg);
 }

@@ -65,7 +65,7 @@
     17. <comandos>      ::= <cmd> ; <comandos> | ?
     18. <cmd>           ::= le ( <variaveis> ) |
                               escreve ( <variaveis> ) |
-                              enquanto <condicao> faca <cmd> |`
+                              enquanto <condicao> faca <cmd> |
                               se <condicao> entao <cmd> <cont_se> |
                               ident <cont_ident>
                               inicio <comandos> fim
