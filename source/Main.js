@@ -1,7 +1,7 @@
 // Copyright © 2009 César Roberto de Souza, Leonardo Sameshima Taba
 // ----------------------------------------------------------------
 
-var TRACE = true;
+var TRACE = false;
 var DEBUG = true;
 
 
