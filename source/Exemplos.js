@@ -87,3 +87,18 @@ fim.                 ";
 
 
 
+
+// Exemplo 05: código sem erros
+exemplo[5] =
+
+"programa exemplo;  \n\
+                    \n\
+{entrada            \n\
+var a: inteiro;     \n\
+                    \n\
+inicio              \n\
+  leia(a);          \n\
+fim.                 ";
+
+
+
