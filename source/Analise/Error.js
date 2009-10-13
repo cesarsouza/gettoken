@@ -2,7 +2,7 @@
 // ----------------------------------------------------------------
 
 
-// A classe Error encompassa erros não tokenizáveis, como por exemplo, 
+// A classe Error encompassa erros não tokenizáveis, como por exemplo,
 //   final de arquivo não esperado encontrado ou delimitador direito
 //   de comentário não encontrado. Durante a análise léxica, comentários
 //   são simplesmente descartados, assim como espaços em branco, e não

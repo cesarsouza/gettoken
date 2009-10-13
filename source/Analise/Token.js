@@ -1,7 +1,7 @@
 // Copyright © 2009 César Roberto de Souza, Leonardo Sameshima Taba
 // ----------------------------------------------------------------
 
-// A classe Token encompassa um lexema e a categoria do lexema 
+// A classe Token encompassa um lexema e a categoria do lexema
 //   identificado, como, por exemplo: <54, numero_inteiro>
 function Token(id, valor)
 {
