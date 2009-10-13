@@ -16,25 +16,25 @@
 //  identificando lexemas como tokens e retornando-as sob demanda através
 //  da chamada do método getToken(). Quando o valor de retorno de getToken
 //  for null, então toda a entrada já terá sido completamente analisada.
-//  
+//
 function AnalisadorLexico(input) {
 
 
-    // ************************************************************************ 
+    // ************************************************************************
     // Variáveis privadas
-    // ************************************************************************ 
+    // ************************************************************************
 
     var inputText = new String(input);  // texto de entrada a ser processado
     var currentIndex = 0;               // posição do cabeçote de leitura
     var currentLine = 1;
     var lastError = null;               // último erro não-tokenizável encontrado
 
-   
 
 
 
 
-    // ************************************************************************ 
+
+    // ************************************************************************
     // Métodos públicos
     // ************************************************************************
 
@@ -56,7 +56,7 @@ function AnalisadorLexico(input) {
     // Indica se o análisador léxico encontrou algum erro que não pôde ser
     //  transformado em token durante a análise, como por exemplo, final
     //  de arquivo encontrado antes de um término de comentário.
-    //  
+    //
     // Comentários, assim como espaços em branco, são simplesmente ignorados
     //  pelo analisador léxico. Assim, não é correto retornar um token contendo
     //  o erro pois, por definição, comentários não são reconhecidos como tokens.
@@ -122,9 +122,9 @@ function AnalisadorLexico(input) {
 
 
 
-    // ************************************************************************ 
+    // ************************************************************************
     // Métodos Privados
-    // ************************************************************************ 
+    // ************************************************************************
 
     // Retorna o próximo caractere e avança na entrada
     function getNext() {
