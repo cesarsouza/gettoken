@@ -86,19 +86,28 @@ inicio              \n\
 fim.                 ";
 
 
-
-
-// Exemplo 05: código sem erros
+// Exemplo 05: código com erros
 exemplo[5] =
 
 "programa exemplo;  \n\
                     \n\
-{entrada            \n\
+{entrada     }      \n\
+var a: inteiro;     \n\
+var b: inteiro;     \n\
+                    \n\
+inicio              \n\
+  a := a_ + b;      \n\
+fim.                 ";
+
+
+// Exemplo 06: código sem erros
+exemplo[6] =
+
+"programa exemplo;  \n\
+                    \n\
+{entrada}           \n\
 var a: inteiro;     \n\
                     \n\
 inicio              \n\
   leia(a);          \n\
 fim.                 ";
-
-
-
