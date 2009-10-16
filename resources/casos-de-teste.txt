@@ -69,3 +69,17 @@ teste de corpo_p
 //     escreva(a);
 // fim;
 //
+
+
+
+
+programa exemplo;  
+                    
+{entrada}           
+var a: inteiro;     
+                    
+inicio              
+  leia(a; @, 1);    
+fim.
+-> linha 7 : esperado identificador mas encontrado '@'
+-> linha 7 : esperado ; mas encontrado ',' ???
