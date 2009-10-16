@@ -1,0 +1,8 @@
+﻿teste de corpo_p
+//
+// var a : inteiro;
+// inicio
+//     a leia(a);
+//     escreva(a);
+// fim;
+//
