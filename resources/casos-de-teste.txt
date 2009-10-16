@@ -1,4 +1,67 @@
-﻿teste de corpo_p
+﻿TESTES DE VARIAVEIS
+
+programa teste1;
+a var
+    a, b : inteiro;
+inicio
+    le(a);
+    escreve(a);
+fim.
+-> linha 2 : esperado 'var', 'procedimento' ou 'inicio', mas encontrado 'a'
+
+
+
+programa teste1;
+var
+    a b, c : inteiro;
+inicio
+    le(a);
+    escreve(a);
+fim.
+-> linha 3 : esperado ',' ou ':', mas encontrado identificador
+
+
+
+programa teste1;
+var
+    a, _, @ : inteiro;
+inicio
+    le(a);
+    escreve(a);
+fim.
+-> linha 3 : esperado identificador, mas encontrado '_'
+-> linha 4 : esperado identificador, mas encontrado '@'
+
+
+
+program teste2;
+var
+    _, b : inteiro;
+inicio
+fim.
+-> linha 3 : esperado identificador, mas encontrado '_'
+
+
+
+program teste2;
+var
+    : inteiro;
+inicio
+fim.
+-> linha 3 : esperado identificador, mas encontrado ':'
+
+
+
+program teste2;
+var
+    a, b inteiro;
+inicio
+fim.
+-> linha 3 : esperado ':' mas encontrado 'inteiro'
+
+
+
+teste de corpo_p
 //
 // var a : inteiro;
 // inicio
