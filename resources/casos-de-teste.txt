@@ -83,3 +83,38 @@ inicio
 fim.
 -> linha 7 : esperado identificador mas encontrado '@'
 -> linha 7 : esperado ; mas encontrado ',' ???
+
+
+
+
+asdfprograma nome2;
+{exemplo 2}
+inicio {programa principal}
+fim.
+-> linha 1 : esperado 'programa' mas encontrado 'asdfprograma'
+-> linha 1 : esperado ';' mas encontrado 'nome2' ???
+
+
+
+
+programa exemplo;  
+                    
+{entrada}           
+var a: inteiro;     
+                    
+inicio              
+  leia(a; @, 1);    
+fim.                
+acusa um erro só ou dois??? porque são três erros seguidos na verdade (@, ',' e 1)
+
+
+
+programa exemplo;  
+                    
+{entrada}           
+var a: inteiro;     
+                    
+inicio              
+  leia(a b c);    
+fim.            
+mesma dúvida do caso acima
