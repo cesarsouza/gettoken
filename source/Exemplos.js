@@ -103,11 +103,32 @@ fim.                 ";
 // Exemplo 06: código sem erros
 exemplo[6] =
 
-"programa exemplo;  \n\
-                    \n\
-{entrada}           \n\
-var a: inteiro;     \n\
-                    \n\
-inicio              \n\
-  leia(a);          \n\
-fim.                 ";
+//"programa exemplo;  \n\
+//                    \n\
+//{entrada}           \n\
+//var a: inteiro;     \n\
+//                    \n\
+//inicio              \n\
+//  leia(a);          \n\
+//fim.                 ";
+
+"programa nome2;              \n\
+{exemplo 2}                    \n\
+var a: real;                   \n\
+var b: inteiro;                \n\
+procedimento nomep(x: real ;   \n\
+    var a, c: inteiro;         \n\
+    inicio                    {ele pensa que ate aqui ainda e a declaracao de argumentos} \n\
+        le(c, a);              \n\
+        se a<x+c entao         \n\
+        inicio                 \n\
+            a:= c+x;           \n\
+            escreve(a);        \n\
+        fim                    \n\
+        senao c:= a+x;        \n\
+    fim;                       \n\
+                               \n\
+inicio {programa principal}    \n\
+    le(b);                     \n\
+    nomep(b);                  \n\
+fim.                            ";
