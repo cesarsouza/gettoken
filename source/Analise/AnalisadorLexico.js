@@ -394,7 +394,7 @@ function AnalisadorLexico(input) {
                         //  erro tokenizável, já que comentários, assim como espaços em
                         //  branco, são simplesmente ignorados nesta fase da análise.
 
-                        lastError = new Error("fim de comentario nao encontrado", currentLine);
+                        lastError = new Error("Fim de comentario nao encontrado", currentLine);
                         return;
                     }
                     else {
