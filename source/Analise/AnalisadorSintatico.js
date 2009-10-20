@@ -77,11 +77,6 @@ function AnalisadorSintatico(input) {
         // Obtem o próximo token
         token = analisadorLexico.getToken();
 
-        // Verifica se houve um erro de análise (como comentário não-finalizado)
-        if (analisadorLexico.error() != null) {
-            error_list.push(analisadorLexico.error());
-        }
-
         // Armazena as informações do token para simplificar os procedimentos
         if (token != null) {
             switch (token.id()) {
@@ -109,6 +104,8 @@ function AnalisadorSintatico(input) {
                 case TokenId.Error:
                     simbolo = "@erro";
                     cadeia  = token.cadeia();
+                    // Colocamos este erro léxico na lista de erros
+                    error("Caractere '" + token.cadeia() + "' nao reconhecido");
                     break;
             }
         }
@@ -119,6 +116,10 @@ function AnalisadorSintatico(input) {
             if (analisadorLexico.error() != null) {
                 // Erro de analise lexica não tokenizável (como comentário nao finalizado)
                 //   o processamento deve ser terminado pois este tipo de erro é crítico.
+
+                // Colocamos o erro léxico na lista de erros
+                error_list.push(analisadorLexico.error());
+
                 token   = null;
                 simbolo = "@erro";
                 cadeia  = '';
