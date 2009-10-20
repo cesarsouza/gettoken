@@ -42,6 +42,11 @@ function AnalisadorLexico(input) {
     this.seek = function(index) {
         currentIndex = index;
     }
+    
+    // Posiciona o ponteiro de leitura no início da entrada
+    this.restart = function() {
+        currentIndex = 0;
+    }
 
     // Indica se atingimos o final da entrada ou não
     this.eof = function() {
