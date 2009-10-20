@@ -15,13 +15,18 @@
   
   <script type="text/javascript">
 
+      // Função executada ao carregar a página
       function onLoad() {
+          // Muda o título do campo de saída
           cbOutput_Click();
+          
           // Carrega o primeiro exemplo no campo de entrada
           setInput(exemplo[1]);
       }
 
-      // apenas muda o titulo do campo (analise lexica, sintatica, etc.)
+      // Função executada quando a caixa de seleção de tipo de análise
+      //  é modificada. Apenas muda o título do campo de saída (para
+      //  análise léxica, sintática, semântica, etc)
       function cbOutput_Click() {
 
         var cbOutput = document.getElementById("cbOutput");
@@ -46,9 +51,9 @@
             break;
 
         }
-
       }
 
+      // Função executada quando o botão Processar é acionado
       function btnProcessar_Click() {
 
             var tbInput  = document.mainForm.txtInput;
@@ -61,11 +66,11 @@
 
             switch (type) {
               case "analiseLexica":
-                tbOutput.value = Main(tbInput.value);
+                tbOutput.value = mainLexico(tbInput.value);
                 break;
 
               case "analiseSintatica":
-                tbOutput.value = Main2(tbInput.value);
+                tbOutput.value = mainSintatico(tbInput.value);
                 break;
 
               case "analiseSemantica":
@@ -76,6 +81,7 @@
             }
       }
 
+      // Altera programaticamente o tipo de saída esperada
       function selectOutput(type)
       {
             var cbOutput = document.getElementById("cbOutput");
@@ -102,10 +108,12 @@
             }
       }
 
+      // Mostra o texto desejado na caixa de entrada
       function setInput(text) {
            document.mainForm.txtInput.value = text;
       }
 
+      // Mostra o texto desejado na caixa de saída
       function setOutput(text) {
           document.mainForm.txtOutput.value = text; 
       }
@@ -151,21 +159,21 @@
 				<ul>
 				    <li>getToken é um compilador de linguagem hipotética implementado inteiramente em <a href="http://en.wikipedia.org/wiki/Client-side_JavaScript" target="_blank">client side javascript</a>.</li>
 				    <li>
-                                  Saida: <select id="cbOutput" style="width: 200px; margin-left:5px;" onclick="cbOutput_Click();">
-                                     <option id="option_analiseLexica" value="analiseLexica">
-                                         Analise Lexica</option>
-                                     <option id="option_analiseSintatica" value="analiseSintatica" selected="selected">
-                                         Analise Sintática</option>
-                                     <option id="option_analiseSemantica" value="analiseSemantica" disabled="disabled">
-                                         Analise Semantica</option>
-                                     <option id="option_geracaoIntermediaria" value="geracaoIntermediaria" disabled="disabled">
-                                         Codigo Intermediario</option>
-                                     <option id="option_geracaoOtimizada" value="geracaoOtimizada" disabled="disabled">
-                                         Codigo Intermediario Otimizado</option>
-                                     <option id="option_geracaoAlvo" value="geracaoAlvo" disabled="disabled">
-                                         Codigo Alvo (ANSI C)</option>
-                                  </select>
-                               </li>
+                        Saida: <select id="cbOutput" style="width: 200px; margin-left:5px;" onclick="cbOutput_Click();">
+                             <option id="option_analiseLexica" value="analiseLexica">
+                                 Analise Lexica</option>
+                             <option id="option_analiseSintatica" value="analiseSintatica" selected="selected">
+                                 Analise Sintática</option>
+                             <option id="option_analiseSemantica" value="analiseSemantica" disabled="disabled">
+                                 Analise Semantica</option>
+                             <option id="option_geracaoIntermediaria" value="geracaoIntermediaria" disabled="disabled">
+                                 Codigo Intermediario</option>
+                             <option id="option_geracaoOtimizada" value="geracaoOtimizada" disabled="disabled">
+                                 Codigo Intermediario Otimizado</option>
+                             <option id="option_geracaoAlvo" value="geracaoAlvo" disabled="disabled">
+                                 Codigo Alvo (ANSI C)</option>
+                          </select>
+                       </li>
 				</ul>
                            <input id="btnProcessar" type="button" style="width: 245px; height: 100px; margin-top:5px;"
                                value="Processar" onClick="btnProcessar_Click();"/>
@@ -173,7 +181,7 @@
 			<div id="content">
 			    <h2>Código de <strong>entrada:</strong></h2>
 			    <p>
-                         <textarea id="txtInput" name="S1" style="width: 100%; height: 200px"></textarea>
+                         <textarea id="txtInput" name="S1" style="width: 100%; height: 225px"></textarea>
                          </p>
 			        <div class="bottomline">
                             <div style="float: left">
@@ -183,7 +191,6 @@
                                | <a href="javascript:;" onclick="setInput(exemplo[4]);">Exemplo 4</a>
                                | <a href="javascript:;" onclick="setInput(exemplo[5]);">Exemplo 5</a>
                                | <a href="javascript:;" onclick="setInput(exemplo[6]);">Exemplo 6</a> ]
-                               | <a href="javascript:;" onclick="setInput(exemplo[7]);">Exemplo 7</a> ]
                             </div>
                             [ <a href="javascript:;" onClick="setInput('');">limpar</a> ]
                          </div>

@@ -2,7 +2,7 @@
 // ----------------------------------------------------------------
 
 var TRACE = false;
-var DEBUG = true;
+var DEBUG = false;
 
 
 /// <reference path="Analise\AnalisadorLexico.js" />
@@ -17,21 +17,26 @@ include("source/Analise/AnalisadorSintatico.js");
 
 
 
-// Ponto de entrada para o analisador sintatico
-function Main2(input) {
+// Ponto de entrada pricipal para o Analisador Sintático
+//
+function mainSintatico(input) {
 
+    // Instanciamos um novo analisador sintático
     var analisadorSintatico = new AnalisadorSintatico(input);
 
     // Efetua a análise sintática da entrada
     var success = analisadorSintatico.parse();
 
+    // Verifica se a análise foi concluída sem erros
     if (success) {
         return "Analise concluida com sucesso";
     }
     else {
+        // Erros foram encontrados durante a análise
         var output = new String("Analise terminada com erros\n");
         var errors = analisadorSintatico.errors();
 
+        // Listamos todos erros encontrados e concatenamos na saída
         for (i in errors) {
             output += errors[i].toString() + "\n";
         }
@@ -48,8 +53,9 @@ function Main2(input) {
 
 
 
-// Ponto de entrada para o analisador lexico
-function Main(input) {
+// Ponto de entrada principal para o Analisador Léxico
+//
+function mainLexico(input) {
 
     // Instanciamos um novo um analisador léxico
     var analisadorLexico = new AnalisadorLexico(input);
@@ -86,13 +92,15 @@ function Main(input) {
 
 
 
-// Função auxiliar para incluir os outros arquivos de script.
+// Função auxiliar para incluir  outros arquivos de script
 function include(file) {
     var scriptNode = document.createElement('script');
     scriptNode.type = 'text/javascript';
     scriptNode.src = file;
     document.getElementsByTagName("head")[0].appendChild(scriptNode);
 }
+
+
 
 
 // Função auxiliar para tracing - mensagens só serão exibidas

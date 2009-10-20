@@ -5,13 +5,60 @@
 var exemplo = new Array();
 
 
-// Exemplo 01: código contendo erros
+exemplo[1] = // Exemplo 01: código sem erros
 
-exemplo[1] =  
-
-"programa exemplo;\n\
+"programa fibonacci;\n\
+{ imprime os n primeiros numeros de fibonacci }\n\
 \n\
-{entrada}\n\
+var n1, n2, n3, qtde, i : inteiro;\n\
+inicio\n\
+    n1 := 0;\n\
+    n2 := 1;\n\
+    i := 0;\n\
+    le(qtde);\n\
+    enquanto i < qtde faca\n\
+    inicio\n\
+        escreve(n2);\n\
+        n3 := n1 + n2;\n\
+        n1 := n2;\n\
+        n2 := n3;\n\
+        i := i + 1;\n\
+    fim;\n\
+fim.";
+
+
+
+exemplo[2] = // Exemplo 02: código sem erros
+
+"programa exemplo2;\n\
+{ testa erros no uso de condicionais }\n\
+\n\
+var a: real;\n\
+var b: inteiro;\n\
+procedimento nomep(x: real);\n\
+    var a, c: inteiro;\n\
+    inicio\n\
+        le(c, a);\n\
+        se a<x+c enta\n\
+        inicio\n\
+            a:= c+x;\n\
+            escreve(a);\n\
+        fim\n\
+        senao c:= a+x;\n\
+    fim;\n\
+\n\
+inicio {programa principal}\n\
+    le(b);\n\
+    nomep(b);\n\
+fim.";
+
+
+
+exemplo[3] = // Exemplo 03: código contendo erros
+
+"programa exemplo3;\n\
+{ testa passagem de parametros com erros }\n\
+\n\
 var a: inteiro;\n\
 \n\
 inicio\n\
@@ -19,14 +66,12 @@ inicio\n\
 fim.";
 
 
+exemplo[4] =
 
-
-// Exemplo 02: código contendo erros
-
-exemplo[2] =
-
-"#programa nome2;\n\
-{exemplo 2}\n\
+"#programa exemplo4;\n\
+{ testa inicio de programa, declaracao de\n\
+  variaveis e expressoes contendo erros }\n\
+\n\
 var @: real;\n\
 var b: inteiro;\n\
 procedimento nomep(x: real);\n\
@@ -48,37 +93,12 @@ fim.";
 
 
 
-// Exemplo 03: código sem erros
 
-exemplo[3] =
+exemplo[5] = // Exemplo 05: código com erros
 
-"programa fibonacci;\n\
-{ imprime os n primeiros numeros de fibonacci }\n\
-var n1, n2, n3, qtde, i : inteiro;\n\
-inicio\n\
-    n1 := 0;\n\
-    n2 := 1;\n\
-    i := 0;\n\
-    le(qtde);\n\
-    enquanto i < qtde faca\n\
-    inicio\n\
-        escreve(n2);\n\
-        n3 := n1 + n2;\n\
-        n1 := n2;\n\
-        n2 := n3;\n\
-        i := i + 1;\n\
-    fim;\n\
-fim.";
-
-
-
-
-// Exemplo 04: código com erros
-exemplo[4] =
-
-"programa exemplo;\n\
+"programa exemplo5;\n\
+{ testa comentarios nao finalizados, como este\n\
 \n\
-{entrada\n\
 var a: inteiro;\n\
 \n\
 inicio\n\
@@ -86,57 +106,12 @@ inicio\n\
 fim.";
 
 
-// Exemplo 05: código com erros
-exemplo[5] =
 
-"programa exemplo;\n\
-\n\
-{entrada     }\n\
-var a: inteiro;\n\
-var b: inteiro;\n\
-\n\
-inicio\n\
-  a := a_ + b;\n\
-fim.";
-
-
-// Exemplo 06: código sem erros
 exemplo[6] =
 
-//"programa exemplo;\n\
-//\n\
-//{entrada}\n\
-//var a: inteiro;\n\
-//\n\
-//inicio\n\
-//  leia(a);\n\
-//fim.";
-
-"programa nome2;\n\
-{exemplo 2}\n\
-var a: real;\n\
-var b: inteiro;\n\
-procedimento nomep(x: real);\n\
-    var a, c: inteiro;\n\
-    inicio\n\
-        le(c, a);\n\
-        se a<x+c enta\n\
-        inicio\n\
-            a:= c+x;\n\
-            escreve(a);\n\
-        fim\n\
-        senao c:= a+x;\n\
-    fim;\n\
+"programa exemplo6;\n\
+{ testa um programa sem inicio }\n\
 \n\
-inicio {programa principal}\n\
-    le(b);\n\
-    nomep(b);\n\
-fim.";
-
-exemplo[7] =
-
-"programa nome2;\n\
-{exemplo 2}\n\
 var a: real;\n\
 var b: inteiro;\n\
 procedimento nomep(x: real);\n\
