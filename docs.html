@@ -122,9 +122,9 @@
                          <h2><a href="javascript:;" onMouseDown="toggleSlide('content-analise-sintatica');">
                              Análise Sintática
                          </a></h2>
-                         <div id="content-analise-sintatica" style="display:none; overflow:hidden; height:200px;">
+                         <div id="content-analise-sintatica" style="display:none; overflow:hidden; height:520px;">
 			             <p>
-			                A classe responsável por conduzir a análise sintática é a <a href="source/Analise/AnalisadorSemantico.js" target="_blank">AnalisadorSintatico.js</a>.
+			                A classe responsável por conduzir a análise sintática é a classe <a href="source/Analise/AnalisadorSemantico.js" target="_blank">AnalisadorSintatico.js</a>.
 			                A partir de uma entrada qualquer, esta classe instancia um analisador léxico e começa a utilizá-lo para identificar a sintaxe do texto, a partir das
 			                regras sintáticas da linguagem ALG, implementadas a partir de gráfos sintáticos.
                          </p>
@@ -132,6 +132,23 @@
                             Uma das maiores dificuldades encontrada nesta fase é o tratamento de erros. A estratégia implementada
                             é o modo pânico, que consiste em não tentar corrigir o erro e tentar seguir a análise adiante apenas
                             relatando o erro encontrado.
+                         <p>
+                            A classe AnalisadorSintatico possui apenas um método principal, denominado parse(), que dá inicio à
+                            análise sintática. Esse método faz chamadas ao método getToken() do analisador léxico, que retorna os
+                            tokens identificados no programa. Após sua execução, eventuais erros encontrados estarão disponíveis
+                            através do método errors(), que retorna a lista de erros detectados.
+                         </p>
+                         <p>
+                            A cada ponto de erro é associado um conjunto de símbolos de sincronização que dirão ao parser onde
+                            prosseguir a análise caso um erro seja encontrado. Com o andamento da análise sintática, marcas de
+                            sincronização são passadas para as demais regras no momento de sua ativação. Ao se deparar com um erro,
+                            o analisador varre a entrada, utilizando o método varre(), descartando simbolos até encontrar um dos
+                            símbolos de sincronização, de onde então a análise poderá ser continuada.
+                         </p>  
+                         <p>
+                            Para facilitar a programação do modo pânico, os procedimentos foram codificados de forma a evitar
+                            estruturas condicionais aninhadas. Tal estratégia possibilita que a análise continue, na maioria das
+                            vezes, por mais que vários erros sejam encontrados em cascata.
                          </p>
                          </div>
 
