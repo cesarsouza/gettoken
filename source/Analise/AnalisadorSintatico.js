@@ -437,7 +437,7 @@ function AnalisadorSintatico(input) {
 
         if (simbolo != ";" && !(simbolo in Seguidores["lista_par"])) {
             error("Esperado ';' ou ')' mas encontrado '" + cadeia + "'");
-            varre(join(";", "var", Primeiros["lista_par"], Seguidores["lista_par"], seguidores));
+            varre(join(";", "var", "real", "inteiro", Primeiros["lista_par"], Seguidores["lista_par"], seguidores));
         }
 
         if (simbolo in Primeiros["lista_par"]) {
@@ -451,8 +451,8 @@ function AnalisadorSintatico(input) {
             variaveis(join(seguidores, Seguidores["lista_par"], "var"));
 
             if (simbolo != ":") {
-                //error("Esperado ':' mas encontrado '" + cadeia + "'");
-                varre(join(";", Primeiros["lista_par"], Seguidores["lista_par"], Seguidores["dc_p"], seguidores));
+                error("Esperado ':' mas encontrado '" + cadeia + "'");
+                varre(join(";", ":", "real", "inteiro", Primeiros["lista_par"], Seguidores["lista_par"], Seguidores["dc_p"], seguidores));
             }
             if (simbolo == ":") {
                 obterSimbolo();
