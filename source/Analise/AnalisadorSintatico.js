@@ -489,7 +489,7 @@ function AnalisadorSintatico(input) {
         dc_v(join(seguidores, Seguidores["corpo_p"], Primeiros["corpo_p"], Primeiros["cmd"]));
 
         if (simbolo != "inicio") {
-            //error("Esperado 'inicio' mas encontrado '" + cadeia + "'");
+            error("Esperado 'inicio' mas encontrado '" + cadeia + "'");
             varre(join(Seguidores["corpo_p"], Seguidores["dc_p"], seguidores, Primeiros["cmd"]));
         }
         if (simbolo == "inicio") {
