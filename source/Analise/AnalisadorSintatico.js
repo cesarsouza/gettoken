@@ -421,7 +421,7 @@ function AnalisadorSintatico(input) {
         variaveis(join(seguidores, Seguidores["lista_par"], ":", "real", "inteiro"));
 
         if (simbolo != ":") {
-            //error("Esperado ':' mas encontrado '" + cadeia + "'");
+            error("Esperado ':' mas encontrado '" + cadeia + "'");
             varre(join(";", Primeiros["lista_par"], Seguidores["lista_par"], Seguidores["dc_p"], seguidores, "inteiro", "real"));
         }
         if (simbolo == ":") {
@@ -509,14 +509,14 @@ function AnalisadorSintatico(input) {
         
         // Enquanto o simbolo estiver em primeiros de cmd
         while (simbolo in Primeiros["cmd"]) {
-        
+
+            //alert(simbolo);
             // Chama a regra "cmd"
-            cmd(Seguidores["corpo_p"]);
+            cmd(join(Seguidores["corpo_p"], seguidores));
 
             if (simbolo != ";") {
-                //error("Esperado ';' mas encontrado '" + cadeia + "'");
-                varre(join("fim", Seguidores["dc_p"], ";", seguidores));
-                
+                error("Esperado ';' mas encontrado '" + cadeia + "'");
+                varre(join("fim", Seguidores["dc_p"], ";", Primeiros["cmd"], seguidores));
             }
             if (simbolo == ";") {
                 obterSimbolo();
@@ -633,7 +633,7 @@ function AnalisadorSintatico(input) {
             cmd(join(seguidores, Seguidores["comandos"]));
 
             if (simbolo != ";") {
-                //error("Esperado ';' mas encontrado '" + cadeia + "'");
+                error("Esperado ';' mas encontrado '" + cadeia + "'");
                 varre(join(";", Primeiros["cmd"], Seguidores["comandos"], seguidores));
             }
             if (simbolo == ";") {
@@ -678,7 +678,7 @@ function AnalisadorSintatico(input) {
             variaveis(join(seguidores, Primeiros["cmd"], Seguidores["cmd"]));
 
             if (simbolo != ")") {
-                //error("Esperado ')' mas encontrado '" + cadeia + "'");
+                error("Esperado ')' mas encontrado '" + cadeia + "'");
                 varre(join(Seguidores["cmd"], ")", seguidores));
             }
             if (simbolo == ")") {
@@ -700,7 +700,7 @@ function AnalisadorSintatico(input) {
             variaveis(join(seguidores, Primeiros["cmd"], Seguidores["cmd"]));
 
             if (simbolo != ")") {
-                //error("Esperado ')' mas encontrado '" + cadeia + "'");
+                error("Esperado ')' mas encontrado '" + cadeia + "'");
                 varre(join(Seguidores["cmd"], ")", seguidores));
             }
             if (simbolo == ")") {
@@ -714,7 +714,7 @@ function AnalisadorSintatico(input) {
             condicao(join(seguidores, Primeiros["cmd"], Seguidores["cmd"]));
 
             if (simbolo != "faca") {
-                //error("Esperado 'faca' mas encontrado '" + cadeia + "'");
+                error("Esperado 'faca' mas encontrado '" + cadeia + "'");
                 varre(join(Seguidores["cmd"], Primeiros["cmd"], seguidores));
             }
             if (simbolo == "faca") {
@@ -731,7 +731,7 @@ function AnalisadorSintatico(input) {
             condicao(join(seguidores, Primeiros["cmd"], Seguidores["cmd"]));
 
             if (simbolo != "entao") {
-                //error("Esperado 'entao' mas encontrado '" + cadeia + "'");
+                error("Esperado 'entao' mas encontrado '" + cadeia + "'");
                 varre(join(Primeiros["cmd"], seguidores));
             }
             if (simbolo == "entao") {
