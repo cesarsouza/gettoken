@@ -253,7 +253,7 @@ function AnalisadorSintatico(input) {
             variaveis(join(Seguidores["dc_v"], seguidores, ":", "real", "inteiro"));
 
             if (simbolo != ":") {
-                //error("Esperado ':' mas encontrado '" + cadeia + "'");
+                error("Esperado ':' mas encontrado '" + cadeia + "'");
                 varre(join(Seguidores["dc_v"], ":", "real", "inteiro", ";", seguidores));
             }
             if (simbolo == ":") {
