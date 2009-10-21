@@ -634,7 +634,7 @@ function AnalisadorSintatico(input) {
             }
 
             if (!(simbolo in Primeiros["comandos"]) && !(simbolo in Seguidores["comandos"])) {
-                //error("Esperado comando, ';', 'fim' ou 'senao', mas encontrado '" + cadeia + "'");
+                error("Esperado comando, ';', 'fim' ou 'senao', mas encontrado '" + cadeia + "'");
                 varre(join(Primeiros["comandos"], Seguidores["comandos"], seguidores));
             }
         }
@@ -754,7 +754,7 @@ function AnalisadorSintatico(input) {
                 cmd(join(seguidores, Seguidores["cmd"]));
 
                 if (simbolo != ";") {
-                    //error("Esperado ';' mas encontrado '" + cadeia + "'");
+                    error("Esperado ';' mas encontrado '" + cadeia + "'");
                     varre(join(";", Primeiros["cmd"], "fim", seguidores));
                 }
                 if (simbolo == ";") {
