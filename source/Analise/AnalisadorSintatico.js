@@ -200,7 +200,7 @@ function AnalisadorSintatico(input) {
         dc_p(Seguidores["programa"]);
 
         if (simbolo != "inicio") {
-            error("Esperado 'inicio' mas encontrado '" + cadeia + "'");
+            //error("Esperado 'inicio' mas encontrado '" + cadeia + "'");
             varre(join(Primeiros["comandos"], "inicio"));
         }
         if (simbolo == "inicio") {
@@ -211,7 +211,7 @@ function AnalisadorSintatico(input) {
         comandos(Seguidores["programa"]);
 
         if (simbolo != "fim") {
-            error("Esperado 'fim' mas encontrado '" + cadeia + "'");
+            //error("Esperado 'fim' mas encontrado '" + cadeia + "'");
             varre(join(Seguidores["programa"], "fim"));
         }
         if (simbolo == "fim") {
@@ -234,6 +234,7 @@ function AnalisadorSintatico(input) {
     }
 
 
+
     // Procedimento para regra "dc_v" e "tipo_var"
     //   04. <dc_v>          ::= var <variaveis> : <tipo_var> ; <dc_v> | @vazio
     //   05. <tipo_var>      ::= real | inteiro
@@ -241,20 +242,19 @@ function AnalisadorSintatico(input) {
     function dc_v(seguidores) {
 
         if (!(simbolo in Primeiros["dc_v"]) && !(simbolo in Seguidores["dc_v"])) {
-            //error("Esperado 'var', 'procedimento' ou 'inicio' mas encontrado '" + cadeia + "'");
+            error("Esperado 'var', 'procedimento' ou 'inicio' mas encontrado '" + cadeia + "'");
             varre(join(Primeiros["dc_v"], Seguidores["dc_v"], seguidores));
         }
 
         while (simbolo == "var") {
             obterSimbolo();
-            
+
             // Chama a regra "variáveis"
             variaveis(join(Seguidores["dc_v"], seguidores, ":", "real", "inteiro"));
 
             if (simbolo != ":") {
-                error("Esperado ':' mas encontrado '" + cadeia + "'");
+                //error("Esperado ':' mas encontrado '" + cadeia + "'");
                 varre(join(Seguidores["dc_v"], ":", "real", "inteiro", ";", seguidores));
-                
             }
             if (simbolo == ":") {
                 obterSimbolo();
@@ -271,7 +271,7 @@ function AnalisadorSintatico(input) {
 
             if (simbolo != ";") {
                 error("Esperado ';' mas encontrado '" + cadeia + "'");
-                varre(join(Seguidores["dc_v"], ":", "real", "inteiro", ";", seguidores));
+                varre(join(Primeiros["dc_v"], Seguidores["dc_v"], "@ident", ":", "real", "inteiro", ";", seguidores));
             }
             if (simbolo == ";") {
                 obterSimbolo();
@@ -310,14 +310,6 @@ function AnalisadorSintatico(input) {
                 error("Esperado ',' mas encontrado '" + cadeia + "'");
             }
 
-            //if (arguments.callee.caller == programa) {
-                //error("Esperado ':' mas encontrado '" + cadeia + "'");
-            // }
-            //else if (arguments.callee.caller == lista_par) {
-                //error("Esperado ',' ou ':' mas encontrado '" + cadeia + "'");
-            //} else {
-                //error("Esperado ',' ou ')' mas encontrado '" + cadeia + "'"); 
-            // }
             varre(join(Seguidores["variaveis"], seguidores, ",", "@ident"));
         }
 
@@ -388,7 +380,7 @@ function AnalisadorSintatico(input) {
                 lista_par(join(seguidores, Seguidores["dc_p"], Primeiros["corpo_p"], Primeiros["cmd"]));
 
                 if (simbolo != ")") {
-                    error("Esperado ')' mas encontrado '" + cadeia + "'");
+                    //error("Esperado ')' mas encontrado '" + cadeia + "'");
                     varre(join(")", Seguidores["dc_p"], Primeiros["corpo_p"], seguidores));
                 }
 
@@ -410,12 +402,13 @@ function AnalisadorSintatico(input) {
             corpo_p(join(seguidores, Seguidores["dc_p"]));
 
             if (!(simbolo in Primeiros["dc_p"]) && !(simbolo in Seguidores["dc_p"])) {
-                error("Esperado 'procedimento' ou 'inicio' mas encontrado '" + cadeia + "'");
+                //error("Esperado 'procedimento' ou 'inicio' mas encontrado '" + cadeia + "'");
                 varre(join(Primeiros["dc_p"], Seguidores["dc_p"], seguidores));
                 
             }
         }
     }
+
 
 
     // Procedimento para regra "lista_par" e "mais_par"
@@ -428,7 +421,7 @@ function AnalisadorSintatico(input) {
         variaveis(join(seguidores, Seguidores["lista_par"], ":", "real", "inteiro"));
 
         if (simbolo != ":") {
-            error("Esperado ':' mas encontrado '" + cadeia + "'");
+            //error("Esperado ':' mas encontrado '" + cadeia + "'");
             varre(join(";", Primeiros["lista_par"], Seguidores["lista_par"], Seguidores["dc_p"], seguidores, "inteiro", "real"));
         }
         if (simbolo == ":") {
@@ -438,17 +431,14 @@ function AnalisadorSintatico(input) {
         if (simbolo != "real" && simbolo != "inteiro") {
             error("Esperado 'inteiro' ou 'real' mas encontrado '" + cadeia + "'");
             varre(join("real", "inteiro", Primeiros["lista_par"], Seguidores["lista_par"], Seguidores["dc_p"], seguidores, "inteiro", "real"));
-            
         }
         if (simbolo == "real" || simbolo == "inteiro") {
             obterSimbolo();
-            
         }
 
         if (simbolo != ";" && !(simbolo in Seguidores["lista_par"])) {
             error("Esperado ';' ou ')' mas encontrado '" + cadeia + "'");
             varre(join(";", "var", Primeiros["lista_par"], Seguidores["lista_par"], seguidores));
-            
         }
 
         if (simbolo in Primeiros["lista_par"]) {
@@ -462,7 +452,7 @@ function AnalisadorSintatico(input) {
             variaveis(join(seguidores, Seguidores["lista_par"], "var"));
 
             if (simbolo != ":") {
-                error("Esperado ':' mas encontrado '" + cadeia + "'");
+                //error("Esperado ':' mas encontrado '" + cadeia + "'");
                 varre(join(";", Primeiros["lista_par"], Seguidores["lista_par"], Seguidores["dc_p"], seguidores));
             }
             if (simbolo == ":") {
@@ -497,16 +487,14 @@ function AnalisadorSintatico(input) {
     function corpo_p(seguidores) {
     
         // Chama a regra "dc_v"
-        dc_v(join(seguidores, Seguidores["corpo_p"], Primeiros["cmd"]));
+        dc_v(join(seguidores, Seguidores["corpo_p"], Primeiros["corpo_p"], Primeiros["cmd"]));
 
         if (simbolo != "inicio") {
-            error("Esperado 'inicio' mas encontrado '" + cadeia + "'");
+            //error("Esperado 'inicio' mas encontrado '" + cadeia + "'");
             varre(join(Seguidores["corpo_p"], Seguidores["dc_p"], seguidores, Primeiros["cmd"]));
-            
         }
         if (simbolo == "inicio") {
             obterSimbolo();
-            
         }
 
         // Antes de entrarmos no laço while, temos de verificar se o
@@ -517,7 +505,6 @@ function AnalisadorSintatico(input) {
             // Varre até os primeiros de cmd ou primeiros de fim.
             error("Esperado comando ou 'fim' mas encontrado '" + cadeia + "'");
             varre(join(Seguidores["corpo_p"], Primeiros["cmd"], "fim", seguidores));
-            
         }
         
         // Enquanto o simbolo estiver em primeiros de cmd
@@ -527,20 +514,17 @@ function AnalisadorSintatico(input) {
             cmd(Seguidores["corpo_p"]);
 
             if (simbolo != ";") {
-                error("Esperado ';' mas encontrado '" + cadeia + "'");
+                //error("Esperado ';' mas encontrado '" + cadeia + "'");
                 varre(join("fim", Seguidores["dc_p"], ";", seguidores));
                 
             }
             if (simbolo == ";") {
                 obterSimbolo();
-                
             }
 
             if (!(simbolo in Primeiros["cmd"]) && simbolo != "fim") {
-                // Varre ate os primeiros de cmd U fim.
                 error("Esperado comando ou 'fim' mas encontrado '" + cadeia + "'");
                 varre(join(Seguidores["corpo_p"], Primeiros["cmd"], "fim", seguidores));
-                
             }
         }
         
@@ -552,18 +536,15 @@ function AnalisadorSintatico(input) {
         }
         if (simbolo == "fim") {
             obterSimbolo();
-            
         }
             
         // Espera "ponto-e-virgula"
         if (simbolo != ";") {
             error("Esperado ';' mas encontrado '" + cadeia + "'");
             varre(join(Seguidores["corpo_p"], Seguidores["dc_p"], seguidores));
-            
         }
         if (simbolo == ";") {
             obterSimbolo();
-            
         }
     }
 
@@ -605,6 +586,7 @@ function AnalisadorSintatico(input) {
             }
 
             while (simbolo == ";") {
+
                 obterSimbolo();
 
                 if (simbolo != "@ident") {
@@ -619,15 +601,18 @@ function AnalisadorSintatico(input) {
                     error("Esperado ';' ou ')' mas encontrado '" + cadeia + "'");
                     varre(join("@ident", ";", ")", Seguidores["lista_arg"], seguidores));
                 }
+
             }
 
-            if (simbolo != ")") {
-                error("Esperado ')' mas encontrado '" + cadeia + "'");
-                varre(join(")", Seguidores["lista_arg"], seguidores));
-            }
             if (simbolo == ")") {
                 obterSimbolo();
             }
+
+//            if (simbolo != ")") {
+//                error("Esperado ')' mas encontrado '" + cadeia + "'");
+//                varre(join(")", Seguidores["lista_arg"], seguidores));
+//            }
+            
         }
     }
 
@@ -640,7 +625,6 @@ function AnalisadorSintatico(input) {
         if (!(simbolo in Primeiros["comandos"]) && !(simbolo in Seguidores["comandos"])) {
             error("Esperado comando, ';', 'fim' ou 'senao', mas encontrado '" + cadeia + "'");
             varre(join(Primeiros["comandos"], Seguidores["comandos"], seguidores));
-            
         }
 
         while (simbolo in Primeiros["comandos"]) {
@@ -649,7 +633,7 @@ function AnalisadorSintatico(input) {
             cmd(join(seguidores, Seguidores["comandos"]));
 
             if (simbolo != ";") {
-                error("Esperado ';' mas encontrado '" + cadeia + "'");
+                //error("Esperado ';' mas encontrado '" + cadeia + "'");
                 varre(join(";", Primeiros["cmd"], Seguidores["comandos"], seguidores));
             }
             if (simbolo == ";") {
@@ -694,7 +678,7 @@ function AnalisadorSintatico(input) {
             variaveis(join(seguidores, Primeiros["cmd"], Seguidores["cmd"]));
 
             if (simbolo != ")") {
-                error("Esperado ')' mas encontrado '" + cadeia + "'");
+                //error("Esperado ')' mas encontrado '" + cadeia + "'");
                 varre(join(Seguidores["cmd"], ")", seguidores));
             }
             if (simbolo == ")") {
@@ -716,7 +700,7 @@ function AnalisadorSintatico(input) {
             variaveis(join(seguidores, Primeiros["cmd"], Seguidores["cmd"]));
 
             if (simbolo != ")") {
-                error("Esperado ')' mas encontrado '" + cadeia + "'");
+                //error("Esperado ')' mas encontrado '" + cadeia + "'");
                 varre(join(Seguidores["cmd"], ")", seguidores));
             }
             if (simbolo == ")") {
@@ -730,7 +714,7 @@ function AnalisadorSintatico(input) {
             condicao(join(seguidores, Primeiros["cmd"], Seguidores["cmd"]));
 
             if (simbolo != "faca") {
-                error("Esperado 'faca' mas encontrado '" + cadeia + "'");
+                //error("Esperado 'faca' mas encontrado '" + cadeia + "'");
                 varre(join(Seguidores["cmd"], Primeiros["cmd"], seguidores));
             }
             if (simbolo == "faca") {
@@ -747,9 +731,8 @@ function AnalisadorSintatico(input) {
             condicao(join(seguidores, Primeiros["cmd"], Seguidores["cmd"]));
 
             if (simbolo != "entao") {
-                error("Esperado 'entao' mas encontrado '" + cadeia + "'");
+                //error("Esperado 'entao' mas encontrado '" + cadeia + "'");
                 varre(join(Primeiros["cmd"], seguidores));
-                
             }
             if (simbolo == "entao") {
                 obterSimbolo();
@@ -778,9 +761,8 @@ function AnalisadorSintatico(input) {
                 cmd(join(seguidores, Seguidores["cmd"]));
 
                 if (simbolo != ";") {
-                    error("Esperado ';' mas encontrado '" + cadeia + "'");
+                    //error("Esperado ';' mas encontrado '" + cadeia + "'");
                     varre(join(";", Primeiros["cmd"], "fim", seguidores));
-                    
                 }
                 if (simbolo == ";") {
                     obterSimbolo();
@@ -806,16 +788,13 @@ function AnalisadorSintatico(input) {
         if (simbolo != "fim" && simbolo != "senao") {
             error("Esperado 'fim' ou 'senao', mas encontrado '" + cadeia + "'");
             varre(join(Seguidores["cont_se"], "fim", "senao", seguidores));
-            
         }
 
         if (simbolo == "fim") {
             obterSimbolo();
-            
         }
         else if (simbolo == "senao") {
             obterSimbolo();
-            
             
             // Chama a regra "cmd"
             cmd(join(seguidores, Seguidores["cont_se"]));
@@ -836,19 +815,14 @@ function AnalisadorSintatico(input) {
         if (simbolo != ":=" && !(simbolo in Primeiros["lista_arg"])) {
             error("Esperado ':=' ou '(', mas encontrado '" + cadeia + "'");
             varre(join(":=", Primeiros["lista_arg"], Seguidores["cont_ident"], seguidores));
-            
         }
 
         if (simbolo == ":=") {
             obterSimbolo();
-            
-            
             // Chama a regra "expressão"
             expressao(join(seguidores, Seguidores["cont_ident"]));
         }
         else if (simbolo in Primeiros["lista_arg"]) {
-            
-            
             // Chama a regra "lista_arg" 
             lista_arg(join(seguidores, Seguidores["cont_ident"]));
         }
@@ -891,11 +865,9 @@ function AnalisadorSintatico(input) {
         // Se simbolo não for um sinal nem estiver em seguidores
         //  de expressao, este é um erro. Algo como (a _+ b).
         if (simbolo != "+" && simbolo != "-" && !(simbolo in Seguidores["expressao"])) {
-            //if (simbolo in Primeiros["expressao"]) {
-                error("Expressao invalida: '" + cadeia + "'");
-            //}
+            error("Expressao invalida: '" + cadeia + "'");
             varre(join("+", "-", Seguidores["expressao"], seguidores));
-            
+
             if (simbolo in Primeiros["expressao"]) {
                 expressao(seguidores);
             }
@@ -946,10 +918,9 @@ function AnalisadorSintatico(input) {
 
         if (simbolo != "*" && simbolo != "/" && !(simbolo in Seguidores["termo"])) {
 
-            //if (simbolo in Primeiros["termo"]) {
-                //error("Esperado operador matematico, operador relacional, 'faca', 'entao', 'fim', 'senao' ou ')', mas encontrado '" + cadeia + "'");
-                error("Esperado operador matematico mas encontrado '" + cadeia + "'");
-            //}
+            error("Esperado operador matematico, operador relacional, 'faca', 'entao', 'fim', 'senao' ou ')', mas encontrado '" + cadeia + "'");
+            //error("Esperado operador matematico mas encontrado '" + cadeia + "'");
+
             varre(join("*", "/", Seguidores["termo"], seguidores));
 
             if (simbolo in Primeiros["termo"]) {
@@ -964,11 +935,9 @@ function AnalisadorSintatico(input) {
             fator(join(seguidores, Seguidores["termo"]));
 
             if (simbolo != "*" && simbolo != "/" && !(simbolo in Seguidores["termo"])) {
-                //error("Esperado operador matematico, operador relacional, 'faca', 'entao', 'fim', 'senao' ou ')', mas encontrado '" + cadeia + "'");
+                error("Esperado operador matematico, operador relacional, 'faca', 'entao', 'fim', 'senao' ou ')', mas encontrado '" + cadeia + "'");
 
-                //if (simbolo in Primeiros["termo"]) {
-                    error("Esperado operador matematico mas encontrado '" + cadeia + "'");
-                //}
+                //error("Esperado operador matematico mas encontrado '" + cadeia + "'");
 
                 varre(join("*", "/", Seguidores["termo"], seguidores));
                 
