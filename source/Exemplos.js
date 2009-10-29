@@ -129,3 +129,11 @@ inicio {programa principal}\n\
     le(b);\n\
     nomep(b);\n\
 fim.";
+
+exemplo[7] =
+
+"programa teste;\n\
+\n\
+inicio\n\
+    le(b);\n\
+fim.";

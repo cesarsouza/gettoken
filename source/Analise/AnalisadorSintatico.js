@@ -196,8 +196,8 @@ function AnalisadorSintatico(input) {
         }
 
         // Chama as regras "dc_p" e "dc_v"
-        dc_v(join(Seguidores["programa"], Primeiros["comandos"]));
-        dc_p(join(Seguidores["programa"], Primeiros["comandos"]));
+        dc_v(join(Seguidores["programa"], "inicio", Primeiros["comandos"]));
+        dc_p(join(Seguidores["programa"], "inicio", Primeiros["comandos"]));
 
         if (simbolo != "inicio") {
             error("Esperado 'inicio' mas encontrado '" + cadeia + "'");
@@ -241,6 +241,9 @@ function AnalisadorSintatico(input) {
     //
     function dc_v(seguidores) {
 
+        alert('> dc_v');
+        print_list(seguidores);
+
         if (!(simbolo in Primeiros["dc_v"]) && !(simbolo in Seguidores["dc_v"]) && !(simbolo in seguidores)) {
             error("Esperado 'var', 'procedimento' ou 'inicio' mas encontrado '" + cadeia + "'");
             varre(join(Primeiros["dc_v"], Seguidores["dc_v"], seguidores));
@@ -271,7 +274,7 @@ function AnalisadorSintatico(input) {
 
             if (simbolo != ";") {
                 error("Esperado ';' mas encontrado '" + cadeia + "'");
-                varre(join(Primeiros["dc_v"], Seguidores["dc_v"], "@ident", ":", "real", "inteiro", ";", seguidores));
+                varre(join(Primeiros["dc_v"], Seguidores["dc_v"], ";", seguidores));
             }
             if (simbolo == ";") {
                 obterSimbolo();
@@ -560,7 +563,7 @@ function AnalisadorSintatico(input) {
     //
     function lista_arg(seguidores) {
 
-        if (simbolo != "(" && !(simbolo in Seguidores["lista_arg"])) {
+        if (simbolo != "(" && !(simbolo in Seguidores["lista_arg"]) && !(simbolo in seguidores)) {
             error("Esperado '(' ou seguidores de lista_arg mas encontrado '" + cadeia + "'");
             varre(join("(", "@ident", ";", ")", Seguidores["lista_arg"], seguidores));
         }
@@ -584,9 +587,12 @@ function AnalisadorSintatico(input) {
                 varre(join("@ident", ";", ")", Seguidores["lista_arg"], seguidores));
             }
 
-            while (simbolo == ";") {
+/////////////////////////////////////////////////////////////////////////////////////////////////
+// gambiarra?
+            while (simbolo == ";" || simbolo == "@ident") {
 
-                obterSimbolo();
+                if (simbolo == ";")
+                    obterSimbolo();
 
                 if (simbolo != "@ident") {
                     error("Esperado identificador mas encontrado '" + cadeia + "'");
@@ -1081,6 +1087,14 @@ function AnalisadorSintatico(input) {
         return list;
     }
 
+    // funcao de debug
+    function print_list(objeto) {
+        var texto = '';
+        for (o in objeto) {
+            texto += o + "\n";
+        }
+        alert(texto);
+    }
 
 
 
