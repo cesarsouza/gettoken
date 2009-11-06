@@ -12,7 +12,9 @@
 // OBSERVAÇÕES:
 //
 // ---------------------------------------------------------------------------------------
-// 
+// 091106 - Erro que ainda não é capturado: Chamada de procedimento que tem parâmetros mas
+//          nenhum parâmetro ou um número menor é passado
+//
 
 
 
@@ -55,7 +57,6 @@ function AnalisadorSemantico() {
             return e;
         }
         return false;
-        return this.lastError;
     }
 
     this.setCadeia = function(cadeia) { this.cadeia = cadeia; }
@@ -299,10 +300,12 @@ function AnalisadorSemantico() {
                 }
                 else if (estado == 8) {
                     // Verifica se os parametros passados correspondem aos parâmetros formais
+                    if (w.getTipo() == undefined) {
+                        w.setTipo("invalid");
+                    }
                     var temp = new Variavel({"tipo":w.getTipo(), "procedimento":this.procedimento, "posicao":posicao++});
-                    x = tabelaSimbolos.verificar(temp);
 
-                    if (!x) {
+                    if (!tabelaSimbolos.verificar(temp)) {
                         this.error("Parametro " + w.getCadeia() + " incorreto.");
                     }
                 }
@@ -338,10 +341,19 @@ function AnalisadorSemantico() {
                 }
                 else if (estado == 10) {
                     // Verifica se os parametros passados correspondem aos parâmetros formais
+////////////////////////////////////////////////////////////////////////////////////////////
+// se não tivesse isto, construções como p1(p1); seriam válidas
+// checar se nos estados 7 e 9 isso também não acontece!!!
+                    if (w.getTipo() == undefined) {
+                        w.setTipo("invalid");
+                    }
+////////////////////////////////////////////////////////////////////////////////////////////
                     var temp = new Variavel({"tipo":w.getTipo(), "procedimento":this.procedimento, "posicao":posicao++});
-                    x = tabelaSimbolos.verificar(temp);
 
-                    if (!x) {
+                    //alert(temp);
+                    //alert(tabelaSimbolos.verificar(temp));
+
+                    if (!tabelaSimbolos.verificar(temp)) {
                         this.error("Parametro " + w.getCadeia() + " incorreto.");
                     }
                 }

@@ -4,6 +4,9 @@
 var TRACE = false;
 var DEBUG = false;
 
+var ANALISE_SINTATICA = 0;
+var ANALISE_SEMANTICA = 1;
+var GERACAO_CODIGO    = 2;
 
 /// <reference path="Analise\AnalisadorLexico.js" />
 /// <reference path="Analise\AnalisadorSintatico.js" />
@@ -20,12 +23,50 @@ include("source/Sintese/Gerador.js")
 
 
 
-// Ponto de entrada pricipal para o Analisador Sintático
+// Ponto de entrada pricipal para o Gerador de Código Alvo
 //
-function mainSintatico(input) {
+function mainGeracao(input) {
 
     // Instanciamos um novo analisador sintático
-    var analisadorSintatico = new AnalisadorSintatico(input);
+    var analisadorSintatico = new AnalisadorSintatico(input, GERACAO_CODIGO);
+
+    // Efetua a análise sintática da entrada
+    var result = analisadorSintatico.parse();
+
+    // Verifica se a análise foi concluída sem erros
+    if (typeof(result) == "string") {
+        return result;
+    }
+    else {
+        // Erros foram encontrados durante a análise
+        var output = new String("Analise terminada com erros\n");
+        var errors = analisadorSintatico.errors();
+
+        // Listamos todos erros encontrados e concatenamos na saída
+        for (i in errors) {
+            output += errors[i].toString() + "\n";
+        }
+
+        // Removemos a última quebra de linha apenas para motivos de formatação
+        output = output.substring(0, output.length - 1);
+
+        // Ao finalizarmos a análise, retornamos sua saída.
+        return output;
+    }
+
+}
+
+
+
+
+
+
+// Ponto de entrada pricipal para o Analisador Semântico
+//
+function mainSemantico(input) {
+
+    // Instanciamos um novo analisador sintático
+    var analisadorSintatico = new AnalisadorSintatico(input, ANALISE_SEMANTICA);
 
     // Efetua a análise sintática da entrada
     var success = analisadorSintatico.parse();
@@ -51,6 +92,44 @@ function mainSintatico(input) {
         return output;
     }
 }
+
+
+
+
+
+
+// Ponto de entrada pricipal para o Analisador Sintático
+//
+function mainSintatico(input) {
+
+    // Instanciamos um novo analisador sintático
+    var analisadorSintatico = new AnalisadorSintatico(input, ANALISE_SINTATICA);
+
+    // Efetua a análise sintática da entrada
+    var success = analisadorSintatico.parse();
+
+    // Verifica se a análise foi concluída sem erros
+    if (success) {
+        return "Analise concluida com sucesso";
+    }
+    else {
+        // Erros foram encontrados durante a análise
+        var output = new String("Analise terminada com erros\n");
+        var errors = analisadorSintatico.errors();
+
+        // Listamos todos erros encontrados e concatenamos na saída
+        for (i in errors) {
+            output += errors[i].toString() + "\n";
+        }
+
+        // Removemos a última quebra de linha apenas para motivos de formatação
+        output = output.substring(0, output.length - 1);
+
+        // Ao finalizarmos a análise, retornamos sua saída.
+        return output;
+    }
+}
+
 
 
 

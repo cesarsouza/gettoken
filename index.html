@@ -47,6 +47,10 @@
             lbTitle.innerHTML = "analisador semântico";
             break;
 
+          case "geracaoAlvo":
+            lbTitle.innerHTML = "gerador de código alvo";
+            break;
+
           default:
             break;
 
@@ -74,36 +78,14 @@
                 break;
 
               case "analiseSemantica":
+                tbOutput.value = mainSemantico(tbInput.value);
+                break;
+
+              case "geracaoAlvo":
+                tbOutput.value = mainGeracao(tbInput.value);
                 break;
 
               default:
-                break;
-            }
-      }
-
-      // Altera programaticamente o tipo de saída esperada
-      function selectOutput(type)
-      {
-            var cbOutput = document.getElementById("cbOutput");
-            var lbTitle  = document.getElementById("lbOutputTitle");
-            var option   = document.getElementById("option_" + type);         
-            option.selected = true;
-
-            switch (type) {
-              case "analiseLexica":
-                lbTitle.innerHTML = "analisador léxico";
-                break;
-
-              case "analiseSintatica":
-                lbTitle.innerHTML = "analisador sintático";
-                break;
-
-              case "analiseSemantica":
-                lbTitle.innerHTML = "analisador semântico";
-                break;
-
-              default:
-                alert("Saida nao suportada");
                 break;
             }
       }
@@ -162,11 +144,11 @@
                         Saida: <select id="cbOutput" style="width: 200px; margin-left:5px;" onclick="cbOutput_Click();">
                              <option id="option_analiseLexica" value="analiseLexica">
                                  Analise Lexica</option>
-                             <option id="option_analiseSintatica" value="analiseSintatica" selected="selected">
+                             <option id="option_analiseSintatica" value="analiseSintatica">
                                  Analise Sintática</option>
                              <option id="option_analiseSemantica" value="analiseSemantica">
                                  Analise Semantica</option>
-                             <option id="option_geracaoAlvo" value="geracaoAlvo" disabled="disabled">
+                             <option id="option_geracaoAlvo" value="geracaoAlvo" selected="selected">
                                  Codigo Alvo (ANSI C)</option>
                           </select>
                        </li>
