@@ -52,7 +52,7 @@ function AnalisadorSemantico() {
     this.erro = function() {
         var e;
         if (erros.length > 0) {
-            e = new Array(erros);
+            e = erros;
             erros = new Array();
             return e;
         }

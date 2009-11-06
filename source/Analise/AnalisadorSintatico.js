@@ -162,7 +162,8 @@ function AnalisadorSintatico(input, tipo) {
 
     // Empilha um erro semântico na lista de erros
     function errorSemantico(listaErros) {
-        if (tipoAnalise == ANALISE_SEMANTICA) {
+        //alert(listaErros);
+        if (tipoAnalise == ANALISE_SEMANTICA || tipoAnalise == GERACAO_CODIGO) {
             for (e in listaErros) {
                 error(listaErros[e]);
             }
@@ -354,7 +355,16 @@ function AnalisadorSintatico(input, tipo) {
             if (listaErros = analisadorSemantico.erro()) {
                 errorSemantico(listaErros);
             }
-            gerador.guardaVariavel(cadeia);
+
+            temp = analisadorSemantico.verificar({"cadeia":cadeia});
+            if (typeof(temp) == "object") {
+                tipo = temp.getTipo();
+            }
+            else {
+                tipo = undefined;
+            }
+            gerador.guardaVariavel(cadeia, tipo);
+
             obterSimbolo();
         }
 
@@ -384,7 +394,16 @@ function AnalisadorSintatico(input, tipo) {
                 if (listaErros = analisadorSemantico.erro()) {
                     errorSemantico(listaErros);
                 }
-                gerador.guardaVariavel(cadeia);
+
+                temp = analisadorSemantico.verificar({"cadeia":cadeia});
+                if (typeof(temp) == "object") {
+                    tipo = temp.getTipo();
+                }
+                else {
+                    tipo = undefined;
+                }
+                gerador.guardaVariavel(cadeia, tipo);
+
                 obterSimbolo();
             }
 
@@ -680,7 +699,7 @@ function AnalisadorSintatico(input, tipo) {
                 if (listaErros = analisadorSemantico.erro()) {
                     errorSemantico(listaErros);
                 }
-                gerador.guardaVariavel(cadeia);
+                gerador.incluirArgumento(cadeia);
                 obterSimbolo();
             }
 
@@ -705,7 +724,7 @@ function AnalisadorSintatico(input, tipo) {
                     if (listaErros = analisadorSemantico.erro()) {
                         errorSemantico(listaErros);
                     }
-                    gerador.guardaVariavel(cadeia);
+                    gerador.incluirArgumento(cadeia);
                     obterSimbolo();
                 }
 
@@ -773,7 +792,7 @@ function AnalisadorSintatico(input, tipo) {
             obterSimbolo();
 
             analisadorSemantico.iniciarLeEscreve();
-            gerador.iniciaLe();
+            gerador.iniciarLe();
 
             if (simbolo != "(") {
                 error("Esperado '(' mas encontrado '" + cadeia + "'");
@@ -805,6 +824,7 @@ function AnalisadorSintatico(input, tipo) {
             obterSimbolo();
 
             analisadorSemantico.iniciarLeEscreve();
+            gerador.iniciarEscreve();
 
             if (simbolo != "(") {
                 error("Esperado '(' mas encontrado '" + cadeia + "'");
@@ -829,10 +849,13 @@ function AnalisadorSintatico(input, tipo) {
             if (listaErros = analisadorSemantico.erro()) {
                 errorSemantico(listaErros);
             }
+            gerador.finalizarEscreve();
 
         }
         else if (simbolo == "enquanto") {
             obterSimbolo();
+
+            gerador.iniciarEnquanto();
 
             // Chama a regra "condição" 
             condicao(join(seguidores, Primeiros["cmd"], Seguidores["cmd"]));
@@ -850,6 +873,8 @@ function AnalisadorSintatico(input, tipo) {
         }
         else if (simbolo == "se") {
             obterSimbolo();
+
+            gerador.iniciarSe();
 
             // Chama a regra "condição" 
             condicao(join(seguidores, Primeiros["cmd"], Seguidores["cmd"]));
@@ -870,6 +895,8 @@ function AnalisadorSintatico(input, tipo) {
         }
         else if (simbolo == "@ident") {
 
+            gerador.genIdentificador(cadeia);
+
             //analisadorSemantico.verificar({"cadeia":cadeia});
             analisadorSemantico.setCadeia(cadeia);
             obterSimbolo();
@@ -878,8 +905,9 @@ function AnalisadorSintatico(input, tipo) {
             cont_ident(join(seguidores, Seguidores["cmd"]));
         }
         else if (simbolo == "inicio") {
-
             obterSimbolo();
+
+            gerador.iniciarBloco();
 
             while (simbolo in Primeiros["cmd"]) {
 
@@ -902,6 +930,9 @@ function AnalisadorSintatico(input, tipo) {
             if (simbolo == "fim") {
                 obterSimbolo();
             }
+
+            gerador.finalizarBloco();
+
         }
     }
 
@@ -921,14 +952,14 @@ function AnalisadorSintatico(input, tipo) {
         }
         else if (simbolo == "senao") {
             obterSimbolo();
-            
+
+            gerador.iniciarSenao();
+
             // Chama a regra "cmd"
             cmd(join(seguidores, Seguidores["cont_se"]));
         }
         
         // TODO: Não ta faltando um fim na gramática aqui?
-
-        trace("< funcao cont_se()");
     }
 
 
@@ -948,6 +979,8 @@ function AnalisadorSintatico(input, tipo) {
         if (simbolo == ":=") {
             obterSimbolo();
 
+            gerador.iniciarAtribuicao();
+
             v = analisadorSemantico.verificar({"cadeia":analisadorSemantico.getCadeia()});
 
             if (listaErros = analisadorSemantico.erro()) {
@@ -960,16 +993,20 @@ function AnalisadorSintatico(input, tipo) {
                 errorSemantico("Atribuicao de valor real a variavel inteira '" + v.getCadeia() + "'.");
             }
 
+            gerador.finalizarAtribuicao();
+
         }
         else if (simbolo in Primeiros["lista_arg"]) {
+
             analisadorSemantico.verificar({"cadeia":analisadorSemantico.getCadeia(), "categoria":"procedimento"});
             if (listaErros = analisadorSemantico.erro()) {
                 errorSemantico(listaErros);
             }
-
             analisadorSemantico.setProcedimento(analisadorSemantico.getCadeia());
 
             analisadorSemantico.iniciarChamada();
+
+            gerador.iniciarChamada();
 
             // Chama a regra "lista_arg" 
             lista_arg(join(seguidores, Seguidores["cont_ident"]));
@@ -978,6 +1015,8 @@ function AnalisadorSintatico(input, tipo) {
             if (listaErros = analisadorSemantico.erro()) {
                 errorSemantico(listaErros);
             }
+
+            gerador.finalizarChamada();
 
         }
     }
@@ -990,6 +1029,8 @@ function AnalisadorSintatico(input, tipo) {
     //
     function condicao(seguidores) {
 
+        gerador.iniciarCondicao();
+
         // Chama a regra "expressao"
         expressao(join(seguidores, Seguidores["condicao"], "=","<>",">=","<=",">","<"));
 
@@ -998,11 +1039,15 @@ function AnalisadorSintatico(input, tipo) {
             varre(join(Seguidores["condicao"], "=", "<>", ">=", "<=", ">", "<", seguidores));
         }
         if (simbolo in {"=":0,"<>":0,">=":0,"<=":0,">":0,"<":0}) {
+            gerador.expressao(simbolo);
             obterSimbolo();
         }
 
         // Chama a regra "expressão" 
         expressao(join(seguidores, Seguidores["condicao"]));
+
+        gerador.finalizarCondicao();
+
     }
 
 
@@ -1033,6 +1078,9 @@ function AnalisadorSintatico(input, tipo) {
 
         // Enquanto houver "+" ou "-"
         while (simbolo == "+" || simbolo == "-") {
+
+            gerador.expressao(cadeia);
+
             obterSimbolo();
 
             // Chama a regra "termo"
@@ -1080,6 +1128,7 @@ function AnalisadorSintatico(input, tipo) {
             varre(join(Primeiros["termo"], Primeiros["fator"], seguidores));
         }
         if (simbolo == "+" || simbolo == "-") {
+            gerador.expressao(cadeia);
             obterSimbolo();
         }
 
@@ -1105,6 +1154,8 @@ function AnalisadorSintatico(input, tipo) {
         retorno = tipo_fator1;
 
         while (simbolo == "*" || simbolo == "/") {
+
+            gerador.expressao(cadeia);
 
             operacao = simbolo;
 
@@ -1162,6 +1213,9 @@ function AnalisadorSintatico(input, tipo) {
             if (listaErros = analisadorSemantico.erro()) {
                 errorSemantico(listaErros);
             }
+
+            gerador.expressao(cadeia);
+
             obterSimbolo();
 
             if (typeof(v) == "object") {
@@ -1170,18 +1224,27 @@ function AnalisadorSintatico(input, tipo) {
 
         }
         else if (simbolo == "@numero_int") {
+
+            gerador.expressao(cadeia);
+
             obterSimbolo();
 
             retorno = "inteiro";
 
         }
         else if (simbolo == "@numero_real") {
+
+            gerador.expressao(cadeia);
+
             obterSimbolo();
 
             retorno = "real";
 
         }
         else if (simbolo == "(") {
+
+            gerador.expressao(cadeia);
+
             obterSimbolo();
 
             // Chama a regra "expressão"
@@ -1192,6 +1255,7 @@ function AnalisadorSintatico(input, tipo) {
                 varre(join(Seguidores["fator"], ")", seguidores));  // provavelmente seguidores de termos e etc tb
             }
             if (simbolo == ")") {
+                gerador.expressao(cadeia);
                 obterSimbolo();
             }
 
