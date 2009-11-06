@@ -18,6 +18,9 @@ function AnalisadorSintatico(input) {
     // Analisador Léxico a ser utilizado por este Analisador Sintático (parser)
     var analisadorLexico = new AnalisadorLexico(input);
 
+    // Analisador Semântico a ser utilizado pelo parser
+    var analisadorSemantico = new AnalisadorSemantico();
+
     // Lista de erros encontrados durante a análise
     var error_list = new Array();
 
@@ -136,7 +139,7 @@ function AnalisadorSintatico(input) {
             }
         }
     }
-
+    
 
     // Empilha um erro na lista de erros
     function error(mensagem) {
@@ -184,6 +187,12 @@ function AnalisadorSintatico(input) {
             varre(join(Primeiros["dc_v"], Primeiros["dc_p"], "inicio", ";", "@ident"));
         }
         if (simbolo == "@ident") {
+            analisadorSemantico.inserir({"cadeia":cadeia, "categoria":"nome_programa"});
+            if (listaErros = analisadorSemantico.erro()) {
+                for (e in listaErros) {
+                    error(listaErros[e]);
+                }
+            }
             obterSimbolo();
         }
 
@@ -198,6 +207,9 @@ function AnalisadorSintatico(input) {
         // Chama as regras "dc_p" e "dc_v"
         dc_v(join(Seguidores["programa"], "inicio", Primeiros["comandos"]));
         dc_p(join(Seguidores["programa"], "inicio", Primeiros["comandos"]));
+
+        // Sinaliza ao analisador semântico que o corpo do programa está começando
+        analisadorSemantico.iniciarCorpo();
 
         if (simbolo != "inicio") {
             error("Esperado 'inicio' mas encontrado '" + cadeia + "'");
@@ -231,6 +243,9 @@ function AnalisadorSintatico(input) {
             error("Simbolo '" + cadeia + "' encontrado apos final de programa.");
             obterSimbolo();
         }
+
+        analisadorSemantico.imprimir();
+
     }
 
 
@@ -241,8 +256,8 @@ function AnalisadorSintatico(input) {
     //
     function dc_v(seguidores) {
 
-        alert('> dc_v');
-        print_list(seguidores);
+        //alert('> dc_v');
+        //print_list(seguidores);
 
         if (!(simbolo in Primeiros["dc_v"]) && !(simbolo in Seguidores["dc_v"]) && !(simbolo in seguidores)) {
             error("Esperado 'var', 'procedimento' ou 'inicio' mas encontrado '" + cadeia + "'");
@@ -251,6 +266,9 @@ function AnalisadorSintatico(input) {
 
         while (simbolo == "var") {
             obterSimbolo();
+
+            // sinaliza ao analisador que um bloco de declaração de variáveis está se iniciando
+            analisadorSemantico.iniciarDeclaracao();
 
             // Chama a regra "variáveis"
             variaveis(join(Seguidores["dc_v"], seguidores, ":", "real", "inteiro"));
@@ -269,6 +287,12 @@ function AnalisadorSintatico(input) {
                 
             }
             if (simbolo == "real" || simbolo == "inteiro") {
+                analisadorSemantico.inserir({"tipo":simbolo});
+                if (listaErros = analisadorSemantico.erro()) {
+                    for (e in listaErros) {
+                        error(listaErros[e]);
+                    }
+                }
                 obterSimbolo();
             }
 
@@ -304,6 +328,12 @@ function AnalisadorSintatico(input) {
             varre(join(Seguidores["variaveis"], seguidores, ",", "@ident"));
         }
         if (simbolo == "@ident") {
+            analisadorSemantico.variavel({"cadeia":cadeia});
+            if (listaErros = analisadorSemantico.erro()) {
+                for (e in listaErros) {
+                    error(listaErros[e]);
+                }
+            }
             obterSimbolo();
         }
 
@@ -329,6 +359,12 @@ function AnalisadorSintatico(input) {
                 varre(join(Seguidores["variaveis"], seguidores, ",", "@ident"));
             }
             if (simbolo == "@ident") {
+                analisadorSemantico.variavel({"cadeia":cadeia});
+                if (listaErros = analisadorSemantico.erro()) {
+                    for (e in listaErros) {
+                        error(listaErros[e]);
+                    }
+                }
                 obterSimbolo();
             }
 
@@ -363,11 +399,20 @@ function AnalisadorSintatico(input) {
         while (simbolo == "procedimento") {
             obterSimbolo();
 
+            analisadorSemantico.iniciarProcedimento();
+
             if (simbolo != "@ident") {
                 error("Esperado identificador mas encontrado '" + cadeia + "'");
                 varre(join("(", ";", Seguidores["dc_p"], Primeiros["corpo_p"], seguidores));
             }
             if (simbolo == "@ident") {
+                analisadorSemantico.setProcedimento(cadeia);
+                analisadorSemantico.inserir({"cadeia":cadeia, "categoria":"procedimento"});
+                if (listaErros = analisadorSemantico.erro()) {
+                    for (e in listaErros) {
+                        error(listaErros[e]);
+                    }
+                }
                 obterSimbolo();
             }
 
@@ -404,11 +449,18 @@ function AnalisadorSintatico(input) {
             // Chama a regra "corpo_p"
             corpo_p(join(seguidores, Seguidores["dc_p"]));
 
+            // Removemos as variáveis locais do procedimento
+            analisadorSemantico.remover({"categoria":"local", "procedimento":analisadorSemantico.getProcedimento()});
+
+            // debug : verificar com o exemplo 7
+            // alert(analisadorSemantico.verificar({"cadeia":"v4"}));
+
             if (!(simbolo in Primeiros["dc_p"]) && !(simbolo in Seguidores["dc_p"]) && !(simbolo in seguidores)) {
                 error("Esperado 'procedimento' ou 'inicio' mas encontrado '" + cadeia + "'");
                 varre(join(Primeiros["dc_p"], Seguidores["dc_p"], seguidores));
             }
         }
+
     }
 
 
@@ -418,6 +470,9 @@ function AnalisadorSintatico(input) {
     //   11. <mais_par>      ::= ; <lista_par> | ?
     //
     function lista_par(seguidores) {
+
+        // sinaliza ao analisador que um bloco de declaração de parametros está se iniciando
+        analisadorSemantico.iniciarParametros();
 
         // Chama a regra "variaveis"
         variaveis(join(seguidores, Seguidores["lista_par"], ":", "real", "inteiro"));
@@ -435,6 +490,12 @@ function AnalisadorSintatico(input) {
             varre(join("real", "inteiro", Primeiros["lista_par"], Seguidores["lista_par"], Seguidores["dc_p"], seguidores, "inteiro", "real"));
         }
         if (simbolo == "real" || simbolo == "inteiro") {
+            analisadorSemantico.inserir({"tipo":simbolo});
+            if (listaErros = analisadorSemantico.erro()) {
+                for (e in listaErros) {
+                    error(listaErros[e]);
+                }
+            }
             obterSimbolo();
         }
 
@@ -449,6 +510,9 @@ function AnalisadorSintatico(input) {
 
         while (simbolo == ";") {
             obterSimbolo();
+
+            // sinaliza ao analisador que um bloco de declaração de parametros está se iniciando
+            analisadorSemantico.iniciarParametros();
 
             // Chama a regra "variáveis" 
             variaveis(join(seguidores, Seguidores["lista_par"], "var"));
@@ -466,6 +530,12 @@ function AnalisadorSintatico(input) {
                 varre(join("real", "inteiro", Primeiros["lista_par"], Seguidores["lista_par"], Seguidores["dc_p"], seguidores));
             }
             if (simbolo == "real" || simbolo == "inteiro") {
+                analisadorSemantico.inserir({"tipo":simbolo});
+                if (listaErros = analisadorSemantico.erro()) {
+                    for (e in listaErros) {
+                        error(listaErros[e]);
+                    }
+                }
                 obterSimbolo();
             }
 
@@ -487,9 +557,12 @@ function AnalisadorSintatico(input) {
     //   13. <dc_loc>        ::= <dc_v>
     //
     function corpo_p(seguidores) {
-    
+
         // Chama a regra "dc_v"
         dc_v(join(seguidores, Seguidores["corpo_p"], Primeiros["corpo_p"], Primeiros["cmd"]));
+
+        // Sinaliza ao analisador semântico que o corpo do procedimento está começando
+        analisadorSemantico.iniciarCorpo();
 
         if (simbolo != "inicio") {
             error("Esperado 'inicio' mas encontrado '" + cadeia + "'");
@@ -579,6 +652,12 @@ function AnalisadorSintatico(input) {
                 varre(join("@ident", ";", ")", Seguidores["lista_arg"], seguidores));
             }
             if (simbolo == "@ident") {
+                analisadorSemantico.verificar({"cadeia":cadeia});
+                if (listaErros = analisadorSemantico.erro()) {
+                    for (e in listaErros) {
+                        error(listaErros[e]);
+                    }
+                }
                 obterSimbolo();
             }
 
@@ -599,6 +678,12 @@ function AnalisadorSintatico(input) {
                     varre(join("@ident", ";", ")", Seguidores["lista_arg"], seguidores));
                 }
                 if (simbolo == "@ident") {
+                    analisadorSemantico.verificar({"cadeia":cadeia});
+                    if (listaErros = analisadorSemantico.erro()) {
+                        for (e in listaErros) {
+                            error(listaErros[e]);
+                        }
+                    }
                     obterSimbolo();
                 }
 
@@ -665,6 +750,8 @@ function AnalisadorSintatico(input) {
         if (simbolo == "le") {
             obterSimbolo();
 
+            analisadorSemantico.iniciarLeEscreve();
+
             if (simbolo != "(") {
                 error("Esperado '(' mas encontrado '" + cadeia + "'");
                 varre(join(Seguidores["cmd"], "(", seguidores, "@ident"));
@@ -683,9 +770,19 @@ function AnalisadorSintatico(input) {
             if (simbolo == ")") {
                 obterSimbolo();
             }
+
+            analisadorSemantico.terminarLeEscreve();
+            if (listaErros = analisadorSemantico.erro()) {
+                for (e in listaErros) {
+                    error(listaErros[e]);
+                }
+            }
+
         }
         else if (simbolo == "escreve") {
             obterSimbolo();
+
+            analisadorSemantico.iniciarLeEscreve();
 
             if (simbolo != "(") {
                 error("Esperado '(' mas encontrado '" + cadeia + "'");
@@ -705,6 +802,14 @@ function AnalisadorSintatico(input) {
             if (simbolo == ")") {
                 obterSimbolo();
             }
+
+            analisadorSemantico.terminarLeEscreve();
+            if (listaErros = analisadorSemantico.erro()) {
+                for (e in listaErros) {
+                    error(listaErros[e]);
+                }
+            }
+
         }
         else if (simbolo == "enquanto") {
             obterSimbolo();
@@ -745,6 +850,8 @@ function AnalisadorSintatico(input) {
         }
         else if (simbolo == "@ident") {
 
+            //analisadorSemantico.verificar({"cadeia":cadeia});
+            analisadorSemantico.setCadeia(cadeia);
             obterSimbolo();
 
             // Chama a regra "cont_ident" 
@@ -811,6 +918,8 @@ function AnalisadorSintatico(input) {
     //
     function cont_ident(seguidores) {
 
+        var v;
+
         if (simbolo != ":=" && !(simbolo in Primeiros["lista_arg"])) {
             error("Esperado ':=' ou '(', mas encontrado '" + cadeia + "'");
             varre(join(":=", Primeiros["lista_arg"], Seguidores["cont_ident"], seguidores));
@@ -818,12 +927,44 @@ function AnalisadorSintatico(input) {
 
         if (simbolo == ":=") {
             obterSimbolo();
+
+            v = analisadorSemantico.verificar({"cadeia":analisadorSemantico.getCadeia()});
+
+            if (listaErros = analisadorSemantico.erro()) {
+                for (e in listaErros) {
+                    error(listaErros[e]);
+                }
+            }
             // Chama a regra "expressão"
-            expressao(join(seguidores, Seguidores["cont_ident"]));
+            tipo = expressao(join(seguidores, Seguidores["cont_ident"]));
+
+            if (typeof(v) == "object" && v.getTipo() == "inteiro" && tipo == "real") {
+                error("Atribuicao de valor real a variavel inteira '" + v.getCadeia() + "'.");
+            }
+
         }
         else if (simbolo in Primeiros["lista_arg"]) {
+            analisadorSemantico.verificar({"cadeia":analisadorSemantico.getCadeia(), "categoria":"procedimento"});
+            if (listaErros = analisadorSemantico.erro()) {
+                for (e in listaErros) {
+                    error(listaErros[e]);
+                }
+            }
+
+            analisadorSemantico.setProcedimento(analisadorSemantico.getCadeia());
+
+            analisadorSemantico.iniciarChamada();
+
             // Chama a regra "lista_arg" 
             lista_arg(join(seguidores, Seguidores["cont_ident"]));
+
+            analisadorSemantico.terminarChamada();
+            if (listaErros = analisadorSemantico.erro()) {
+                for (e in listaErros) {
+                    error(listaErros[e]);
+                }
+            }
+
         }
     }
 
@@ -858,8 +999,10 @@ function AnalisadorSintatico(input) {
     //
     function expressao(seguidores) {
 
+        var retorno;
+
         // Chama a regra "termo"
-        termo(join(Seguidores["expressao"], seguidores, "+", "-", "@ident"));
+        tipo_termo1 = termo(join(Seguidores["expressao"], seguidores, "+", "-", "@ident"));
 
         // Se simbolo não for um sinal nem estiver em seguidores
         //  de expressao, este é um erro. Algo como (a _+ b).
@@ -872,12 +1015,21 @@ function AnalisadorSintatico(input) {
             }
         }
 
+        retorno = tipo_termo1;
+
         // Enquanto houver "+" ou "-"
         while (simbolo == "+" || simbolo == "-") {
             obterSimbolo();
 
             // Chama a regra "termo"
-            termo(join(Seguidores["expressao"], seguidores, "+", "-", "@ident"));
+            tipo_termo2 = termo(join(Seguidores["expressao"], seguidores, "+", "-", "@ident"));
+
+            if (tipo_termo1 == "real" || tipo_termo2 == "real") {
+                retorno = "real";
+            }
+            else {
+                retorno = "inteiro";
+            }
 
             if (simbolo != "+" && simbolo != "-" && !(simbolo in Seguidores["expressao"])) {
 
@@ -892,6 +1044,9 @@ function AnalisadorSintatico(input) {
                 }
             }
         }
+
+        return retorno;
+
     }
 
 
@@ -904,6 +1059,8 @@ function AnalisadorSintatico(input) {
     //
     function termo(seguidores) {
 
+        var retorno;
+
         if (simbolo != "+" && simbolo != "-" && !(simbolo in Primeiros["fator"])) {
             error("Esperado '+', '-', identificador, numero inteiro, numero real ou '(', mas encontrado '" + cadeia + "'");
             varre(join(Primeiros["termo"], Primeiros["fator"], seguidores));
@@ -913,8 +1070,11 @@ function AnalisadorSintatico(input) {
         }
 
         // Chama a regra "fator"
-        fator(join(seguidores, Seguidores["termo"]));
+        tipo_fator1 = fator(join(seguidores, Seguidores["termo"]));
 
+        // Se temos um erro sintático como 12 3 - 1, não temos como saver que operação iria
+        //   ser realizada, e portanto não conseguimos determinar se seria um erro semântico
+        //   ou não
         if (simbolo != "*" && simbolo != "/" && !(simbolo in Seguidores["termo"])) {
 
             error("Esperado operador matematico, operador relacional, 'faca', 'entao', 'fim', 'senao' ou ')', mas encontrado '" + cadeia + "'");
@@ -927,11 +1087,29 @@ function AnalisadorSintatico(input) {
             }
         }
 
+        // Caso não tenha a parte da operação
+        retorno = tipo_fator1;
+
         while (simbolo == "*" || simbolo == "/") {
+
+            operacao = simbolo;
+
             obterSimbolo();
 
             // Chama a regra "fator"
-            fator(join(seguidores, Seguidores["termo"]));
+            tipo_fator2 = fator(join(seguidores, Seguidores["termo"]));
+
+            if (operacao == "*") {
+                if (tipo_fator1 == "real" || tipo_fator2 == "real") {
+                    retorno = "real";
+                }
+                else {
+                    retorno = "inteiro";
+                }
+            }
+            else {
+                retorno = "real";
+            }
 
             if (simbolo != "*" && simbolo != "/" && !(simbolo in Seguidores["termo"])) {
                 error("Esperado operador matematico, operador relacional, 'faca', 'entao', 'fim', 'senao' ou ')', mas encontrado '" + cadeia + "'");
@@ -945,6 +1123,9 @@ function AnalisadorSintatico(input) {
                 }
             }
         }
+
+        return retorno;
+
     }
 
 
@@ -954,25 +1135,45 @@ function AnalisadorSintatico(input) {
     //
     function fator(seguidores) {
 
+        var v;
+        var retorno;
+
         if (!(simbolo in Primeiros["fator"])) {
             error("Esperado '(', identificador, numero inteiro ou numero real, mas encontrado '" + cadeia + "'");
             varre(join("@ident", "@numero_int", "@numero_real", "(", ";", seguidores));
         }
 
         if (simbolo == "@ident") {
+            v = analisadorSemantico.verificar({"cadeia":cadeia});
+            if (listaErros = analisadorSemantico.erro()) {
+                for (e in listaErros) {
+                    error(listaErros[e]);
+                }
+            }
             obterSimbolo();
+
+            if (typeof(v) == "object") {
+                retorno = v.getTipo();
+            }
+
         }
         else if (simbolo == "@numero_int") {
             obterSimbolo();
+
+            retorno = "inteiro";
+
         }
         else if (simbolo == "@numero_real") {
             obterSimbolo();
+
+            retorno = "real";
+
         }
         else if (simbolo == "(") {
             obterSimbolo();
 
             // Chama a regra "expressão"
-            expressao(join(seguidores, Seguidores["fator"]));
+            tipo = expressao(join(seguidores, Seguidores["fator"]));
 
             if (simbolo != ")") {
                 error("Esperado ')' mas encontrado '" + cadeia + "'");
@@ -981,7 +1182,13 @@ function AnalisadorSintatico(input) {
             if (simbolo == ")") {
                 obterSimbolo();
             }
+
+            retorno = tipo;
+
         }
+
+        return retorno;
+
     }
 
 

@@ -7,13 +7,16 @@ var DEBUG = false;
 
 /// <reference path="Analise\AnalisadorLexico.js" />
 /// <reference path="Analise\AnalisadorSintatico.js" />
+/// <reference path="Analise\AnalisadorSemantico.js" />
 
 
 include("source/Analise/Error.js");
 include("source/Analise/Token.js");
 include("source/Analise/Keywords.js");
 include("source/Analise/AnalisadorLexico.js");
-include("source/Analise/AnalisadorSintatico.js");
+include("source/Analise/AnalisadorSintatico.js")
+include("source/Analise/AnalisadorSemantico.js")
+include("source/Sintese/Gerador.js")
 
 
 

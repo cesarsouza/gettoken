@@ -134,6 +134,15 @@ exemplo[7] =
 
 "programa teste;\n\
 \n\
+var a, b, c: inteiro;\n\
+\n\
+procedimento p1 (v1, v2: real; v3: inteiro);\n\
+var v4 : real;\n\
 inicio\n\
-    le(b);\n\
+    a := b + c + v3 + v4;\n\
+fim;\n\
+\n\
+inicio\n\
+    le(a, b, c);\n\
+    p1(a; b; c);\n\
 fim.";
