@@ -310,8 +310,7 @@ function AnalisadorSemantico() {
                     }
                 }
 
-                return true;
-
+                return w;
                 break;
             case 6:
             case 9:

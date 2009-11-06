@@ -363,6 +363,7 @@ function AnalisadorSintatico(input, tipo) {
             else {
                 tipo = undefined;
             }
+
             gerador.guardaVariavel(cadeia, tipo);
 
             obterSimbolo();
@@ -990,7 +991,7 @@ function AnalisadorSintatico(input, tipo) {
             tipo = expressao(join(seguidores, Seguidores["cont_ident"]));
 
             if (typeof(v) == "object" && v.getTipo() == "inteiro" && tipo == "real") {
-                errorSemantico("Atribuicao de valor real a variavel inteira '" + v.getCadeia() + "'.");
+                error("Atribuicao de valor real a variavel inteira '" + v.getCadeia() + "'.");
             }
 
             gerador.finalizarAtribuicao();
