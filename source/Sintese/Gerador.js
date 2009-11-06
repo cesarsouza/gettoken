@@ -38,7 +38,7 @@ function Gerador() {
 
     this.genStart = function (cadeia) {
         identar();
-        codigo += "// programa " + cadeia + "\n\n";
+        codigo += "/* programa " + cadeia + " */\n\n";
         codigo += "#include <stdio.h>\n\n";
     }
 
