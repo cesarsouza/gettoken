@@ -3,9 +3,9 @@
 
 
 // Classe Analisador Semântico
-//  Esta classe é responsável por executar a etapa de análise semântica,
-//  analisando a corretude na utilização de variáveis e reportando os
-//  erros encontrados através da lista de erros em error()
+//   Esta classe é responsável por executar a etapa de análise semântica,
+//   analisando a corretude na utilização de variáveis e reportando os
+//   erros encontrados através da lista de erros em error()
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -29,12 +29,12 @@ function AnalisadorSemantico() {
     // Analisador semântico implementado como uma máquina de estados para facilitar o processamento
     var estado = 0;
 
-    var procedimento;
-    var posicao;
-    var variaveis;
-    var cadeia;
-    var tipo;
-    var erroTipo;
+    var procedimento = "";
+    var posicao = 0;
+    var variaveis = undefined;
+    var cadeia = "";
+    var tipo = "";
+    var erroTipo = false;
 
     // Variavel booleana que sinaliza ao analisador se ele deve ou não relatar certos erros
     //   (como na situação em que um procedimento não foi declarado, e cada parâmetro seria
@@ -44,11 +44,15 @@ function AnalisadorSemantico() {
     ///////////////////////////////////////////
     // Métodos públicos
 
+    // Empilha um erro no vetor de erros
     this.error = function(mensagem) {
         if (!ignorar) {
             erros.push(mensagem);
         }
     }
+
+    // Retorna o vetor de erros semânticos enconrados (é necessário retornar uma cópia do
+    //   vetor de erros pois este é resetado após a chamada desta função)
     this.erro = function() {
         var e;
         if (erros.length > 0) {
@@ -58,6 +62,8 @@ function AnalisadorSemantico() {
         }
         return false;
     }
+
+    // Métodos que indicam qual variável ou procedimento está sendo processado pelo analisador
 
     this.setCadeia = function(cadeia) { this.cadeia = cadeia; }
     this.getCadeia = function() { return this.cadeia; }
@@ -183,8 +189,6 @@ function AnalisadorSemantico() {
 
         var v = new Variavel(variavel);
 
-        this.lastError = false;
-
         switch (estado) {
             case 0:
             case 2:
@@ -248,8 +252,6 @@ function AnalisadorSemantico() {
 
         var v = new Variavel(variavel);
 
-        this.lastError = false;
-
         switch (estado) {
             case 0:
             case 1:
@@ -274,6 +276,7 @@ function AnalisadorSemantico() {
                 w = tabelaSimbolos.verificar(v);
                 if (!w) {
                     v.setProcedimento(undefined);
+                    // Primeiro, verificamos se o símbolo está definido 
                     w = tabelaSimbolos.verificar(v);
                     if (!w) {
                         if (v.getCategoria() == "procedimento") {
@@ -384,12 +387,15 @@ function AnalisadorSemantico() {
 
     this.remover = function(variavel) {
         var v = new Variavel(variavel);
-        this.lastError = false;
         tabelaSimbolos.remover(v);
     }
 
     this.imprimir = function() {
-        tabelaSimbolos.imprimir();
+        alert(tabelaSimbolos);
+    }
+
+    this.toString = function() {
+        return tabelaSimbolos;
     }
 
 }
@@ -419,7 +425,7 @@ function TabelaSimbolos() {
             return true;
         }
         else {
-            return "Erro na insercao da variavel '" + variavel.getCadeia() + "' - ja declarada" + "\n";;
+            //return "Erro na insercao da variavel '" + variavel.getCadeia() + "' - ja declarada" + "\n";;
             return false;
         }
     }
@@ -458,8 +464,9 @@ function TabelaSimbolos() {
 
 }
 
-
-
+// Classe Vetor
+//  Implementação de um vetor dinâmico de símbolos. Conforme símbolos vão sendo
+//  inseridos o vetor cresce dinamicamente
 
 function Vetor() {
 
@@ -504,7 +511,8 @@ function Vetor() {
             }
 
         }
-        return false;
+        // Se não encontrou, retorna undefined
+        return undefined;
     }
 
     this.remover = function(variavel) {
@@ -526,16 +534,22 @@ function Vetor() {
 }
 
 
+// Classe Variavel
+//  Representa um símbolo que pode ser guardado na tabela de símbolos.
 
 function Variavel(variavel) {
     var cadeia;          // identificador
     var tipo;            // inteiro, real, nome_programa, nome_procedimento
     var categoria;       // local, global, parametro
-    var procedimento;    // p1, p2
-    var posicao;         // apenas para parametros de procedimentos
+    var procedimento;    // apenas para parâmetros e variáveis locais - indica a
+                         //   qual procedimento a variável pertence
+    var posicao;         // apenas para parametros - representa a posição em que
+                         //   o parâmetro é declarado
 
     if (variavel != undefined) {
         if (typeof(variavel) == "object") {
+            // Checamos se a variavel 'variavel' é um objeto Variavel (se o método getCadeia
+            //  for definido, então é)
             if (variavel.getCadeia != undefined) {
                 this.cadeia        = variavel.getCadeia();
                 this.tipo          = variavel.getTipo();
@@ -543,6 +557,7 @@ function Variavel(variavel) {
                 this.procedimento  = variavel.getProcedimento();
                 this.posicao       = variavel.getPosicao();
             }
+            // Caso contrário, é um array
             else {
                 this.cadeia       = variavel["cadeia"];
                 this.tipo         = variavel["tipo"];

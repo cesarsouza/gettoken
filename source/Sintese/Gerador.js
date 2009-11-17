@@ -16,12 +16,27 @@ function Gerador() {
 
     // Nivel de identação em que o código se encontra
     var identacao = 0;
+    // Tamanho, em número de espaços, do recuo de identação
     var identSize = 4;
 
+    //
     var listaVariaveis;
     var listaTipos;
 
 
+    ///////////////////////////////////////////
+    // Métodos públicos
+
+    // Retorna o código gerado
+    this.getCodigo = function () {
+        return codigo;
+    }
+
+
+    ///////////////////////////////////////////
+    // Métodos privados
+
+    // Insere identação na linha atual do código gerado
     function identar() {
         for (var i = 0; i < identacao; i++) {
             for (var j = 0; j < identSize; j++) {
@@ -30,12 +45,8 @@ function Gerador() {
         }
     }
 
-    this.getCodigo = function () {
-        return codigo;
-    }
-
-
-
+    // Inicia a geração do código. Coloca um cabeçalho (nome do programa) e
+    //   insere o #include <stdio.h>
     this.genStart = function (cadeia) {
         identar();
         codigo += "/* programa " + cadeia + " */\n\n";
@@ -241,6 +252,7 @@ function Gerador() {
         codigo += "}\n";
     }
 
+    // As expressões são traduzidas ipsis litteris no código gerado
     this.expressao = function (cadeia) {
         codigo += cadeia + " ";
     }

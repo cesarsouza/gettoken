@@ -113,12 +113,13 @@ function AnalisadorSintatico(input, tipo) {
                     cadeia  = token.cadeia();
                     break;
 
+                // Erro léxico simples (cadeia não reocnhecida) encontrado
                 case TokenId.Error:
                     simbolo = "@erro";
                     cadeia  = token.cadeia();
                     // Colocamos este erro léxico na lista de erros
                     error("Caractere '" + token.cadeia() + "' nao reconhecido");
-                    // Ignoramos o erro léxico
+                    // Ignoramos a cadeia não reconhecida
                     obterSimbolo();
                     break;
             }
@@ -160,9 +161,11 @@ function AnalisadorSintatico(input, tipo) {
     }
 
 
-    // Empilha um erro semântico na lista de erros
+    // Empilha erros semânticos na lista de erros (é fornecida uma lista de erros como
+    //   parâmetro porque o analisador semântico retorna um array de erros a cada checagem)
     function errorSemantico(listaErros) {
-        //alert(listaErros);
+        // Só empilhamos o erro semântico se estivermos na análise semântica ou na
+        //   geração de código
         if (tipoAnalise == ANALISE_SEMANTICA || tipoAnalise == GERACAO_CODIGO) {
             for (e in listaErros) {
                 error(listaErros[e]);
