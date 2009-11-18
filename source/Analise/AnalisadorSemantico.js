@@ -2,10 +2,7 @@
 // ----------------------------------------------------------------
 
 
-// Classe Analisador Semântico
-//   Esta classe é responsável por executar a etapa de análise semântica,
-//   analisando a corretude na utilização de variáveis e reportando os
-//   erros encontrados através da lista de erros em error()
+
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -17,16 +14,21 @@
 //
 
 
-
+// Classe Analisador Semântico
+//   Esta classe é responsável por executar a etapa de análise semântica,
+//   analisando a corretude na utilização de variáveis e reportando os
+//   erros encontrados através da lista de erros em error()
+//
 function AnalisadorSemantico() {
 
     // Lista de erros encontrados
     var erros = new Array();
 
     // Tabelas de símbolos
-    var tabelaSimbolos = new TabelaSimbolos();
+    var tabelaSimbolos = new Symbols();
 
-    // Analisador semântico implementado como uma máquina de estados para facilitar o processamento
+    // Analisador semântico implementado como uma máquina de estados para
+    //  facilitar o processamento
     var estado = 0;
 
     var procedimento = "";
@@ -41,6 +43,7 @@ function AnalisadorSemantico() {
     //   considerado um erro)
     var ignorar = false;
 
+
     ///////////////////////////////////////////
     // Métodos públicos
 
@@ -51,25 +54,19 @@ function AnalisadorSemantico() {
         }
     }
 
-    // Retorna o vetor de erros semânticos enconrados (é necessário retornar uma cópia do
-    //   vetor de erros pois este é resetado após a chamada desta função)
-    this.erro = function() {
-        var e;
-        if (erros.length > 0) {
-            e = erros;
-            erros = new Array();
-            return e;
-        }
-        return false;
+    // Retorna o vetor de erros semânticos encontrados
+    this.errors = function() {
+        return erros;
     }
 
-    // Métodos que indicam qual variável ou procedimento está sendo processado pelo analisador
 
+    // Métodos que indicam qual variável ou procedimento está sendo processado pelo analisador
     this.setCadeia = function(cadeia) { this.cadeia = cadeia; }
     this.getCadeia = function() { return this.cadeia; }
 
     this.setProcedimento = function(procedimento) { this.procedimento = procedimento; }
     this.getProcedimento = function() { return this.procedimento; }
+
 
     this.iniciarDeclaracao = function() {
         ignorar = false;
@@ -184,10 +181,10 @@ function AnalisadorSemantico() {
 
 
 
+    // Insere um simbolo na tabela de símbolos
+    this.inserir = function(simbolo) {
 
-    this.inserir = function(variavel) {
-
-        var v = new Variavel(variavel);
+        var v = new Simbolo(simbolo);
 
         switch (estado) {
             case 0:
@@ -373,13 +370,13 @@ function AnalisadorSemantico() {
             case 1:
             case 3:
             case 4:
-                this.inserir(variavel);
+                return this.inserir(variavel);
                 break;
             case 5:
             case 6:
             case 7:
             case 9:
-                this.verificar(variavel);
+                return this.verificar(variavel);
                 break;
         }
 
@@ -400,195 +397,3 @@ function AnalisadorSemantico() {
 
 }
 
-
-
-
-
-
-// Classe TabelaSimbolos
-//  Implementação da tabela de símbolos como uma tabela hash (estrutura intrínseca do
-//  JavaScript) juntamente com um vetor dinâmico para tratar os casos de colisão
-
-function TabelaSimbolos() {
-
-    var tabela = new Array();
-
-    this.tabela = new Array();
-
-    this.inserir = function(variavel) {
-        var cadeia = variavel.getCadeia();
-        if (!this.verificar(variavel)) {
-            if (tabela[cadeia] == undefined) {
-                tabela[cadeia] = new Vetor();
-            }
-            tabela[cadeia].inserir(variavel);
-            return true;
-        }
-        else {
-            //return "Erro na insercao da variavel '" + variavel.getCadeia() + "' - ja declarada" + "\n";;
-            return false;
-        }
-    }
-
-    this.verificar = function(variavel) {
-        if (tabela[variavel.getCadeia()] == undefined) {
-            for (var a in tabela) {
-                var x = tabela[a].verificar(variavel);
-                if (x) {
-                    return x;
-                }
-            }
-            return false;
-        }
-        else {
-            return tabela[variavel.getCadeia()].verificar(variavel);
-        }
-    }
-
-    this.remover = function(variavel) {
-        // Passamos por todos os registros da tabela, removendo todos que tenham a categoria local
-        // e o nome do procedimento igual ao que passamos
-        for (var a in tabela) {
-            tabela[a].remover(variavel);
-        }
-    }
-
-    this.imprimir = function() {
-        var texto = "Imprimindo tabela de simbolos\n\n";
-        for (var o in tabela) {
-            texto += "Linha " + o + "\n";
-            texto += tabela[o] + "\n";
-        }
-        alert(texto);
-    }
-
-}
-
-// Classe Vetor
-//  Implementação de um vetor dinâmico de símbolos. Conforme símbolos vão sendo
-//  inseridos o vetor cresce dinamicamente
-
-function Vetor() {
-
-    var vetor;
-    var fim;
-
-    vetor = new Array();
-    fim = 0;
-
-    this.inserir = function(variavel) {
-        vetor[fim++] = new Variavel(variavel);
-        return true;
-    }
-
-    this.verificar = function(variavel) {
-
-        var achou;
-        var i;
-
-        for (i = fim - 1; i >= 0; i--) {
-
-            achou = true;
-
-            if (variavel.getCadeia() != undefined && vetor[i].getCadeia() != variavel.getCadeia()) {
-                achou = false;
-            }
-            if (variavel.getTipo() != undefined && vetor[i].getTipo() != variavel.getTipo()) {
-                achou = false;
-            }
-            if (variavel.getCategoria() != undefined && vetor[i].getCategoria() != variavel.getCategoria()) {
-                achou = false;
-            }
-            if (variavel.getProcedimento() != undefined && vetor[i].getProcedimento() != variavel.getProcedimento()) {
-                achou = false;
-            }
-            if (variavel.getPosicao() != undefined && vetor[i].getPosicao() != variavel.getPosicao()) {
-                achou = false;
-            }
-
-            if (achou) {
-                return vetor[i];
-            }
-
-        }
-        // Se não encontrou, retorna undefined
-        return undefined;
-    }
-
-    this.remover = function(variavel) {
-        while (this.verificar(variavel)) {
-            fim--;
-            delete vetor[fim];
-        }
-        return true;
-    }
-
-    this.toString = function() {
-        var saida = "";
-        for (var i = 0; i < fim; i++) {
-            saida = saida + vetor[i].toString() + "\n";
-        }
-        return saida;
-    }
-
-}
-
-
-// Classe Variavel
-//  Representa um símbolo que pode ser guardado na tabela de símbolos.
-
-function Variavel(variavel) {
-    var cadeia;          // identificador
-    var tipo;            // inteiro, real, nome_programa, nome_procedimento
-    var categoria;       // local, global, parametro
-    var procedimento;    // apenas para parâmetros e variáveis locais - indica a
-                         //   qual procedimento a variável pertence
-    var posicao;         // apenas para parametros - representa a posição em que
-                         //   o parâmetro é declarado
-
-    if (variavel != undefined) {
-        if (typeof(variavel) == "object") {
-            // Checamos se a variavel 'variavel' é um objeto Variavel (se o método getCadeia
-            //  for definido, então é)
-            if (variavel.getCadeia != undefined) {
-                this.cadeia        = variavel.getCadeia();
-                this.tipo          = variavel.getTipo();
-                this.categoria     = variavel.getCategoria();
-                this.procedimento  = variavel.getProcedimento();
-                this.posicao       = variavel.getPosicao();
-            }
-            // Caso contrário, é um array
-            else {
-                this.cadeia       = variavel["cadeia"];
-                this.tipo         = variavel["tipo"];
-                this.categoria    = variavel["categoria"];
-                this.procedimento = variavel["procedimento"];
-                this.posicao      = variavel["posicao"];                
-            }
-        }
-        else if (typeof(variavel) == "string") {
-            this.cadeia = variavel;
-        }
-    }
-
-    this.setCadeia       = function(cadeia)       { this.cadeia       = cadeia; }
-    this.setTipo         = function(tipo)         { this.tipo         = tipo; }
-    this.setCategoria    = function(categoria)    { this.categoria    = categoria; }
-    this.setProcedimento = function(procedimento) { this.procedimento = procedimento; }
-    this.setPosicao      = function(posicao)      { this.posicao      = posicao; }
-    
-    this.getCadeia       = function() { return this.cadeia; }
-    this.getTipo         = function() { return this.tipo; }
-    this.getCategoria    = function() { return this.categoria; }
-    this.getProcedimento = function() { return this.procedimento; }
-    this.getPosicao      = function() { return this.posicao; }
-
-    this.toString = function() {
-        return "cadeia = " + this.cadeia +
-            "   tipo = " + this.tipo +
-            "   categoria = " + this.categoria +
-            "   procedimento = " + this.procedimento +
-            "   posicao = " + this.posicao;
-    }
-
-}

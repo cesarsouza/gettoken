@@ -2,13 +2,19 @@
 // ----------------------------------------------------------------
 
 
+
 // Classe Analisador Sintático (Parser)
 //  Esta classe é responsável por conduzir a etapa de análise sintática,
 //  identificando regras gramaticais respeitadas pelos tokens adquiridos
 //  pelo Analisador Léxico. Eventuais erros identificados durante a
 //  análise poderão ser resgatados através da lista de erros em error().
 //
-function AnalisadorSintatico(input, tipo) {
+//  Opcionalmente, pode ser passado um Analisador Semantico para que o
+//    analisador sintatico o guie para efetuar a analise semântica;
+//  Ou também pode ser passado um Gerador de Código Alvo para que o
+//    analisador sintático o guie para efetuar a geração de código.
+//
+function AnalisadorSintatico(input, analisadorSemantico, geradorCodigo) {
 
 
     // ************************************************************************
@@ -18,14 +24,13 @@ function AnalisadorSintatico(input, tipo) {
     // Analisador Léxico a ser utilizado por este Analisador Sintático (parser)
     var analisadorLexico = new AnalisadorLexico(input);
 
-    // Analisador Semântico a ser utilizado pelo parser
-    var analisadorSemantico = new AnalisadorSemantico();
+    // Analisador Semântico a ser utilizado pelo parser, caso solicitado
+    var analisadorSemantico = analisadorSemantico;
 
     // Gerador de código acoplado ao parser
-    var gerador = new Gerador();
+    var gerador = geradorCodigo;
 
-    // Controla qual tipo de análise será feita (sintática, semântica ou geração de código)
-    var tipoAnalise = tipo;
+
 
     // Lista de erros encontrados durante a análise
     var error_list = new Array();
@@ -57,7 +62,7 @@ function AnalisadorSintatico(input, tipo) {
         // Inicia a análise a partir da regra inicial
         programa();
 
-        // Se estamos na fase de geração de código e nenhum error ocorreu,
+        // Se estamos na fase de geração de código e nenhum erro ocorreu,
         // retornamos o código produzido
         if (tipoAnalise == GERACAO_CODIGO && error_list.length == 0) {
             return gerador.getCodigo();
@@ -211,11 +216,12 @@ function AnalisadorSintatico(input, tipo) {
             varre(join(Primeiros["dc_v"], Primeiros["dc_p"], "inicio", ";", "@ident"));
         }
         if (simbolo == "@ident") {
-            analisadorSemantico.inserir({"cadeia":cadeia, "categoria":"nome_programa"});
-            if (listaErros = analisadorSemantico.erro()) {
-                errorSemantico(listaErros);
-            }
+        
+// Corte para o analisador semantico e gerador de código
+            analisadorSemantico.inserir({"cadeia":cadeia, "categoria":"programa"});
             gerador.genStart(cadeia);
+// Fim do corte para o analisador semantico e gerador de código    
+            
             obterSimbolo();
         }
 
@@ -231,10 +237,13 @@ function AnalisadorSintatico(input, tipo) {
         dc_v(join(Seguidores["programa"], "inicio", Primeiros["comandos"]));
         dc_p(join(Seguidores["programa"], "inicio", Primeiros["comandos"]));
 
+
+// Corte para o analisador semantico e gerador de código
         // Sinaliza ao analisador semântico que o corpo do programa está começando
         analisadorSemantico.iniciarCorpo();
-
         gerador.iniciarMain();
+// Fim do corte para o analisador semantico e gerador de código
+
 
         if (simbolo != "inicio") {
             error("Esperado 'inicio' mas encontrado '" + cadeia + "'");
@@ -269,10 +278,9 @@ function AnalisadorSintatico(input, tipo) {
             obterSimbolo();
         }
 
+// Corte para o analisador semantico e gerador de código
         gerador.finalizarMain();
-
-        //analisadorSemantico.imprimir();
-
+// Fim do corte para o analisador semantico e gerador de código
     }
 
 
@@ -283,9 +291,6 @@ function AnalisadorSintatico(input, tipo) {
     //
     function dc_v(seguidores) {
 
-        //alert('> dc_v');
-        //print_list(seguidores);
-
         if (!(simbolo in Primeiros["dc_v"]) && !(simbolo in Seguidores["dc_v"]) && !(simbolo in seguidores)) {
             error("Esperado 'var', 'procedimento' ou 'inicio' mas encontrado '" + cadeia + "'");
             varre(join(Primeiros["dc_v"], Seguidores["dc_v"], seguidores));
@@ -294,8 +299,10 @@ function AnalisadorSintatico(input, tipo) {
         while (simbolo == "var") {
             obterSimbolo();
 
+// Corte para o analisador semantico e gerador de código
             // sinaliza ao analisador que um bloco de declaração de variáveis está se iniciando
             analisadorSemantico.iniciarDeclaracao();
+// Fim do corte para o analisador semantico e gerador de código
 
             // Chama a regra "variáveis"
             variaveis(join(Seguidores["dc_v"], seguidores, ":", "real", "inteiro"));
@@ -314,11 +321,12 @@ function AnalisadorSintatico(input, tipo) {
                 
             }
             if (simbolo == "real" || simbolo == "inteiro") {
+            
+// Corte para o analisador semantico e gerador de código
                 analisadorSemantico.inserir({"tipo":simbolo});
-                if (listaErros = analisadorSemantico.erro()) {
-                    errorSemantico(listaErros);
-                }
                 gerador.genDeclaracao(simbolo);
+// Fim do corte para o analisador semantico e gerador de código
+
                 obterSimbolo();
             }
 
@@ -354,20 +362,19 @@ function AnalisadorSintatico(input, tipo) {
             varre(join(Seguidores["variaveis"], seguidores, ",", "@ident"));
         }
         if (simbolo == "@ident") {
-            analisadorSemantico.variavel({"cadeia":cadeia});
-            if (listaErros = analisadorSemantico.erro()) {
-                errorSemantico(listaErros);
-            }
+        
+        
+// Corte para o analisador semantico e gerador de código
+            var simbolo = analisadorSemantico.variavel({"cadeia":cadeia});
 
-            temp = analisadorSemantico.verificar({"cadeia":cadeia});
-            if (typeof(temp) == "object") {
-                tipo = temp.getTipo();
+            if (temp instanceof Simbolo) {
+                gerador.guardaVariavel(cadeia, temp.getTipo());
             }
             else {
-                tipo = undefined;
+                gerador.guardaVariavel(cadeia);
             }
-
-            gerador.guardaVariavel(cadeia, tipo);
+// Fim do corte para o analisador semantico e gerador de código
+            
 
             obterSimbolo();
         }
@@ -394,19 +401,19 @@ function AnalisadorSintatico(input, tipo) {
                 varre(join(Seguidores["variaveis"], seguidores, ",", "@ident"));
             }
             if (simbolo == "@ident") {
-                analisadorSemantico.variavel({"cadeia":cadeia});
-                if (listaErros = analisadorSemantico.erro()) {
-                    errorSemantico(listaErros);
-                }
 
-                temp = analisadorSemantico.verificar({"cadeia":cadeia});
-                if (typeof(temp) == "object") {
-                    tipo = temp.getTipo();
+            
+// Corte para o analisador semantico e gerador de código
+                var simbolo = analisadorSemantico.variavel({"cadeia":cadeia});
+
+                if (simbolo instanceof Simbolo) {
+                    gerador.guardaVariavel(cadeia, temp.getTipo());
                 }
                 else {
-                    tipo = undefined;
+                    gerador.guardaVariavel(cadeia, null);
                 }
-                gerador.guardaVariavel(cadeia, tipo);
+// Fim do corte para o analisador semantico e gerador de código
+
 
                 obterSimbolo();
             }
@@ -424,9 +431,6 @@ function AnalisadorSintatico(input, tipo) {
                 variaveis(seguidores);
             }
         }
-
-        
-
     }
 
 
@@ -445,19 +449,28 @@ function AnalisadorSintatico(input, tipo) {
         while (simbolo == "procedimento") {
             obterSimbolo();
 
-            analisadorSemantico.iniciarProcedimento();
+// Corte para o analisador semantico e gerador de código
+            if (analisadorSemantico)
+              analisadorSemantico.iniciarProcedimento();
+// Fim do corte para o analisador semantico e gerador de código
 
             if (simbolo != "@ident") {
                 error("Esperado identificador mas encontrado '" + cadeia + "'");
                 varre(join("(", ";", Seguidores["dc_p"], Primeiros["corpo_p"], seguidores));
             }
             if (simbolo == "@ident") {
+            
+// Corte para o analisador semantico e gerador de código
+                if (analisadorSemantico)
+                {
                 analisadorSemantico.setProcedimento(cadeia);
                 analisadorSemantico.inserir({"cadeia":cadeia, "categoria":"procedimento"});
-                if (listaErros = analisadorSemantico.erro()) {
-                    errorSemantico(listaErros);
-                }
+                
+                if (gerador)
                 gerador.genProcedimento(cadeia);
+                }
+// Fim do corte para o analisador semantico e gerador de código
+                
                 obterSimbolo();
             }
 
@@ -494,9 +507,15 @@ function AnalisadorSintatico(input, tipo) {
             // Chama a regra "corpo_p"
             corpo_p(join(seguidores, Seguidores["dc_p"]));
 
+// Corte para o analisador semantico e gerador de código
+            if (analisadorSemantico)
+            {
             // Removemos as variáveis locais do procedimento
             analisadorSemantico.remover({"categoria":"local", "procedimento":analisadorSemantico.getProcedimento()});
+            if (gerador)
             gerador.finalizarProcedimento();
+            }
+// Fim do corte para o analisador semantico e gerador de código
 
             // debug : verificar com o exemplo 7
             // alert(analisadorSemantico.verificar({"cadeia":"v4"}));
@@ -518,6 +537,7 @@ function AnalisadorSintatico(input, tipo) {
     function lista_par(seguidores) {
 
         // sinaliza ao analisador que um bloco de declaração de parametros está se iniciando
+        if (analisadorSemantico)
         analisadorSemantico.iniciarParametros();
 
         // Chama a regra "variaveis"
@@ -536,11 +556,15 @@ function AnalisadorSintatico(input, tipo) {
             varre(join("real", "inteiro", Primeiros["lista_par"], Seguidores["lista_par"], Seguidores["dc_p"], seguidores, "inteiro", "real"));
         }
         if (simbolo == "real" || simbolo == "inteiro") {
+        
+// Corte para o analisador semantico e gerador de código
+           if (analisadorSemantico) {
             analisadorSemantico.inserir({"tipo":simbolo});
-            if (listaErros = analisadorSemantico.erro()) {
-                errorSemantico(listaErros);
-            }
+            if (gerador)
             gerador.genParametros(simbolo);
+            }
+// Fim do corte para o analisador semantico e gerador de código
+
             obterSimbolo();
         }
 
@@ -557,7 +581,7 @@ function AnalisadorSintatico(input, tipo) {
             obterSimbolo();
 
             // sinaliza ao analisador que um bloco de declaração de parametros está se iniciando
-            analisadorSemantico.iniciarParametros();
+            if (analisadorSemantico) analisadorSemantico.iniciarParametros();
 
             // Chama a regra "variáveis" 
             variaveis(join(seguidores, Seguidores["lista_par"], "var"));
@@ -575,11 +599,16 @@ function AnalisadorSintatico(input, tipo) {
                 varre(join("real", "inteiro", Primeiros["lista_par"], Seguidores["lista_par"], Seguidores["dc_p"], seguidores));
             }
             if (simbolo == "real" || simbolo == "inteiro") {
-                analisadorSemantico.inserir({"tipo":simbolo});
-                if (listaErros = analisadorSemantico.erro()) {
-                    errorSemantico(listaErros);
+            
+// Corte para o analisador semantico e gerador de código
+                if (analisadorSemantico)
+                {
+                    analisadorSemantico.inserir({"tipo":simbolo});
+                    if (gerador)
+                    gerador.genParametros(simbolo);
                 }
-                gerador.genParametros(simbolo);
+// Fim do corte para o analisador semantico e gerador de código
+
                 obterSimbolo();
             }
 
@@ -608,8 +637,13 @@ function AnalisadorSintatico(input, tipo) {
         // Chama a regra "dc_v"
         dc_v(join(seguidores, Seguidores["corpo_p"], Primeiros["corpo_p"], Primeiros["cmd"]));
 
-        // Sinaliza ao analisador semântico que o corpo do procedimento está começando
-        analisadorSemantico.iniciarCorpo();
+// Corte para o analisador semantico e gerador de código
+        if (analisadorSemantico)
+        {
+            // Sinaliza ao analisador semântico que o corpo do procedimento está começando
+            analisadorSemantico.iniciarCorpo();
+        }
+// Fim do corte para o analisador semantico e gerador de código
 
         if (simbolo != "inicio") {
             error("Esperado 'inicio' mas encontrado '" + cadeia + "'");
@@ -699,11 +733,16 @@ function AnalisadorSintatico(input, tipo) {
                 varre(join("@ident", ";", ")", Seguidores["lista_arg"], seguidores));
             }
             if (simbolo == "@ident") {
+            
+// Corte para o analisador semantico e gerador de código
+              if (analisadorSemantico)
+              {
                 analisadorSemantico.verificar({"cadeia":cadeia});
-                if (listaErros = analisadorSemantico.erro()) {
-                    errorSemantico(listaErros);
-                }
-                gerador.incluirArgumento(cadeia);
+                if (gerador)
+                  gerador.incluirArgumento(cadeia);
+               }
+// Fim do corte para o analisador semantico e gerador de código
+
                 obterSimbolo();
             }
 
@@ -724,11 +763,16 @@ function AnalisadorSintatico(input, tipo) {
                     varre(join("@ident", ";", ")", Seguidores["lista_arg"], seguidores));
                 }
                 if (simbolo == "@ident") {
-                    analisadorSemantico.verificar({"cadeia":cadeia});
-                    if (listaErros = analisadorSemantico.erro()) {
-                        errorSemantico(listaErros);
+                
+// Corte para o analisador semantico e gerador de código
+                    if (analisadorSemantico)
+                    {
+                       analisadorSemantico.verificar({"cadeia":cadeia});
+                       if (gerador)
+                       gerador.incluirArgumento(cadeia);
                     }
-                    gerador.incluirArgumento(cadeia);
+// Fim do corte para o analisador semantico e gerador de código
+                    
                     obterSimbolo();
                 }
 

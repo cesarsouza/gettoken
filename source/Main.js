@@ -16,6 +16,7 @@ var GERACAO_CODIGO    = 2;
 include("source/Analise/Error.js");
 include("source/Analise/Token.js");
 include("source/Analise/Keywords.js");
+include("source/Analise/Symbols.js");
 include("source/Analise/AnalisadorLexico.js");
 include("source/Analise/AnalisadorSintatico.js")
 include("source/Analise/AnalisadorSemantico.js")
@@ -28,14 +29,17 @@ include("source/Sintese/Gerador.js")
 function mainGeracao(input) {
 
     // Instanciamos um novo analisador sintático
-    var analisadorSintatico = new AnalisadorSintatico(input, GERACAO_CODIGO);
+    var geradorCodigo = new Gerador();
+    var analisadorSemantico = new AnalisadorSemantico();
+    var analisadorSintatico = new AnalisadorSintatico(input, analisadorSemantico, geradorCodigo);
 
+    
     // Efetua a análise sintática da entrada
-    var result = analisadorSintatico.parse();
+    var success = analisadorSintatico.parse();
 
     // Verifica se a análise foi concluída sem erros
-    if (typeof(result) == "string") {
-        return result;
+    if (success) {
+        return geradorCodigo.getCode();
     }
     else {
         // Erros foram encontrados durante a análise
@@ -53,7 +57,6 @@ function mainGeracao(input) {
         // Ao finalizarmos a análise, retornamos sua saída.
         return output;
     }
-
 }
 
 
@@ -65,8 +68,10 @@ function mainGeracao(input) {
 //
 function mainSemantico(input) {
 
-    // Instanciamos um novo analisador sintático
-    var analisadorSintatico = new AnalisadorSintatico(input, ANALISE_SEMANTICA);
+    // Instanciamos um novo analisador sintático em modo especial, para 
+    //   guiar a analise semantica
+    var analisadorSemantico = new AnalisadorSemantico();
+    var analisadorSintatico = new AnalisadorSintatico(input, analisadorSemantico);
 
     // Efetua a análise sintática da entrada
     var success = analisadorSintatico.parse();
