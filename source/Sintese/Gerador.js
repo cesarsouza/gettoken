@@ -19,9 +19,10 @@ function Gerador() {
     // Tamanho, em número de espaços, do recuo de identação
     var identSize = 4;
 
-    //
-    var listaVariaveis;
-    var listaTipos;
+    // Lista de variáveis e lista de tipos, utilizadas na geração de
+    //   declarações de variáveis e parâmetros
+    var listaVariaveis = undefined;
+    var listaTipos = undefined;
 
 
     ///////////////////////////////////////////
@@ -48,11 +49,12 @@ function Gerador() {
     // Inicia a geração do código. Coloca um cabeçalho (nome do programa) e
     //   insere o #include <stdio.h>
     this.genStart = function (cadeia) {
-        identar();
         codigo += "/* programa " + cadeia + " */\n\n";
         codigo += "#include <stdio.h>\n\n";
     }
 
+    // Guarda uma variável e seu tipo em uma lista temporária (utilizada na declaração de
+    //   variáveis e parâmetros)
     this.guardaVariavel = function (cadeia, tipo) {
         if (listaVariaveis == undefined) {
             listaVariaveis = Array();
@@ -68,6 +70,7 @@ function Gerador() {
         }
     }
 
+    // Gera declaração de variáveis ou parâmetros
     this.genDeclaracao = function (tipo) {
         identar();
         if (tipo == "inteiro") {
@@ -80,18 +83,20 @@ function Gerador() {
         for (v in listaVariaveis) {
             codigo += listaVariaveis[v] + ", ";
         }
-        // Retiramos a ultima virgula que sobra ao final
+        // Retiramos a ultima virgula e espaço que sobram ao final
         codigo = codigo.substr(0, codigo.length - 2);
         codigo += ";\n";
-//        delete listaVariaveis;
+
         listaVariaveis = undefined;
     }
 
+    // Inicia a geração de um procedimento
     this.genProcedimento = function (cadeia) {
         codigo += "\n";
         codigo += "void " + cadeia + " (";
     }
 
+    // Gera a declaração de parâmetros de uma função
     this.genParametros = function (tipo) {
         identar();
 
@@ -108,25 +113,32 @@ function Gerador() {
         listaVariaveis = undefined;
     }
 
+    // Finaliza a declaração de parâmetros de uma função
     this.finalizaParametros = function () {
         identar();
-        // Retiramos a ultima virgula que sobra ao final
+        // Retiramos a ultima virgula e espaço que sobram ao final
         codigo = codigo.substr(0, codigo.length - 2);
         codigo += ") {\n";
         identacao++;
     }
 
+    // Finaliza uma função
+/////////////////////////////////////////////////////////////////////////////////////////////////
+    // Perceber que é igual ao finalizar bloco
+/////////////////////////////////////////////////////////////////////////////////////////////////
     this.finalizarProcedimento = function () {
         identacao--;
         identar();
         codigo += "}\n\n";
     }
 
+    // Inicia a função principal
     this.iniciarMain = function () {
         codigo += "\nint main (int argc, char **argv) {\n\n";
         identacao++;
     }
 
+    // Finaliza a função principal
     this.finalizarMain = function () {
         codigo += "\n";
         identar();
@@ -135,11 +147,13 @@ function Gerador() {
         codigo += "}\n";
     }
 
+    // Transforma uma instrução "le" em uma função "scanf"
     this.iniciarLe = function () {
         identar();
         codigo += "scanf(\"";
     }
 
+    // Finaliza uma função scanf, escrevendo a string de formatação e os parâmetros
     this.finalizarLe = function () {
         for (t in listaTipos) {
             if (listaTipos[t] == "inteiro") {
@@ -162,11 +176,13 @@ function Gerador() {
         listaVariaveis = undefined;
     }
 
+    // Transforma uma instrução "escreve" em uma função "printf"
     this.iniciarEscreve = function () {
         identar();
         codigo += "printf(\"";
     }
 
+    // Finaliza uma função "printf", escrevendo a string de formatação e os parâmetros
     this.finalizarEscreve = function () {
         for (t in listaTipos) {
             if (listaTipos[t] == "inteiro") {
@@ -189,70 +205,85 @@ function Gerador() {
         listaVariaveis = undefined;
     }
 
+    // Transforma uma instrução "enquanto" em uma instrução "while"
     this.iniciarEnquanto = function () {
         identar();
         codigo += "while (";
     }
 
+    // Transforma uma instrução "se" em uma instrução "if"
     this.iniciarSe = function () {
         identar();
         codigo += "if (";
     }
 
+    // Transforma uma instrução "senao" em uma instrução "else"
     this.iniciarSenao = function () {
         identar();
         codigo += "else\n";
     }
 
+    // Insere um identificador no código (pode ser uma atribuição de variável ou
+    //   chamada de função)
     this.genIdentificador = function (cadeia) {
         identar();
         codigo += cadeia;
     }
 
+    // Começa a inserir um comando de atribuição ('=')
     this.iniciarAtribuicao = function () {
         codigo += " = ";
     }
 
+    // Finaliza a atribuição retirando o último caractere do código, que é um espaço (vindo da
+    // expressão)
     this.finalizarAtribuicao = function () {
         codigo = codigo.substr(0, codigo.length - 1);
         codigo += ";\n";
     }
 
+    // Começa uma chamada de função
     this.iniciarChamada = function () {
         codigo += "(";
     }
 
+    // Escreve os argumentos de chamadas de função
     this.incluirArgumento = function (cadeia) {
         codigo += cadeia + ", ";
     }
 
+    // Finaliza uma chamada de função, retirando os dois últimos caracteres (vírgula e espaço)
     this.finalizarChamada = function () {
         codigo = codigo.substr(0, codigo.length - 2);
         codigo += ");\n";
     }
 
+    
     this.iniciarCondicao = function () {
 
     }
 
+    //
     this.finalizarCondicao = function () {
         codigo = codigo.substr(0, codigo.length - 1);
         codigo += ")\n";
     }
 
+    // Inicia um bloco de comandos, aumentando o nível de identação
     this.iniciarBloco = function () {
         identar();
         codigo += "{\n";
         identacao++;
     }
 
+    // Finaliza um bloco de comandos, diminuindo o nível de identação
     this.finalizarBloco = function () {
         identacao--;
         identar();
         codigo += "}\n";
     }
 
-    // As expressões são traduzidas ipsis litteris no código gerado
+    // As expressões são transcritas ipsis litteris no código gerado
     this.expressao = function (cadeia) {
         codigo += cadeia + " ";
     }
