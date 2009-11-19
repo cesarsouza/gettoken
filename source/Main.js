@@ -2,11 +2,7 @@
 // ----------------------------------------------------------------
 
 var TRACE = false;
-var DEBUG = false;
-
-var ANALISE_SINTATICA = 0;
-var ANALISE_SEMANTICA = 1;
-var GERACAO_CODIGO    = 2;
+var DEBUG = true;
 
 /// <reference path="Analise\AnalisadorLexico.js" />
 /// <reference path="Analise\AnalisadorSintatico.js" />
@@ -28,18 +24,19 @@ include("source/Sintese/Gerador.js")
 //
 function mainGeracao(input) {
 
-    // Instanciamos um novo analisador sintático
+    // Instanciamos um novo analisador sintático, juntamente com um analisador semântico
+    //   e gerador de código
     var geradorCodigo = new Gerador();
     var analisadorSemantico = new AnalisadorSemantico();
     var analisadorSintatico = new AnalisadorSintatico(input, analisadorSemantico, geradorCodigo);
 
     
-    // Efetua a análise sintática da entrada
+    // Efetua a geração de código, guiada pelo analisador sintático
     var success = analisadorSintatico.parse();
 
     // Verifica se a análise foi concluída sem erros
     if (success) {
-        return geradorCodigo.getCode();
+        return geradorCodigo.getCodigo();
     }
     else {
         // Erros foram encontrados durante a análise
@@ -73,7 +70,7 @@ function mainSemantico(input) {
     var analisadorSemantico = new AnalisadorSemantico();
     var analisadorSintatico = new AnalisadorSintatico(input, analisadorSemantico);
 
-    // Efetua a análise sintática da entrada
+    // Efetua a análise semântica, guiada pelo analisador sintático
     var success = analisadorSintatico.parse();
 
     // Verifica se a análise foi concluída sem erros
@@ -179,7 +176,7 @@ function mainLexico(input) {
 
 
 
-// Função auxiliar para incluir  outros arquivos de script
+// Função auxiliar para incluir outros arquivos de script
 function include(file) {
     var scriptNode = document.createElement('script');
     scriptNode.type = 'text/javascript';
@@ -193,13 +190,15 @@ function include(file) {
 // Função auxiliar para tracing - mensagens só serão exibidas
 //   se a variável global TRACE estiver setada como true.
 function trace(msg) {
-    if (TRACE)
+    if (TRACE) {
         alert(msg);
+    }
 }
 
 // Função auxiliar para debugging - mensagens só serão exibidas
 //   se a variável global DEBUG estiver setada como true.
 function debug(msg) {
-    if (DEBUG)
+    if (DEBUG) {
         alert(msg);
+    }
 }

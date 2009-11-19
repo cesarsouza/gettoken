@@ -19,6 +19,29 @@
 //   analisando a corretude na utilização de variáveis e reportando os
 //   erros encontrados através da lista de erros em error()
 //
+/*
+
+    Implementação do analisador semântico como máquina de estados:
+
+        Esta implementação consiste de 11 estados, cada um correspondendo a uma
+        das partes do programa fonte. As transições entre cada estado são feitas
+        através de chamadas dos métodos desta classe, como "iniciarDeclaracao",
+        "iniciarProcedimento", etc.
+
+        0 - Início
+        1 - Declaração de variáveis globais
+        2 - Declaração de procedimentos
+        3 - Declaração de parâmetros de procedimentos
+        4 - Declaração de variáveis locais à procedimentos
+        5 - Corpo do procedimento
+        6 - Corpo do programa
+        7 - Comando le/escreve dentro de procedimento
+        8 - Chamada de procedimento dentro de procedimento
+        9 - Comando le/escreve
+        10 - Chamada de procedimento
+
+*/
+
 function AnalisadorSemantico() {
 
     // Lista de erros encontrados
@@ -32,11 +55,14 @@ function AnalisadorSemantico() {
     var estado = 0;
 
     var procedimento = "";
-    var posicao = 0;
-    var variaveis = undefined;
     var cadeia = "";
     var tipo = "";
+    var variaveis = undefined;
+    var assinatura = undefined;
     var erroTipo = false;
+    var procedimentoAtual;
+
+    var linha = 0;              // Linha atual da análise sintática
 
     // Variavel booleana que sinaliza ao analisador se ele deve ou não relatar certos erros
     //   (como na situação em que um procedimento não foi declarado, e cada parâmetro seria
@@ -47,10 +73,16 @@ function AnalisadorSemantico() {
     ///////////////////////////////////////////
     // Métodos públicos
 
+    // Atribui a linha atual da análise sintática
+    this.setLinha = function(linha) {
+        this.linha = linha;
+    }
+
     // Empilha um erro no vetor de erros
     this.error = function(mensagem) {
         if (!ignorar) {
-            erros.push(mensagem);
+            var error = new Error(mensagem, this.linha, "semantico");
+            erros.push(error);
         }
     }
 
@@ -60,10 +92,11 @@ function AnalisadorSemantico() {
     }
 
 
-    // Métodos que indicam qual variável ou procedimento está sendo processado pelo analisador
+    // Métodos que indicam qual variável está sendo processado pelo analisador
     this.setCadeia = function(cadeia) { this.cadeia = cadeia; }
     this.getCadeia = function() { return this.cadeia; }
 
+    // Métodos que indicam qual procedimento está sendo processado pelo analisador
     this.setProcedimento = function(procedimento) { this.procedimento = procedimento; }
     this.getProcedimento = function() { return this.procedimento; }
 
@@ -101,12 +134,15 @@ function AnalisadorSemantico() {
         switch (estado) {
             case 2:
                 estado = 3;
-                posicao = 0;
                 break;
             default:
                 break;
         }
         variaveis = new Array();
+        //assinatura = new Array();
+        if (procedimentoAtual.getAssinatura() == undefined) {
+            procedimentoAtual.setAssinatura(new Array());
+        }
     }
 
     this.iniciarLeEscreve = function() {
@@ -148,7 +184,6 @@ function AnalisadorSemantico() {
             default:
                 break;
         }
-        posicao = 0;
     }
 
     this.terminarChamada = function() {
@@ -184,18 +219,19 @@ function AnalisadorSemantico() {
     // Insere um simbolo na tabela de símbolos
     this.inserir = function(simbolo) {
 
+        trace("> analisadorSemantico.inserir()");
+
         var v = new Simbolo(simbolo);
+
+        //alert(v);
 
         switch (estado) {
             case 0:
             case 2:
-                if (!tabelaSimbolos.verificar(v)) {
-                    if (!tabelaSimbolos.inserir(v)) {
-                        this.error("Erro na declaracao do procedimento '" + v.getCadeia() + "' - ja declarado.");
-                        return false;
-                    }
+                if (estado == 2) { 
+                    procedimentoAtual = v;
                 }
-                else {
+                if (!tabelaSimbolos.inserir(v)) {
                     this.error("Erro na declaracao do procedimento '" + v.getCadeia() + "' - ja declarado.");
                     return false;
                 }
@@ -206,26 +242,26 @@ function AnalisadorSemantico() {
             case 3:
             case 4:
                 if (estado == 1) {
-                    v.setCategoria("global");
+                    v.setEscopo("global");
                 }
                 if (estado == 3) {
-                    v.setPosicao(posicao++);
                     v.setCategoria("parametro");
                     v.setProcedimento(this.procedimento);
                 }
                 if (estado == 4) {
-                    v.setCategoria("local");
+                    v.setEscopo("local");
                     v.setProcedimento(this.procedimento);
                 }
 
                 if (v.getCadeia() != undefined) {
+                    //alert("pushing - " + v);
                     variaveis.push(v);
                 }
                 else if (v.getTipo() != undefined) {
-                    var v2 = new Variavel();
-                    posicao--;
                     for (var c in variaveis) {
+                        var v2 = new Simbolo();
                         v2.setCadeia(variaveis[c].getCadeia());
+                        v2.setEscopo(variaveis[c].getEscopo());
                         v2.setProcedimento(variaveis[c].getProcedimento());
                         if (tabelaSimbolos.verificar(v2)) {
                             this.error("Erro na declaracao da variavel '" + v2.getCadeia() + "' - ja declarada.");
@@ -233,8 +269,10 @@ function AnalisadorSemantico() {
                         else {
                             v2.setTipo(v.getTipo());
                             v2.setCategoria(variaveis[c].getCategoria());
-                            v2.setPosicao(variaveis[c].getPosicao());
                             tabelaSimbolos.inserir(v2);
+                            if (estado == 3) {
+                                procedimentoAtual.getAssinatura().push(v.getTipo());
+                            }
                         }
                     }
                 }
@@ -247,22 +285,22 @@ function AnalisadorSemantico() {
 
     this.verificar = function(variavel) {
 
-        var v = new Variavel(variavel);
+        trace("> analisadorSemantico.verificar()");
+
+        var v = new Simbolo(variavel);
 
         switch (estado) {
-            case 0:
+/*            case 0:
             case 1:
             case 2:
                 if (tabelaSimbolos.verificar(v)) {
-                    //error("Variavel '" + v.getCadeia() + "' ja declarada.");
                     return false;
                 }
-                break;
+                break;*/
             case 3:
             case 4:
                 v.setProcedimento(this.procedimento);
                 if (tabelaSimbolos.verificar(v)) {
-                    //error("Variavel '" + v.getCadeia() + "' ja declarada.");
                     return false;
                 }
                 break;
@@ -270,8 +308,10 @@ function AnalisadorSemantico() {
             case 7:
             case 8:
                 v.setProcedimento(this.procedimento);
+                //alert("verificando - " + v);
                 w = tabelaSimbolos.verificar(v);
                 if (!w) {
+                    v.setEscopo("global");
                     v.setProcedimento(undefined);
                     // Primeiro, verificamos se o símbolo está definido 
                     w = tabelaSimbolos.verificar(v);
@@ -303,7 +343,7 @@ function AnalisadorSemantico() {
                     if (w.getTipo() == undefined) {
                         w.setTipo("invalid");
                     }
-                    var temp = new Variavel({"tipo":w.getTipo(), "procedimento":this.procedimento, "posicao":posicao++});
+                    var temp = new Simbolo({"tipo":w.getTipo(), "procedimento":this.procedimento});
 
                     if (!tabelaSimbolos.verificar(temp)) {
                         this.error("Parametro " + w.getCadeia() + " incorreto.");
@@ -315,6 +355,7 @@ function AnalisadorSemantico() {
             case 6:
             case 9:
             case 10:
+                //v.setEscopo("global");
                 w = tabelaSimbolos.verificar(v);
                 if (!w) {
                     if (v.getCategoria() == "procedimento") {
@@ -347,7 +388,7 @@ function AnalisadorSemantico() {
                         w.setTipo("invalid");
                     }
 ////////////////////////////////////////////////////////////////////////////////////////////
-                    var temp = new Variavel({"tipo":w.getTipo(), "procedimento":this.procedimento, "posicao":posicao++});
+                    var temp = new Simbolo({"tipo":w.getTipo(), "procedimento":this.procedimento});
 
                     //alert(temp);
                     //alert(tabelaSimbolos.verificar(temp));
@@ -378,12 +419,14 @@ function AnalisadorSemantico() {
             case 9:
                 return this.verificar(variavel);
                 break;
+            default:
+                break;
         }
 
     }
 
     this.remover = function(variavel) {
-        var v = new Variavel(variavel);
+        var v = new Simbolo(variavel);
         tabelaSimbolos.remover(v);
     }
 

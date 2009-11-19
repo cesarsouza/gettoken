@@ -24,7 +24,7 @@ function AnalisadorSintatico(input, analisadorSemantico, geradorCodigo) {
     // Analisador Léxico a ser utilizado por este Analisador Sintático (parser)
     var analisadorLexico = new AnalisadorLexico(input);
 
-    // Analisador Semântico a ser utilizado pelo parser, caso solicitado
+    // Analisador Semântico a ser utilizado pelo parser
     var analisadorSemantico = analisadorSemantico;
 
     // Gerador de código acoplado ao parser
@@ -62,20 +62,45 @@ function AnalisadorSintatico(input, analisadorSemantico, geradorCodigo) {
         // Inicia a análise a partir da regra inicial
         programa();
 
-        // Se estamos na fase de geração de código e nenhum erro ocorreu,
-        // retornamos o código produzido
-        if (tipoAnalise == GERACAO_CODIGO && error_list.length == 0) {
-            return gerador.getCodigo();
+        if (DEBUG) {
+            analisadorSemantico.imprimir();
         }
 
-        // Verifica se houve erros durante a analise
-        //  sintática e retorna o estado de sucesso
-        return (error_list.length == 0)
+        // Verifica se houve erros durante a analise e retorna o estado de sucesso
+        if (!analisadorSemantico && !gerador) {
+            return (error_list.length == 0);
+        }
+        else {
+            return (error_list.length == 0 && analisadorSemantico.errors().length == 0);
+        }
+
     }
 
     // Retorna a lista de erros encontrados
     this.errors = function() {
+        // Se estamos na análise semântica, concatenamos à lista os erros semânticos encontrados
+        if (analisadorSemantico) {
+            error_list = error_list.concat(analisadorSemantico.errors());
+            error_list.sort(sortErros); 
+        }
         return error_list;
+    }
+
+    function sortErros(a, b) {
+        if (a instanceof Error && b instanceof Error) {
+/*            if (a.phase() == "sintatica" && b.phase() == "semantica") {
+                return -1;
+            }
+            else if (a.phase() == "semantica" && b.phase() == "sintatica") {
+                return 1;
+            }
+            else { */
+                return a.line() - b.line();
+//            }
+        }
+        else {
+            return 0;
+        }
     }
 
 
@@ -96,6 +121,10 @@ function AnalisadorSintatico(input, analisadorSemantico, geradorCodigo) {
 
         // Armazena as informações do token para simplificar os procedimentos
         if (token != null) {
+
+            // Passamos a linha do token atual para o analisador semântico
+            analisadorSemantico.setLinha(analisadorLexico.line());
+
             switch (token.id()) {
 
                 case TokenId.Identifier:
@@ -160,24 +189,10 @@ function AnalisadorSintatico(input, analisadorSemantico, geradorCodigo) {
     // Empilha um erro na lista de erros
     function error(mensagem) {
         if (!ignorando) {
-           var error = new Error(mensagem, analisadorLexico.line());
-           error_list.push(error);
+            var error = new Error(mensagem, analisadorLexico.line(), "sintatico");
+            error_list.push(error);
         }
     }
-
-
-    // Empilha erros semânticos na lista de erros (é fornecida uma lista de erros como
-    //   parâmetro porque o analisador semântico retorna um array de erros a cada checagem)
-    function errorSemantico(listaErros) {
-        // Só empilhamos o erro semântico se estivermos na análise semântica ou na
-        //   geração de código
-        if (tipoAnalise == ANALISE_SEMANTICA || tipoAnalise == GERACAO_CODIGO) {
-            for (e in listaErros) {
-                error(listaErros[e]);
-            }
-        }
-    }
-
 
 
     // Varre a entrada ate que um símbolo de sincronização seja encontrado
@@ -301,7 +316,9 @@ function AnalisadorSintatico(input, analisadorSemantico, geradorCodigo) {
 
 // Corte para o analisador semantico e gerador de código
             // sinaliza ao analisador que um bloco de declaração de variáveis está se iniciando
-            analisadorSemantico.iniciarDeclaracao();
+            if (analisadorSemantico) {
+                analisadorSemantico.iniciarDeclaracao();
+            }
 // Fim do corte para o analisador semantico e gerador de código
 
             // Chama a regra "variáveis"
@@ -363,9 +380,9 @@ function AnalisadorSintatico(input, analisadorSemantico, geradorCodigo) {
         }
         if (simbolo == "@ident") {
         
-        
+
 // Corte para o analisador semantico e gerador de código
-            var simbolo = analisadorSemantico.variavel({"cadeia":cadeia});
+            var temp = analisadorSemantico.variavel({"cadeia":cadeia});
 
             if (temp instanceof Simbolo) {
                 gerador.guardaVariavel(cadeia, temp.getTipo());
@@ -404,9 +421,9 @@ function AnalisadorSintatico(input, analisadorSemantico, geradorCodigo) {
 
             
 // Corte para o analisador semantico e gerador de código
-                var simbolo = analisadorSemantico.variavel({"cadeia":cadeia});
+                var temp = analisadorSemantico.variavel({"cadeia":cadeia});
 
-                if (simbolo instanceof Simbolo) {
+                if (temp instanceof Simbolo) {
                     gerador.guardaVariavel(cadeia, temp.getTipo());
                 }
                 else {
@@ -450,8 +467,9 @@ function AnalisadorSintatico(input, analisadorSemantico, geradorCodigo) {
             obterSimbolo();
 
 // Corte para o analisador semantico e gerador de código
-            if (analisadorSemantico)
-              analisadorSemantico.iniciarProcedimento();
+            if (analisadorSemantico) {
+                analisadorSemantico.iniciarProcedimento();
+            }
 // Fim do corte para o analisador semantico e gerador de código
 
             if (simbolo != "@ident") {
@@ -465,8 +483,8 @@ function AnalisadorSintatico(input, analisadorSemantico, geradorCodigo) {
                 {
                 analisadorSemantico.setProcedimento(cadeia);
                 analisadorSemantico.inserir({"cadeia":cadeia, "categoria":"procedimento"});
-                
-                if (gerador)
+                }
+                if (gerador) {
                 gerador.genProcedimento(cadeia);
                 }
 // Fim do corte para o analisador semantico e gerador de código
@@ -511,8 +529,9 @@ function AnalisadorSintatico(input, analisadorSemantico, geradorCodigo) {
             if (analisadorSemantico)
             {
             // Removemos as variáveis locais do procedimento
-            analisadorSemantico.remover({"categoria":"local", "procedimento":analisadorSemantico.getProcedimento()});
-            if (gerador)
+            analisadorSemantico.remover({"escopo":"local", "procedimento":analisadorSemantico.getProcedimento()});
+            }
+            if (gerador) {
             gerador.finalizarProcedimento();
             }
 // Fim do corte para o analisador semantico e gerador de código
@@ -537,8 +556,9 @@ function AnalisadorSintatico(input, analisadorSemantico, geradorCodigo) {
     function lista_par(seguidores) {
 
         // sinaliza ao analisador que um bloco de declaração de parametros está se iniciando
-        if (analisadorSemantico)
-        analisadorSemantico.iniciarParametros();
+        if (analisadorSemantico) {
+            analisadorSemantico.iniciarParametros();
+        }
 
         // Chama a regra "variaveis"
         variaveis(join(seguidores, Seguidores["lista_par"], ":", "real", "inteiro"));
@@ -558,10 +578,11 @@ function AnalisadorSintatico(input, analisadorSemantico, geradorCodigo) {
         if (simbolo == "real" || simbolo == "inteiro") {
         
 // Corte para o analisador semantico e gerador de código
-           if (analisadorSemantico) {
-            analisadorSemantico.inserir({"tipo":simbolo});
-            if (gerador)
-            gerador.genParametros(simbolo);
+            if (analisadorSemantico) {
+                analisadorSemantico.inserir({"tipo":simbolo});
+            }
+            if (gerador) {
+                gerador.genParametros(simbolo);
             }
 // Fim do corte para o analisador semantico e gerador de código
 
@@ -581,7 +602,9 @@ function AnalisadorSintatico(input, analisadorSemantico, geradorCodigo) {
             obterSimbolo();
 
             // sinaliza ao analisador que um bloco de declaração de parametros está se iniciando
-            if (analisadorSemantico) analisadorSemantico.iniciarParametros();
+            if (analisadorSemantico) {
+                analisadorSemantico.iniciarParametros();
+            }
 
             // Chama a regra "variáveis" 
             variaveis(join(seguidores, Seguidores["lista_par"], "var"));
@@ -604,7 +627,8 @@ function AnalisadorSintatico(input, analisadorSemantico, geradorCodigo) {
                 if (analisadorSemantico)
                 {
                     analisadorSemantico.inserir({"tipo":simbolo});
-                    if (gerador)
+                }
+                if (gerador) {
                     gerador.genParametros(simbolo);
                 }
 // Fim do corte para o analisador semantico e gerador de código
@@ -862,9 +886,7 @@ function AnalisadorSintatico(input, analisadorSemantico, geradorCodigo) {
             }
 
             analisadorSemantico.terminarLeEscreve();
-            if (listaErros = analisadorSemantico.erro()) {
-                errorSemantico(listaErros);
-            }
+
             gerador.finalizarLe();
 
         }
@@ -894,9 +916,7 @@ function AnalisadorSintatico(input, analisadorSemantico, geradorCodigo) {
             }
 
             analisadorSemantico.terminarLeEscreve();
-            if (listaErros = analisadorSemantico.erro()) {
-                errorSemantico(listaErros);
-            }
+
             gerador.finalizarEscreve();
 
         }
@@ -1031,9 +1051,6 @@ function AnalisadorSintatico(input, analisadorSemantico, geradorCodigo) {
 
             v = analisadorSemantico.verificar({"cadeia":analisadorSemantico.getCadeia()});
 
-            if (listaErros = analisadorSemantico.erro()) {
-                errorSemantico(listaErros);
-            }
             // Chama a regra "expressão"
             tipo = expressao(join(seguidores, Seguidores["cont_ident"]));
 
@@ -1047,9 +1064,7 @@ function AnalisadorSintatico(input, analisadorSemantico, geradorCodigo) {
         else if (simbolo in Primeiros["lista_arg"]) {
 
             analisadorSemantico.verificar({"cadeia":analisadorSemantico.getCadeia(), "categoria":"procedimento"});
-            if (listaErros = analisadorSemantico.erro()) {
-                errorSemantico(listaErros);
-            }
+
             analisadorSemantico.setProcedimento(analisadorSemantico.getCadeia());
 
             analisadorSemantico.iniciarChamada();
@@ -1060,9 +1075,6 @@ function AnalisadorSintatico(input, analisadorSemantico, geradorCodigo) {
             lista_arg(join(seguidores, Seguidores["cont_ident"]));
 
             analisadorSemantico.terminarChamada();
-            if (listaErros = analisadorSemantico.erro()) {
-                errorSemantico(listaErros);
-            }
 
             gerador.finalizarChamada();
 
@@ -1258,9 +1270,6 @@ function AnalisadorSintatico(input, analisadorSemantico, geradorCodigo) {
 
         if (simbolo == "@ident") {
             v = analisadorSemantico.verificar({"cadeia":cadeia});
-            if (listaErros = analisadorSemantico.erro()) {
-                errorSemantico(listaErros);
-            }
 
             gerador.expressao(cadeia);
 

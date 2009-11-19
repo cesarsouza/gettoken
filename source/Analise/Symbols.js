@@ -25,14 +25,18 @@ function Symbols() {
     //  Retorna true caso o simbolo tenha sido inserido com
     //  sucesso, e falso caso o simbolo ja estava na tabela
     this.inserir = function(simbolo) {
-        
+
+        trace("> tabelaSimbolos.inserir(" + simbolo + ")");
+
+//        var s = new Simbolo(simbolo);
+
         // Pegamos o nome identificador do simbolo
         var cadeia = simbolo.getCadeia();
         
         // Verificamos primeiro se o símbolo não
         //  está na tabela.
         if (!this.verificar(simbolo)) {
-            
+
             // O símbolo não está.
             // Verificamos se ja existe uma linha contendo
             //  outros símbolos que atendem pelo mesmo nome
@@ -40,9 +44,12 @@ function Symbols() {
             if (!tabela[cadeia]) {
                 tabela[cadeia] = new Array();
             }
-            
+
             // Insere o simbolo na linha da tabela
             tabela[cadeia].push(simbolo);
+
+            //alert("inserido - " + s);
+
             return true;
         }
         else {
@@ -52,11 +59,15 @@ function Symbols() {
 
 
     // Verifica se um simbolo está na tabela de símbolos e
-    //  retorna o símbolo correspondente com todas informacoes
+    //   o retorna com todos seus atributos
     this.verificar = function(simbolo) {
-        
+
+        trace("> tabelaSimbolos.verificar(" + simbolo + ")");
+
+        //alert("Verificando simbolo " + simbolo);
+
         var cadeia = simbolo.getCadeia();
-        
+
         // Verifica se há uma linha na tabela identificada
         //   pelo nome do simbolo
         if (!tabela[cadeia]) {
@@ -66,73 +77,90 @@ function Symbols() {
             // O nome do símbolo está na tabela. Iremos varrer
             //  a linha procurando por um símbolo que tenha os
             //  mesmos atributos do simbolo passado 
-            
-            var index = procuraSimboloNaLinha(simbolo, cadeia);
-            
-            
+
+            var index = this.procuraSimboloNaLinha(simbolo, cadeia);
+
             // Retorna o primeiro simbolo que casar com o que procuramos
-            if (index >= 0) return tabela[cadeia][index];
+            if (index >= 0) {
+                return tabela[cadeia][index];
+            }
         
-           // Se não encontrou, retorna null
-           return null;
+            // Se não encontrou, retorna null
+            return null;
         }
     }
 
 
     // Remove um símbolo da tabela de símbolos.
     this.remover = function(simbolo) {
-    
+
+        trace("> tabelaSimbolos.remover()");
+
+        // alert("vamos remover o simbolo " + simbolo);
         // Passamos por todos os registros da tabela, removendo todos
         //  que tenham a categoria local e o nome do procedimento igual
         //  ao que passamos
         
         // Para cada linha da tabela
         for (var linha in tabela) {
-        
+
             // Verifica se há simbolos que casam com o procurado
-            var index = procuraSimboloNaLinha(simbolo, linha);
-            
+            var index = this.procuraSimboloNaLinha(simbolo, linha);
+
             // Enquanto houver simbolos que casem
             while (index >= 0) {
-               // Remove este simbolo
-               tabela[linha] = tabela[linha].splice(index, 1);
-               
-               // Verifica se há mais simbolos a remover
-               index = procuraSimboloNaLinha(simbolo, linha);
+
+                //alert("linha " + linha + ", " + index + "\n\n" + this);
+
+                // Remove este simbolo
+                tabela[linha].splice(index, 1);
+
+                // Verifica se há mais simbolos a remover
+                index = this.procuraSimboloNaLinha(simbolo, linha);
             }
         }
     }
 
+    // Modifica uma entrada de procedimento, inserindo sua assinatura (lista de tipos dos parâmetros)
+    this.insereAssinatura = function(procedimento, assinatura) {
+        var v = this.verificar(new Simbolo({"procedimento":procedimento, "categoria":"procedimento"}));
+        v.setAssinatura(assinatura);
+        alert("uou");
+    }
 
     // Procura um simbolo na linha e retorna seu indice.
     //  Retorna -1 caso o símbolo não esteja na linha.
     this.procuraSimboloNaLinha = function(simbolo, linha) {
-    
-        var cadeia = simbolo.getChave();
+
+        trace("> tabelaSimbolos.procuraSimboloNaLinha()");
         
         // Para cada simbolo na linha
-        for (var i in tabela[linha])
-        {
+        for (var i in tabela[linha]) {
             var achou = true;
 
-            // Para cada campo definido em simbolo, tentaremos encontrar
-            //  um simbolo que case com todos os campos definidos
-            for (var campo in simbolo)
-            {
-               // Se o campo nao estiver definido
-               if (!simbolo[campo])
-                 continue;
-               
-               // Se o campo estiver definido, mas não bater com o campo atual
-               if (tabela[cadeia][i] != simbolo[campo])
-               {
-                 achou = false;
-                 break;
-               }
+            if (simbolo.getCadeia() != undefined && simbolo.getCadeia() != tabela[linha][i].getCadeia()) {
+                achou = false;
+            }
+            if (simbolo.getTipo() != undefined && simbolo.getTipo() != tabela[linha][i].getTipo()) {
+                achou = false;
+            }
+            if (simbolo.getEscopo() != undefined && simbolo.getEscopo() != tabela[linha][i].getEscopo()) {
+                achou = false;
+            }
+            if (simbolo.getCategoria() != undefined && simbolo.getCategoria() != tabela[linha][i].getCategoria()) {
+                achou = false;
+            }
+            if (simbolo.getProcedimento() != undefined && simbolo.getProcedimento() != tabela[linha][i].getProcedimento()) {
+                achou = false;
+            }
+            if (simbolo.getAssinatura() != undefined && simbolo.getAssinatura() != tabela[linha][i].getAssinatura()) {
+                achou = false;
             }
             
             // Retorna o primeiro simbolo que casar com o que procuramos
-            if (achou) return i;
+            if (achou) {
+                return i;
+            }
         }
         
         return -1; // Se nao acharmos, retorna -1.
@@ -143,16 +171,15 @@ function Symbols() {
     this.toString = function() {
         var texto = "Imprimindo tabela de simbolos\n\n";
         
-        for (var o in tabela) {
-            texto += "Linha " + o + "\n";
-            var saida = "";
-            for (var i in tabela[o]) {
-                saida = saida + vetor[i].toString() + "\n";
+        for (var l in tabela) {
+            texto = texto + "Linha " + l + "\n";
+            for (var s in tabela[l]) {
+                texto = texto + "[" + s + "] - " + tabela[l][s] + "\n";
             }
-        
-            texto += saida + "\n";
+            texto += "\n";
         }
-        alert(texto);
+
+        return texto;
     }
 }
 
@@ -163,38 +190,45 @@ function Symbols() {
 //
 function Simbolo(simbolo) {
 
-    var cadeia;          // cadeia que identifica o simbolo.
-    var tipo;            // tipo do simbolo, como inteiro, real (se suportado).
-    var escopo;          // local ou global.
+    var cadeia;          // cadeia que identifica o simbolo
+    var tipo;            // tipo do simbolo, como inteiro, real (se aplicável)
+    var escopo;          // local ou global
     var categoria;       // variavel, parametro, programa, procedimento
-    
     var procedimento;    // apenas para parâmetros e variáveis locais
                          //   indica a qual procedimento a variável pertence
-                         
     var assinatura;      // apenas para procedimentos
                          //   indica os tipos dos parametros do procedimento
                          //   vetor contendo os tipos dos parametros
                          
-                         
+
+/*
+    debug("simbolo instanceof Simbolo? " + (simbolo instanceof Simbolo) + "\n" +
+        "simbolo instanceof Array? " + (simbolo instanceof Array) + "\n" +
+        "simbolo instanceof String? " + (simbolo instanceof String) + "\n" +
+        "simbolo instanceof Object? " + (simbolo instanceof Object));
+*/
+
     // Determina o tipo do parametro "simbolo" para
-    //  criarmos este objeto simbolo adequadamente
+    //  criarmos este objeto adequadamente
     //
     if (simbolo instanceof Simbolo) {
-        // Checamos se a variavel 'variavel' é um objeto Simbolo
+        // Checamos se a variavel 'simbolo' é um objeto Simbolo
         this.cadeia        = simbolo.cadeia;
         this.tipo          = simbolo.tipo;
+        this.escopo        = simbolo.escopo;
         this.categoria     = simbolo.categoria;
         this.procedimento  = simbolo.procedimento;
         this.assinatura    = simbolo.assinatura;
     }
     
-    else if (simbolo instanceof Array) {
-        // Caso contrário, é um array
+    else if (simbolo instanceof Object) {
+        // Um array associativo é um objeto do tipo Object, e não do tipo Array
         this.cadeia       = simbolo["cadeia"];
         this.tipo         = simbolo["tipo"];
+        this.escopo       = simbolo["escopo"];
         this.categoria    = simbolo["categoria"];
         this.procedimento = simbolo["procedimento"];
-        this.posicao      = simbolo["assinatura"];                   
+        this.assinatura   = simbolo["assinatura"];
      }
      
      else if (simbolo instanceof String) {
@@ -208,12 +242,14 @@ function Simbolo(simbolo) {
     
     this.setCadeia       = function(cadeia)       { this.cadeia       = cadeia; }
     this.setTipo         = function(tipo)         { this.tipo         = tipo; }
+    this.setEscopo       = function(escopo)       { this.escopo       = escopo; }
     this.setCategoria    = function(categoria)    { this.categoria    = categoria; }
     this.setProcedimento = function(procedimento) { this.procedimento = procedimento; }
-    this.setAssinatura   = function(assinatura)   { this.posicao      = assinatura; }
+    this.setAssinatura   = function(assinatura)   { this.assinatura   = assinatura; }
     
     this.getCadeia       = function() { return this.cadeia; }
     this.getTipo         = function() { return this.tipo; }
+    this.getEscopo       = function() { return this.escopo; }
     this.getCategoria    = function() { return this.categoria; }
     this.getProcedimento = function() { return this.procedimento; }
     this.getAssinatura   = function() { return this.assinatura; }
@@ -222,9 +258,10 @@ function Simbolo(simbolo) {
     this.toString = function() {
         return "cadeia = " + this.cadeia +
             "   tipo = " + this.tipo +
+            "   escopo = " + this.escopo +
             "   categoria = " + this.categoria +
             "   procedimento = " + this.procedimento +
-            "   posicao = " + this.posicao;
+            "   assinatura = " + this.assinatura;
     }
 
 }
