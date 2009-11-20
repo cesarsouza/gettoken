@@ -30,10 +30,6 @@ function AnalisadorLexico(input) {
     var lastError = null;               // último erro não-tokenizável encontrado
 
 
-
-
-
-
     // ************************************************************************
     // Métodos públicos
     // ************************************************************************
@@ -148,7 +144,7 @@ function AnalisadorLexico(input) {
     //  *********
 
     // Tenta reconhecer um próximo identificador na entrada através de um
-    //  autômato reconhecedor de identificadores (ou palavras reservadas)
+    //   autômato reconhecedor de identificadores (ou palavras reservadas)
     function proximoIdentificador() {
         // Expressão regular para identificadores:
         // {letra}({letra}|{digito})*
@@ -189,7 +185,7 @@ function AnalisadorLexico(input) {
 
 
     // Tenta reconhecer um próximo número na entrada através de
-    //  um autômato reconhecedor de números (inteiros ou reais)
+    //   um autômato reconhecedor de números (inteiros ou reais)
     function proximoNumero() {
         // Expressões regulares para números:
         // Inteiro:  {digito}{digito}*
@@ -263,7 +259,7 @@ function AnalisadorLexico(input) {
 
 
     // Tenta reconhecer um próximo símbolo na entrada através de
-    //  um autômato reconhecedor de símbolos da linguagem.
+    //   um autômato reconhecedor de símbolos da linguagem.
     function proximoSimbolo() {
         // Expressão regular para símbolos:
         // == | <> | >= | <= | > | < | + | - | * | / | := | ; | : | . | , | ( | )
@@ -362,7 +358,7 @@ function AnalisadorLexico(input) {
     }
 
     // Avança na entrada ignorando espaços e comentários
-    //  até o próximo token (ou até o término da entrada)
+    //   até o próximo token (ou até o término da entrada)
     function avancaAoProximoToken() {
 
         var estado = 0;
@@ -395,9 +391,9 @@ function AnalisadorLexico(input) {
                     }
                     else if (!c) {
                         // Atingimos o final da entrada antes de chegarmos ao final do
-                        //  comentário. Este é um caso especial pois não compreende um
-                        //  erro tokenizável, já que comentários, assim como espaços em
-                        //  branco, são simplesmente ignorados nesta fase da análise.
+                        //   comentário. Este é um caso especial pois não compreende um
+                        //   erro tokenizável, já que comentários, assim como espaços em
+                        //   branco, são simplesmente ignorados nesta fase da análise.
 
                         lastError = new Error("Fim de comentario nao encontrado", currentLine);
                         return;

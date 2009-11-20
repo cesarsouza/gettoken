@@ -12,7 +12,7 @@ var DEBUG = true;
 include("source/Analise/Error.js");
 include("source/Analise/Token.js");
 include("source/Analise/Keywords.js");
-include("source/Analise/Symbols.js");
+include("source/Analise/TabelaSimbolos.js");
 include("source/Analise/Simbolo.js");
 include("source/Analise/AnalisadorLexico.js");
 include("source/Analise/AnalisadorSintatico.js")
@@ -31,7 +31,7 @@ function mainGeracao(input) {
     var analisadorSemantico = new AnalisadorSemantico();
     var analisadorSintatico = new AnalisadorSintatico(input, analisadorSemantico, geradorCodigo);
 
-    
+
     // Efetua a geração de código, guiada pelo analisador sintático
     var success = analisadorSintatico.parse();
 
@@ -67,7 +67,7 @@ function mainGeracao(input) {
 //
 function mainSemantico(input) {
 
-    // Instanciamos um novo analisador sintático em modo especial, para 
+    // Instanciamos um novo analisador sintático em modo especial, para
     //   guiar a analise semantica
     var analisadorSemantico = new AnalisadorSemantico();
     var analisadorSintatico = new AnalisadorSintatico(input, analisadorSemantico);

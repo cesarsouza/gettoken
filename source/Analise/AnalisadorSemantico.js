@@ -6,13 +6,14 @@
 // OBSERVAÇÕES:
 //
 // ---------------------------------------------------------------------------------------
+//
+// 091120 - Vide caso de teste abaixo: linha undefiend.
+//
 // 091119 - O erro reportado abaixo já foi solucionado. Acredito que, de erros na análise
 //          semântica, pegamos todos
 //
 // 091106 - Erro que ainda não é capturado: Chamada de procedimento que tem parâmetros mas
 //          nenhum parâmetro ou um número menor é passado
-//
-// 091120 - Vide caso de teste abaixo: linha undefiend.
 //
 
 /*
@@ -25,7 +26,7 @@ var a: real;
 var b: inteiro;
 procedimento nomep(x: real);
 
-var c: real; 
+var c: real;
 inicio
         le(a);
         se a<x+c entao
@@ -48,35 +49,11 @@ Erro na linha 9: Esperado 'inicio' mas encontrado 'le'
 Erro na linha undefined: Parametro b incorreto. Esperado valor real mas encontrado valor inteiro.
 */
 
-/*
-
-    Implementação do analisador semântico como máquina de estados:
-
-        Esta implementação consiste de 11 estados, cada um correspondendo a uma
-        das partes do programa fonte. As transições entre cada estado são feitas
-        através de chamadas dos métodos desta classe, como "iniciarDeclaracao",
-        "iniciarProcedimento", etc.
-
-        Descrição de cada estado:
-        0 - Início (declaração do nome do programa)
-        1 - Declaração de variáveis globais
-        2 - Declaração de procedimentos
-        3 - Declaração de parâmetros de procedimentos
-        4 - Declaração de variáveis locais à procedimentos
-        5 - Corpo do procedimento
-        6 - Corpo do programa
-        7 - Comando le/escreve dentro de procedimento
-        8 - Chamada de procedimento dentro de procedimento
-        9 - Comando le/escreve
-        10 - Chamada de procedimento
-
-*/
 
 // Classe Analisador Semântico
 //   Esta classe é responsável por executar a etapa de análise semântica,
 //   analisando a corretude na utilização de variáveis e reportando os
 //   erros encontrados através da lista de erros em error()
-//
 //
 //   Implementação do analisador semântico como máquina de estados:
 //
@@ -110,10 +87,10 @@ function AnalisadorSemantico() {
     var error_list = new Array();
 
     // Tabela de símbolos
-    var tabelaSimbolos = new Symbols();
+    var tabelaSimbolos = new TabelaSimbolos();
 
     // O analisador semântico é implementado como uma máquina de estados
-    //  para facilitar o processamento. Estado indicado pela variavel abaixo.
+    //   para facilitar o processamento. Estado indicado pela variavel abaixo.
     var estado = 0;
 
     var procedimento = "";
@@ -129,7 +106,7 @@ function AnalisadorSemantico() {
     var numeroEncontrado;
 
     // Linha atual da análise sintática (para gerar erros na linha correta)
-    var linha;
+    var linha = 0;
 
     // Variavel booleana que sinaliza ao analisador se ele deve ou não relatar certos erros
     //   (como na situação em que um procedimento não foi declarado, e cada parâmetro seria
@@ -146,11 +123,10 @@ function AnalisadorSemantico() {
     // Empilha um erro no vetor de erros
     function error(mensagem) {
         if (!ignorar) {
-            var error = new Error(mensagem, this.linha, "semantico");
+            var error = new Error(mensagem, linha, "semantico");
             error_list.push(error);
         }
     }
-
 
 
 
@@ -160,8 +136,8 @@ function AnalisadorSemantico() {
 
 
     // Atribui a linha atual da análise sintática
-    this.setLinha = function(linha) {
-        this.linha = linha;
+    this.setLinha = function(l) {
+        linha = l;
     }
 
     // Retorna a lista de erros encontrados durante a análise.
@@ -251,6 +227,7 @@ function AnalisadorSemantico() {
                 break;
         }
         if (erroTipo) {
+            // Não se pode tirar o 'this.' daqui!
             error("Parametros com tipos diferentes.");
         }
     }
@@ -376,7 +353,7 @@ function AnalisadorSemantico() {
     }
 
     // Verifica se um símbolo está atualmente na tabela de símbolos.
-    //  Retorna o símbolo, se encontrado, ou null, caso não encontrado.
+    //   Retorna o símbolo, se encontrado, ou null, caso não encontrado.
     this.verificar = function(variavel) {
 
         trace("> analisadorSemantico.verificar()");
@@ -426,6 +403,8 @@ function AnalisadorSemantico() {
                 }
                 else if (estado == 8) {
                     // Verifica se os parametros passados correspondem aos parâmetros formais
+
+                    // Esta checagem impede que construções como p1(p1); sejam válidas
                     if (w.getTipo() == undefined) {
                         w.setTipo("invalid");
                     }
@@ -433,8 +412,6 @@ function AnalisadorSemantico() {
                     if (procedimentoAtual && w.getTipo() != procedimentoAtual.getAssinatura()[argumentoAtual++]) {
                         error("Parametro " + w.getCadeia() + " incorreto. Esperado valor " + procedimentoAtual.getAssinatura()[argumentoAtual - 1] + " mas encontrado valor " + w.getTipo() + ".");
                     }
-                    numeroEncontrado++;
-
                 }
 
                 return w;
@@ -474,9 +451,8 @@ function AnalisadorSemantico() {
                 }
                 else if (estado == 10) {
                     // Verifica se os parametros passados correspondem aos parâmetros formais
-// TODO: Isto ja esta arrumado, certo?
-////////////////////////////////////////////////////////////////////////////////////////////
-// se não tivesse isto, construções como p1(p1); seriam válidas
+
+                    // Esta checagem impede que construções como p1(p1); sejam válidas
                     if (w.getTipo() == undefined) {
                         w.setTipo("invalid");
                     }

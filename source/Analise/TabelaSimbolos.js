@@ -1,9 +1,8 @@
-﻿// Classe Symbols
-//   (Vamos trocar o nome desta classe para TabelaSimbolos?)
+﻿// Classe TabelaSimbolos
 //   Implementação da tabela de símbolos como uma tabela hash (estrutura intrínseca do
 //   JavaScript) juntamente com um vetor dinâmico para tratar os casos de colisão
 //
-function Symbols() {
+function TabelaSimbolos() {
 
 // TODO: Definir melhor o nome de todas as classes. Porque, por exemplo, temos
 //   classe Token, classe Errors, clase Keywords, todas em ingles... mas também
@@ -141,17 +140,8 @@ function Symbols() {
         }
     }
 
-
-//TODO: Estamos usando isso?
-    // Modifica uma entrada de procedimento, inserindo sua assinatura (lista de tipos dos parâmetros)
-    this.insereAssinatura = function(procedimento, assinatura) {
-        var v = this.verificar(new Simbolo({"procedimento":procedimento, "categoria":"procedimento"}));
-        v.setAssinatura(assinatura);
-    }
-
-
     // Procura um simbolo na linha e retorna seu indice.
-    //  Retorna -1 caso o símbolo não esteja na linha.
+    // Retorna -1 caso o símbolo não esteja na linha.
     this.procuraSimboloNaLinha = function(simbolo, linha) {
 
         trace("> tabelaSimbolos.procuraSimboloNaLinha()");
@@ -205,6 +195,3 @@ function Symbols() {
         return texto;
     }
 }
-
-
-

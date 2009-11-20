@@ -3,29 +3,25 @@
 
 // A classe Token encompassa um lexema e a categoria do lexema
 //   identificado, como, por exemplo: <54, numero_inteiro>
-function Token(id, valor)
-{
+function Token(id, valor) {
 
     var tokenId = id;     // Categoria do lexema identificado
     var cadeia = valor;   // Cadeia do lexema identificado
 
 
     // Retorna a cadeia identificada
-    this.cadeia = function()
-    {
+    this.cadeia = function() {
         return cadeia;
     }
 
     // Retorna a categoria da cadeia identificada
-    this.id = function()
-    {
+    this.id = function() {
         return id;
     }
 
     // Retorna uma representacao em string do token
     //  no formato "lexema - categoria", sem aspas
-    this.toString = function()
-    {
+    this.toString = function() {
         if (!cadeia || cadeia == "")
         return new String();
 
@@ -44,8 +40,7 @@ function Token(id, valor)
 
 
 // Enumeracao de categorias de lexemas
-var TokenId =
-{
+var TokenId = {
     Error:      "erro",
     Keyword:    "palavra_reservada",
     Identifier: "identificador",

@@ -14,7 +14,6 @@ function Error(mensagem, linha, fase) {
     var lin = linha;      // Linha em que aparece o erro
     var fas = fase;       // Fase da análise em que o erro ocorreu
 
-
     this.message = function() {
        return msg;
     }
@@ -26,7 +25,6 @@ function Error(mensagem, linha, fase) {
     this.phase = function() { //TODO: acho que o termo correto é "step"
         return fase;
     }
-
 
     this.toString = function() {
         var mensagem = msg;
