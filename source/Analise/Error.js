@@ -7,6 +7,7 @@
 //   de comentário não encontrado. Durante a análise léxica, comentários
 //   são simplesmente descartados, assim como espaços em branco, e não
 //   constituem tokens.
+//
 function Error(mensagem, linha, fase) {
 
     var msg = mensagem;   // Mensagem do erro identificado
@@ -22,7 +23,7 @@ function Error(mensagem, linha, fase) {
        return lin;
     }
 
-    this.phase = function() {
+    this.phase = function() { //TODO: acho que o termo correto é "step"
         return fase;
     }
 

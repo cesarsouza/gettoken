@@ -5,11 +5,19 @@
 // Classe Gerador
 //   Esta classe é responsável por realizar a geração de código fonte
 //     ANSI C equivalente ao programa fornecido em ALG.
-//   Apenas programas bem formados serão compilados. Qualquer erro
-//     encontrado durante qualquer fase de análise impedirá a
-//     apresentação do programa gerado.
-
+//
+//   Apenas programas corretos segundo a especificação ALG serão
+//     compilados. Qualquer erro, seja léxico, semântico ou sintático,
+//     ou seja, encontrado durante qualquer fase de análise impedirá a
+//     apresentação do código em ANSI C do programa gerado.
+//
 function Gerador() {
+
+
+
+    // ************************************************************************
+    // Variáveis privadas
+    // ************************************************************************
 
     // Variável que guardará o código produzido
     var codigo = "";
@@ -26,18 +34,14 @@ function Gerador() {
     var listaTipos = undefined;
 
 
-    ///////////////////////////////////////////
-    // Métodos públicos
-
-    // Retorna o código gerado
-    this.getCodigo = function () {
-        return codigo;
-    }
 
 
-    ///////////////////////////////////////////
+
+    // ************************************************************************
     // Métodos privados
-
+    // ************************************************************************
+ 
+    
     // Insere identação na linha atual do código gerado
     function identar() {
         for (var i = 0; i < identacao; i++) {
@@ -46,6 +50,21 @@ function Gerador() {
             }
         }
     }
+    
+    
+    
+
+    // ************************************************************************
+    // Métodos publicos
+    // ************************************************************************
+
+
+    // Retorna o código gerado
+    this.codigo = function () {
+        return codigo;
+    }
+    
+
 
     // Inicia a geração do código. Coloca um cabeçalho (nome do programa) e
     //   insere o #include <stdio.h>
@@ -261,7 +280,7 @@ function Gerador() {
 
     
     this.iniciarCondicao = function () {
-
+//TODO: este metodo nao faz nada?
     }
 
     //
@@ -284,6 +303,7 @@ function Gerador() {
         codigo += "}\n";
     }
 
+//TODO: bonita expressam em latim!
     // As expressões são transcritas ipsis litteris no código gerado
     this.expressao = function (cadeia) {
         codigo += cadeia + " ";

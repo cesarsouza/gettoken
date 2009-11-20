@@ -5,22 +5,46 @@
 //
 function Symbols() {
 
+// TODO: Definir melhor o nome de todas as classes. Porque, por exemplo, temos
+//   classe Token, classe Errors, clase Keywords, todas em ingles... mas também
+//   temos classe Simbolo, classes Analisadores...
+
 /*
 
- [chave][simbolo1,simbolo2,simbolo3]
+ Estrutura teórica da tabela de símbolos (que é construida utilizando-se objetos)
+
+   [chave] => [simbolo1,simbolo2,simbolo3]
 
  em que simbolo1, simbolo2 e simbolo3 possuem o mesmo nome identificador
  referido por chave
 
- por exemplo
+ por exemplo:
 
- [x][variavel inteira global de nome x, variavel real no procedimento 1 de nome x]
- [y][variavel real no procedimento 1 de nome y]
- [z][procedimento global z]
+   [x] => [variavel inteira global de nome x, variavel real no procedimento 1 de nome x]
+   [y] => [variavel real no procedimento 1 de nome y]
+   [z] => [procedimento global z]
+   [fibonacci] => [procedimento global com assinatura (a:inteiro) global de nome fibonacci]
+   [a] => [variavel local no procedimento fibonacci de nome a]
 
 */
 
+
+    // ************************************************************************
+    // Variáveis Privadas
+    // ************************************************************************
+
+
+    // Estrutura de tabela implementada como Tabela Hash
+    //  (objetos em JavaScript são internamente implementados como tabelas hash)
     var tabela = new Object();
+
+
+
+
+    // ************************************************************************
+    // Métodos públicos
+    // ************************************************************************
+
 
     // Insere um Símbolo na tabela.
     //   Retorna true caso o simbolo tenha sido inserido com
@@ -117,11 +141,14 @@ function Symbols() {
         }
     }
 
+
+//TODO: Estamos usando isso?
     // Modifica uma entrada de procedimento, inserindo sua assinatura (lista de tipos dos parâmetros)
     this.insereAssinatura = function(procedimento, assinatura) {
         var v = this.verificar(new Simbolo({"procedimento":procedimento, "categoria":"procedimento"}));
         v.setAssinatura(assinatura);
     }
+
 
     // Procura um simbolo na linha e retorna seu indice.
     //  Retorna -1 caso o símbolo não esteja na linha.
@@ -163,6 +190,7 @@ function Symbols() {
 
 
 
+    // Retorna uma representação em string da tabela de símbolos
     this.toString = function() {
         var texto = "Imprimindo tabela de simbolos\n\n";
 
@@ -180,83 +208,3 @@ function Symbols() {
 
 
 
-// Classe Simbolo
-//  Representa um símbolo que pode ser guardado na tabela de símbolos.
-//
-function Simbolo(simbolo) {
-
-    var cadeia;          // cadeia que identifica o simbolo
-    var tipo;            // tipo do simbolo, como inteiro, real (se aplicável)
-    var escopo;          // local ou global
-    var categoria;       // variavel, parametro, programa, procedimento
-    var procedimento;    // apenas para parâmetros e variáveis locais
-                         //   indica a qual procedimento a variável pertence
-    var assinatura;      // apenas para procedimentos
-                         //   indica os tipos dos parametros do procedimento
-                         //   vetor contendo os tipos dos parametros
-
-
-/*
-    debug("simbolo instanceof Simbolo? " + (simbolo instanceof Simbolo) + "\n" +
-        "simbolo instanceof Array? " + (simbolo instanceof Array) + "\n" +
-        "simbolo instanceof String? " + (simbolo instanceof String) + "\n" +
-        "simbolo instanceof Object? " + (simbolo instanceof Object));
-*/
-
-    // Determina o tipo do parametro "simbolo" para
-    //  criarmos este objeto adequadamente
-    //
-    if (simbolo instanceof Simbolo) {
-        // Checamos se a variavel 'simbolo' é um objeto Simbolo
-        this.cadeia        = simbolo.cadeia;
-        this.tipo          = simbolo.tipo;
-        this.escopo        = simbolo.escopo;
-        this.categoria     = simbolo.categoria;
-        this.procedimento  = simbolo.procedimento;
-        this.assinatura    = simbolo.assinatura;
-    }
-
-    else if (simbolo instanceof Object) {
-        // Um array associativo é um objeto do tipo Object, e não do tipo Array
-        this.cadeia       = simbolo["cadeia"];
-        this.tipo         = simbolo["tipo"];
-        this.escopo       = simbolo["escopo"];
-        this.categoria    = simbolo["categoria"];
-        this.procedimento = simbolo["procedimento"];
-        this.assinatura   = simbolo["assinatura"];
-     }
-
-     else if (simbolo instanceof String) {
-        // Caso seja uma string
-        this.cadeia = simbolo;
-     }
-
-
-    // Métodos Públicos
-    // ************************************************************************
-
-    this.setCadeia       = function(cadeia)       { this.cadeia       = cadeia; }
-    this.setTipo         = function(tipo)         { this.tipo         = tipo; }
-    this.setEscopo       = function(escopo)       { this.escopo       = escopo; }
-    this.setCategoria    = function(categoria)    { this.categoria    = categoria; }
-    this.setProcedimento = function(procedimento) { this.procedimento = procedimento; }
-    this.setAssinatura   = function(assinatura)   { this.assinatura   = assinatura; }
-
-    this.getCadeia       = function() { return this.cadeia; }
-    this.getTipo         = function() { return this.tipo; }
-    this.getEscopo       = function() { return this.escopo; }
-    this.getCategoria    = function() { return this.categoria; }
-    this.getProcedimento = function() { return this.procedimento; }
-    this.getAssinatura   = function() { return this.assinatura; }
-
-
-    this.toString = function() {
-        return "cadeia = " + this.cadeia +
-            "   tipo = " + this.tipo +
-            "   escopo = " + this.escopo +
-            "   categoria = " + this.categoria +
-            "   procedimento = " + this.procedimento +
-            "   assinatura = " + this.assinatura;
-    }
-
-}

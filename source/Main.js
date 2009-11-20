@@ -13,6 +13,7 @@ include("source/Analise/Error.js");
 include("source/Analise/Token.js");
 include("source/Analise/Keywords.js");
 include("source/Analise/Symbols.js");
+include("source/Analise/Simbolo.js");
 include("source/Analise/AnalisadorLexico.js");
 include("source/Analise/AnalisadorSintatico.js")
 include("source/Analise/AnalisadorSemantico.js")
@@ -36,7 +37,8 @@ function mainGeracao(input) {
 
     // Verifica se a análise foi concluída sem erros
     if (success) {
-        return geradorCodigo.getCodigo();
+        // Se sim, retornamos o código gerado
+        return geradorCodigo.codigo();
     }
     else {
         // Erros foram encontrados durante a análise
