@@ -412,7 +412,7 @@ function AnalisadorSemantico() {
 
                     if (w.getTipo() != procedimentoAtual.getAssinatura()[argumentoAtual++]) {
                         //alert(w.getTipo() + " - " + procedimentoAtual.getAssinatura()[argumentoAtual - 1]);
-                        this.error("Parametro " + w.getCadeia() + " incorreto.");
+                        this.error("Parametro " + w.getCadeia() + " incorreto. Esperado valor " + procedimentoAtual.getAssinatura()[argumentoAtual - 1] + " mas encontrado valor " + w.getTipo() + ".");
                     }
                     numeroEncontrado++;
 
