@@ -105,7 +105,7 @@ function mainSemantico(input) {
 function mainSintatico(input) {
 
     // Instanciamos um novo analisador sintático
-    var analisadorSintatico = new AnalisadorSintatico(input, ANALISE_SINTATICA);
+    var analisadorSintatico = new AnalisadorSintatico(input);
 
     // Efetua a análise sintática da entrada
     var success = analisadorSintatico.parse();
