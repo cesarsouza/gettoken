@@ -1,14 +1,14 @@
 // Copyright © 2009 César Roberto de Souza, Leonardo Sameshima Taba
 // ----------------------------------------------------------------
-
-
-
-
+//
 ///////////////////////////////////////////////////////////////////////////////////////////////
 //
 // OBSERVAÇÕES:
 //
 // ---------------------------------------------------------------------------------------
+// 091119 - O erro reportado abaixo já foi solucionado. Acredito que, de erros na análise
+//          semântica, pegamos todos
+//
 // 091106 - Erro que ainda não é capturado: Chamada de procedimento que tem parâmetros mas
 //          nenhum parâmetro ou um número menor é passado
 //
@@ -28,7 +28,8 @@
         através de chamadas dos métodos desta classe, como "iniciarDeclaracao",
         "iniciarProcedimento", etc.
 
-        0 - Início
+        Descrição de cada estado:
+        0 - Início (declaração do nome do programa)
         1 - Declaração de variáveis globais
         2 - Declaração de procedimentos
         3 - Declaração de parâmetros de procedimentos
@@ -50,8 +51,7 @@ function AnalisadorSemantico() {
     // Tabelas de símbolos
     var tabelaSimbolos = new Symbols();
 
-    // Analisador semântico implementado como uma máquina de estados para
-    //  facilitar o processamento
+    // Analisador semântico implementado como uma máquina de estados para facilitar o processamento
     var estado = 0;
 
     var procedimento = "";
@@ -64,7 +64,6 @@ function AnalisadorSemantico() {
     // Variaveis usadas na checagem de arumentos de procedimentos
     var procedimentoAtual;
     var argumentoAtual;
-    var numeroEsperado;
     var numeroEncontrado;
 
     // Linha atual da análise sintática
@@ -76,7 +75,7 @@ function AnalisadorSemantico() {
     var ignorar = false;
 
 
-    ///////////////////////////////////////////
+    /////////////////////////////////////////////
     // Métodos públicos
 
     // Atribui a linha atual da análise sintática
@@ -97,7 +96,6 @@ function AnalisadorSemantico() {
         return erros;
     }
 
-
     // Métodos que indicam qual variável está sendo processado pelo analisador
     this.setCadeia = function(cadeia) { this.cadeia = cadeia; }
     this.getCadeia = function() { return this.cadeia; }
@@ -106,9 +104,7 @@ function AnalisadorSemantico() {
     this.setProcedimento = function(procedimento) { this.procedimento = procedimento; }
     this.getProcedimento = function() { return this.procedimento; }
 
-
     this.iniciarDeclaracao = function() {
-        ignorar = false;
         switch (estado) {
             case 0:
             case 1:
@@ -121,6 +117,7 @@ function AnalisadorSemantico() {
             default:
                 break;
         }
+        ignorar = false;
         variaveis = new Array();
     }
 
@@ -204,13 +201,12 @@ function AnalisadorSemantico() {
             default:
                 break;
         }
-        if (numeroEncontrado != procedimentoAtual.getAssinatura().length) {
+        if (procedimentoAtual && numeroEncontrado != procedimentoAtual.getAssinatura().length) {
             this.error("Numero de argumentos incorreto.");
         }
     }
 
     this.iniciarCorpo = function() {
-        ignorar = false;
         switch (estado) {
             case 0:
             case 1:
@@ -223,23 +219,24 @@ function AnalisadorSemantico() {
                 estado = 5;
                 break;
         }
+        ignorar = false;
     }
 
 
 
     // Insere um simbolo na tabela de símbolos
+    // Retorna o símbolo inserido em caso de sucesso ou null em caso de falha
     this.inserir = function(simbolo) {
 
         trace("> analisadorSemantico.inserir()");
 
         var v = new Simbolo(simbolo);
 
-        //alert(v);
-
         switch (estado) {
+            // Declaração do nome do programa ou declaração de nome de procedimento
             case 0:
             case 2:
-                if (estado == 2) { 
+                if (estado == 2) {
                     procedimentoAtual = v;
                 }
                 if (!tabelaSimbolos.inserir(v)) {
@@ -249,6 +246,7 @@ function AnalisadorSemantico() {
                 return v;
                 break;
 
+            // Declaração de variáveis globais, parâmetros ou variáveis locais
             case 1:
             case 3:
             case 4:
@@ -268,7 +266,6 @@ function AnalisadorSemantico() {
                 //   e veio um símbolo que tem somente a cadeia definida, então guardamos
                 //   esse símbolo em uma lista temporária
                 if (v.getCadeia() != undefined) {
-                    //alert("pushing - " + v);
                     variaveis.push(v);
                 }
                 // Quando encontramos um tipo, inserimos todas as variáveis que foram
@@ -287,13 +284,13 @@ function AnalisadorSemantico() {
                             v2.setTipo(v.getTipo());
                             v2.setCategoria(variaveis[c].getCategoria());
                             tabelaSimbolos.inserir(v2);
-                            if (estado == 3) {
+                            if (estado == 3 && procedimentoAtual) {
                                 procedimentoAtual.getAssinatura().push(v.getTipo());
                             }
                         }
                     }
                 }
-                return v; // exceto em caso de erro
+                return v;
                 break;
 
         }
@@ -307,29 +304,22 @@ function AnalisadorSemantico() {
         var v = new Simbolo(variavel);
 
         switch (estado) {
-/*            case 0:
-            case 1:
-            case 2:
-                if (tabelaSimbolos.verificar(v)) {
-                    return false;
-                }
-                break;*/
-            case 3:
-            case 4:
-                v.setProcedimento(this.procedimento.getCadeia());
-                if (tabelaSimbolos.verificar(v)) {
-                    return false;
-                }
-                break;
             case 5:
             case 7:
             case 8:
+
+                // Se estamos em uma chamada de função, incrementamos o número de argumentos encontrados,
+                //   sejam eles válidos ou não
+                if (estado == 8) {
+                    numeroEncontrado++;
+                }
+
                 v.setProcedimento(this.procedimento.getCadeia());
                 w = tabelaSimbolos.verificar(v);
                 if (!w) {
                     v.setEscopo("global");
                     v.setProcedimento(undefined);
-                    // Primeiro, verificamos se o símbolo está definido 
+                    // Primeiro, verificamos se o símbolo está definido
                     w = tabelaSimbolos.verificar(v);
                     if (!w) {
                         if (v.getCategoria() == "procedimento") {
@@ -344,7 +334,7 @@ function AnalisadorSemantico() {
                 }
 
                 if (estado == 7) {
-                    // Verifica se todas as variaveis que chegam têm o mesmo tipo
+                    // Verifica se todas as variaveis utilizadas na leitura ou na escrita têm o mesmo tipo
                     if (tipo == "") {
                         tipo = w.getTipo();
                     }
@@ -359,11 +349,12 @@ function AnalisadorSemantico() {
                     if (w.getTipo() == undefined) {
                         w.setTipo("invalid");
                     }
-                    var temp = new Simbolo({"tipo":w.getTipo(), "procedimento":this.procedimento.getCadeia()});
 
-                    if (!tabelaSimbolos.verificar(temp)) {
-                        this.error("Parametro " + w.getCadeia() + " incorreto.");
+                    if (procedimentoAtual && w.getTipo() != procedimentoAtual.getAssinatura()[argumentoAtual++]) {
+                        this.error("Parametro " + w.getCadeia() + " incorreto. Esperado valor " + procedimentoAtual.getAssinatura()[argumentoAtual - 1] + " mas encontrado valor " + w.getTipo() + ".");
                     }
+                    numeroEncontrado++;
+
                 }
 
                 return w;
@@ -371,7 +362,13 @@ function AnalisadorSemantico() {
             case 6:
             case 9:
             case 10:
-                //v.setEscopo("global");
+
+                // Se estamos em uma chamada de função, incrementamos o número de argumentos encontrados,
+                //   sejam eles válidos ou não
+                if (estado == 10) {
+                    numeroEncontrado++;
+                }
+
                 w = tabelaSimbolos.verificar(v);
                 if (!w) {
                     if (v.getCategoria() == "procedimento") {
@@ -385,7 +382,7 @@ function AnalisadorSemantico() {
                 }
 
                 if (estado == 9) {
-                    // Verifica se todas as variaveis que chegam têm o mesmo tipo
+                    // Verifica se todas as variaveis utilizadas na leitura ou na escrita têm o mesmo tipo
                     if (tipo == "") {
                         tipo = w.getTipo();
                     }
@@ -398,29 +395,16 @@ function AnalisadorSemantico() {
                 else if (estado == 10) {
                     // Verifica se os parametros passados correspondem aos parâmetros formais
 
-                    //var assinatura = procedimentoAtual.getAssinatura();
-
-                    //alert(assinatura);
-
 ////////////////////////////////////////////////////////////////////////////////////////////
 // se não tivesse isto, construções como p1(p1); seriam válidas
-// checar se nos estados 7 e 9 isso também não acontece!!!
                     if (w.getTipo() == undefined) {
                         w.setTipo("invalid");
                     }
-////////////////////////////////////////////////////////////////////////////////////////////
 
-                    if (w.getTipo() != procedimentoAtual.getAssinatura()[argumentoAtual++]) {
-                        //alert(w.getTipo() + " - " + procedimentoAtual.getAssinatura()[argumentoAtual - 1]);
+                    if (procedimentoAtual && w.getTipo() != procedimentoAtual.getAssinatura()[argumentoAtual++]) {
                         this.error("Parametro " + w.getCadeia() + " incorreto. Esperado valor " + procedimentoAtual.getAssinatura()[argumentoAtual - 1] + " mas encontrado valor " + w.getTipo() + ".");
                     }
-                    numeroEncontrado++;
 
-                    //var temp = new Simbolo({"tipo":w.getTipo(), "procedimento":this.procedimento});
-
-                    //if (!tabelaSimbolos.verificar(temp)) {
-                        //this.error("Parametro " + w.getCadeia() + " incorreto.");
-                    //}
                 }
 
                 return w;

@@ -1,46 +1,45 @@
-﻿// Classe TabelaSimbolos
-//  Implementação da tabela de símbolos como uma tabela hash (estrutura intrínseca do
-//  JavaScript) juntamente com um vetor dinâmico para tratar os casos de colisão
+﻿// Classe Symbols
+//   (Vamos trocar o nome desta classe para TabelaSimbolos?)
+//   Implementação da tabela de símbolos como uma tabela hash (estrutura intrínseca do
+//   JavaScript) juntamente com um vetor dinâmico para tratar os casos de colisão
 //
 function Symbols() {
 
- /*
- 
+/*
+
  [chave][simbolo1,simbolo2,simbolo3]
- 
+
  em que simbolo1, simbolo2 e simbolo3 possuem o mesmo nome identificador
  referido por chave
- 
+
  por exemplo
- 
+
  [x][variavel inteira global de nome x, variavel real no procedimento 1 de nome x]
  [y][variavel real no procedimento 1 de nome y]
  [z][procedimento global z]
- 
- */
+
+*/
 
     var tabela = new Object();
 
     // Insere um Símbolo na tabela.
-    //  Retorna true caso o simbolo tenha sido inserido com
-    //  sucesso, e falso caso o simbolo ja estava na tabela
+    //   Retorna true caso o simbolo tenha sido inserido com
+    //   sucesso, e falso caso o simbolo ja estava na tabela
     this.inserir = function(simbolo) {
 
         trace("> tabelaSimbolos.inserir(" + simbolo + ")");
 
-//        var s = new Simbolo(simbolo);
-
         // Pegamos o nome identificador do simbolo
         var cadeia = simbolo.getCadeia();
-        
+
         // Verificamos primeiro se o símbolo não
-        //  está na tabela.
+        //   está na tabela.
         if (!this.verificar(simbolo)) {
 
             // O símbolo não está.
             // Verificamos se ja existe uma linha contendo
-            //  outros símbolos que atendem pelo mesmo nome
-            //  identificador do simbolo 
+            //   outros símbolos que atendem pelo mesmo nome
+            //   identificador do simbolo
             if (!tabela[cadeia]) {
                 tabela[cadeia] = new Array();
             }
@@ -64,8 +63,6 @@ function Symbols() {
 
         trace("> tabelaSimbolos.verificar(" + simbolo + ")");
 
-        //alert("Verificando simbolo " + simbolo);
-
         var cadeia = simbolo.getCadeia();
 
         // Verifica se há uma linha na tabela identificada
@@ -75,8 +72,8 @@ function Symbols() {
         }
         else {
             // O nome do símbolo está na tabela. Iremos varrer
-            //  a linha procurando por um símbolo que tenha os
-            //  mesmos atributos do simbolo passado 
+            //   a linha procurando por um símbolo que tenha os
+            //   mesmos atributos do simbolo passado
 
             var index = this.procuraSimboloNaLinha(simbolo, cadeia);
 
@@ -84,7 +81,7 @@ function Symbols() {
             if (index >= 0) {
                 return tabela[cadeia][index];
             }
-        
+
             // Se não encontrou, retorna null
             return null;
         }
@@ -96,11 +93,12 @@ function Symbols() {
 
         trace("> tabelaSimbolos.remover()");
 
-        // alert("vamos remover o simbolo " + simbolo);
+        //alert("vamos remover o simbolo " + simbolo);
+
         // Passamos por todos os registros da tabela, removendo todos
-        //  que tenham a categoria local e o nome do procedimento igual
-        //  ao que passamos
-        
+        //   que tenham a categoria local e o nome do procedimento igual
+        //   ao que passamos
+
         // Para cada linha da tabela
         for (var linha in tabela) {
 
@@ -109,8 +107,6 @@ function Symbols() {
 
             // Enquanto houver simbolos que casem
             while (index >= 0) {
-
-                //alert("linha " + linha + ", " + index + "\n\n" + this);
 
                 // Remove este simbolo
                 tabela[linha].splice(index, 1);
@@ -125,7 +121,6 @@ function Symbols() {
     this.insereAssinatura = function(procedimento, assinatura) {
         var v = this.verificar(new Simbolo({"procedimento":procedimento, "categoria":"procedimento"}));
         v.setAssinatura(assinatura);
-        alert("uou");
     }
 
     // Procura um simbolo na linha e retorna seu indice.
@@ -133,7 +128,7 @@ function Symbols() {
     this.procuraSimboloNaLinha = function(simbolo, linha) {
 
         trace("> tabelaSimbolos.procuraSimboloNaLinha()");
-        
+
         // Para cada simbolo na linha
         for (var i in tabela[linha]) {
             var achou = true;
@@ -156,13 +151,13 @@ function Symbols() {
             if (simbolo.getAssinatura() != undefined && simbolo.getAssinatura() != tabela[linha][i].getAssinatura()) {
                 achou = false;
             }
-            
+
             // Retorna o primeiro simbolo que casar com o que procuramos
             if (achou) {
                 return i;
             }
         }
-        
+
         return -1; // Se nao acharmos, retorna -1.
     }
 
@@ -170,7 +165,7 @@ function Symbols() {
 
     this.toString = function() {
         var texto = "Imprimindo tabela de simbolos\n\n";
-        
+
         for (var l in tabela) {
             texto = texto + "Linha " + l + "\n";
             for (var s in tabela[l]) {
@@ -199,7 +194,7 @@ function Simbolo(simbolo) {
     var assinatura;      // apenas para procedimentos
                          //   indica os tipos dos parametros do procedimento
                          //   vetor contendo os tipos dos parametros
-                         
+
 
 /*
     debug("simbolo instanceof Simbolo? " + (simbolo instanceof Simbolo) + "\n" +
@@ -220,7 +215,7 @@ function Simbolo(simbolo) {
         this.procedimento  = simbolo.procedimento;
         this.assinatura    = simbolo.assinatura;
     }
-    
+
     else if (simbolo instanceof Object) {
         // Um array associativo é um objeto do tipo Object, e não do tipo Array
         this.cadeia       = simbolo["cadeia"];
@@ -230,23 +225,23 @@ function Simbolo(simbolo) {
         this.procedimento = simbolo["procedimento"];
         this.assinatura   = simbolo["assinatura"];
      }
-     
+
      else if (simbolo instanceof String) {
         // Caso seja uma string
         this.cadeia = simbolo;
      }
-    
+
 
     // Métodos Públicos
     // ************************************************************************
-    
+
     this.setCadeia       = function(cadeia)       { this.cadeia       = cadeia; }
     this.setTipo         = function(tipo)         { this.tipo         = tipo; }
     this.setEscopo       = function(escopo)       { this.escopo       = escopo; }
     this.setCategoria    = function(categoria)    { this.categoria    = categoria; }
     this.setProcedimento = function(procedimento) { this.procedimento = procedimento; }
     this.setAssinatura   = function(assinatura)   { this.assinatura   = assinatura; }
-    
+
     this.getCadeia       = function() { return this.cadeia; }
     this.getTipo         = function() { return this.tipo; }
     this.getEscopo       = function() { return this.escopo; }
