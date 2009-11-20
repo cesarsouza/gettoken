@@ -7,7 +7,7 @@
 //     ANSI C equivalente ao programa fornecido em ALG.
 //   Apenas programas bem formados serão compilados. Qualquer erro
 //     encontrado durante qualquer fase de análise impedirá a
-//     apresentação do programa compilado.
+//     apresentação do programa gerado.
 
 function Gerador() {
 
@@ -16,6 +16,7 @@ function Gerador() {
 
     // Nivel de identação em que o código se encontra
     var identacao = 0;
+
     // Tamanho, em número de espaços, do recuo de identação
     var identSize = 4;
 
