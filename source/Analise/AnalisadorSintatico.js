@@ -479,13 +479,12 @@ function AnalisadorSintatico(input, analisadorSemantico, geradorCodigo) {
             if (simbolo == "@ident") {
             
 // Corte para o analisador semantico e gerador de código
-                if (analisadorSemantico)
-                {
-                analisadorSemantico.setProcedimento(cadeia);
-                analisadorSemantico.inserir({"cadeia":cadeia, "categoria":"procedimento"});
-                }
-                if (gerador) {
-                gerador.genProcedimento(cadeia);
+                if (analisadorSemantico) {
+                    var temp = analisadorSemantico.inserir({"cadeia":cadeia, "categoria":"procedimento"});
+                    analisadorSemantico.setProcedimento(temp);
+                    if (gerador) {
+                        gerador.genProcedimento(cadeia);
+                    }
                 }
 // Fim do corte para o analisador semantico e gerador de código
                 
@@ -748,6 +747,9 @@ function AnalisadorSintatico(input, analisadorSemantico, geradorCodigo) {
 
         if (!(simbolo in Seguidores["lista_arg"])) {
 
+            // Recuperamos a assinatura do procedimento em que estamos, para checar a corretude dos parâmetros passados
+            // var assinatura = analisadorSemantico.verificar({"cadeia":analisadorSemantico.getCadeia(), "categoria":"procedimento"}).getAssinatura();            
+
             if (simbolo == "(") {
                 obterSimbolo();
             }
@@ -757,14 +759,14 @@ function AnalisadorSintatico(input, analisadorSemantico, geradorCodigo) {
                 varre(join("@ident", ";", ")", Seguidores["lista_arg"], seguidores));
             }
             if (simbolo == "@ident") {
-            
+
 // Corte para o analisador semantico e gerador de código
-              if (analisadorSemantico)
-              {
-                analisadorSemantico.verificar({"cadeia":cadeia});
-                if (gerador)
-                  gerador.incluirArgumento(cadeia);
-               }
+                if (analisadorSemantico) {
+                    analisadorSemantico.verificar({"cadeia":cadeia});
+                    if (gerador) {
+                        gerador.incluirArgumento(cadeia);
+                    }
+                }
 // Fim do corte para o analisador semantico e gerador de código
 
                 obterSimbolo();
@@ -789,11 +791,11 @@ function AnalisadorSintatico(input, analisadorSemantico, geradorCodigo) {
                 if (simbolo == "@ident") {
                 
 // Corte para o analisador semantico e gerador de código
-                    if (analisadorSemantico)
-                    {
-                       analisadorSemantico.verificar({"cadeia":cadeia});
-                       if (gerador)
-                       gerador.incluirArgumento(cadeia);
+                    if (analisadorSemantico) {
+                        analisadorSemantico.verificar({"cadeia":cadeia});
+                        if (gerador) {
+                            gerador.incluirArgumento(cadeia);
+                        }
                     }
 // Fim do corte para o analisador semantico e gerador de código
                     
@@ -1063,9 +1065,9 @@ function AnalisadorSintatico(input, analisadorSemantico, geradorCodigo) {
         }
         else if (simbolo in Primeiros["lista_arg"]) {
 
-            analisadorSemantico.verificar({"cadeia":analisadorSemantico.getCadeia(), "categoria":"procedimento"});
+            var simboloProcedimento = analisadorSemantico.verificar({"cadeia":analisadorSemantico.getCadeia(), "categoria":"procedimento"});
 
-            analisadorSemantico.setProcedimento(analisadorSemantico.getCadeia());
+            analisadorSemantico.setProcedimento(simboloProcedimento);
 
             analisadorSemantico.iniciarChamada();
 

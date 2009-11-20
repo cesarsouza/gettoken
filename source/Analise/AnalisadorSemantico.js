@@ -60,9 +60,15 @@ function AnalisadorSemantico() {
     var variaveis = undefined;
     var assinatura = undefined;
     var erroTipo = false;
-    var procedimentoAtual;
 
-    var linha = 0;              // Linha atual da análise sintática
+    // Variaveis usadas na checagem de arumentos de procedimentos
+    var procedimentoAtual;
+    var argumentoAtual;
+    var numeroEsperado;
+    var numeroEncontrado;
+
+    // Linha atual da análise sintática
+    var linha;
 
     // Variavel booleana que sinaliza ao analisador se ele deve ou não relatar certos erros
     //   (como na situação em que um procedimento não foi declarado, e cada parâmetro seria
@@ -184,6 +190,8 @@ function AnalisadorSemantico() {
             default:
                 break;
         }
+        argumentoAtual = 0;
+        numeroEncontrado = 0;
     }
 
     this.terminarChamada = function() {
@@ -195,6 +203,9 @@ function AnalisadorSemantico() {
                 estado = 6;
             default:
                 break;
+        }
+        if (numeroEncontrado != procedimentoAtual.getAssinatura().length) {
+            this.error("Numero de argumentos incorreto.");
         }
     }
 
@@ -233,9 +244,9 @@ function AnalisadorSemantico() {
                 }
                 if (!tabelaSimbolos.inserir(v)) {
                     this.error("Erro na declaracao do procedimento '" + v.getCadeia() + "' - ja declarado.");
-                    return false;
+                    return null;
                 }
-                return true;
+                return v;
                 break;
 
             case 1:
@@ -246,27 +257,33 @@ function AnalisadorSemantico() {
                 }
                 if (estado == 3) {
                     v.setCategoria("parametro");
-                    v.setProcedimento(this.procedimento);
+                    v.setProcedimento(this.procedimento.getCadeia());
                 }
                 if (estado == 4) {
                     v.setEscopo("local");
-                    v.setProcedimento(this.procedimento);
+                    v.setProcedimento(this.procedimento.getCadeia());
                 }
 
+                // Se estamos na fase de declaração de variáveis ou declaração de parâmetros,
+                //   e veio um símbolo que tem somente a cadeia definida, então guardamos
+                //   esse símbolo em uma lista temporária
                 if (v.getCadeia() != undefined) {
                     //alert("pushing - " + v);
                     variaveis.push(v);
                 }
+                // Quando encontramos um tipo, inserimos todas as variáveis que foram
+                //   guardadas anteriormente, com o tipo que encontramos agora
                 else if (v.getTipo() != undefined) {
                     for (var c in variaveis) {
                         var v2 = new Simbolo();
                         v2.setCadeia(variaveis[c].getCadeia());
-                        v2.setEscopo(variaveis[c].getEscopo());
                         v2.setProcedimento(variaveis[c].getProcedimento());
                         if (tabelaSimbolos.verificar(v2)) {
                             this.error("Erro na declaracao da variavel '" + v2.getCadeia() + "' - ja declarada.");
+                            return null;
                         }
                         else {
+                            v2.setEscopo(variaveis[c].getEscopo());
                             v2.setTipo(v.getTipo());
                             v2.setCategoria(variaveis[c].getCategoria());
                             tabelaSimbolos.inserir(v2);
@@ -276,7 +293,7 @@ function AnalisadorSemantico() {
                         }
                     }
                 }
-                return true; // exceto em caso de erro
+                return v; // exceto em caso de erro
                 break;
 
         }
@@ -299,7 +316,7 @@ function AnalisadorSemantico() {
                 break;*/
             case 3:
             case 4:
-                v.setProcedimento(this.procedimento);
+                v.setProcedimento(this.procedimento.getCadeia());
                 if (tabelaSimbolos.verificar(v)) {
                     return false;
                 }
@@ -307,8 +324,7 @@ function AnalisadorSemantico() {
             case 5:
             case 7:
             case 8:
-                v.setProcedimento(this.procedimento);
-                //alert("verificando - " + v);
+                v.setProcedimento(this.procedimento.getCadeia());
                 w = tabelaSimbolos.verificar(v);
                 if (!w) {
                     v.setEscopo("global");
@@ -343,7 +359,7 @@ function AnalisadorSemantico() {
                     if (w.getTipo() == undefined) {
                         w.setTipo("invalid");
                     }
-                    var temp = new Simbolo({"tipo":w.getTipo(), "procedimento":this.procedimento});
+                    var temp = new Simbolo({"tipo":w.getTipo(), "procedimento":this.procedimento.getCadeia()});
 
                     if (!tabelaSimbolos.verificar(temp)) {
                         this.error("Parametro " + w.getCadeia() + " incorreto.");
@@ -381,6 +397,11 @@ function AnalisadorSemantico() {
                 }
                 else if (estado == 10) {
                     // Verifica se os parametros passados correspondem aos parâmetros formais
+
+                    //var assinatura = procedimentoAtual.getAssinatura();
+
+                    //alert(assinatura);
+
 ////////////////////////////////////////////////////////////////////////////////////////////
 // se não tivesse isto, construções como p1(p1); seriam válidas
 // checar se nos estados 7 e 9 isso também não acontece!!!
@@ -388,14 +409,18 @@ function AnalisadorSemantico() {
                         w.setTipo("invalid");
                     }
 ////////////////////////////////////////////////////////////////////////////////////////////
-                    var temp = new Simbolo({"tipo":w.getTipo(), "procedimento":this.procedimento});
 
-                    //alert(temp);
-                    //alert(tabelaSimbolos.verificar(temp));
-
-                    if (!tabelaSimbolos.verificar(temp)) {
+                    if (w.getTipo() != procedimentoAtual.getAssinatura()[argumentoAtual++]) {
+                        //alert(w.getTipo() + " - " + procedimentoAtual.getAssinatura()[argumentoAtual - 1]);
                         this.error("Parametro " + w.getCadeia() + " incorreto.");
                     }
+                    numeroEncontrado++;
+
+                    //var temp = new Simbolo({"tipo":w.getTipo(), "procedimento":this.procedimento});
+
+                    //if (!tabelaSimbolos.verificar(temp)) {
+                        //this.error("Parametro " + w.getCadeia() + " incorreto.");
+                    //}
                 }
 
                 return w;
