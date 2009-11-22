@@ -112,9 +112,9 @@ function AnalisadorSintatico(input, analisadorSemantico, geradorCodigo) {
     // ************************************************************************
 
     // Obtem o próximo token to analisador léxico e o armazena nas variáveis
-    //  privadas token, cadeia e símbolo, em que token corresponde ao obejto
-    //  token propriamente dito, símbolo corresponde à sua categoria e cadeia
-    //  corresponde à cadeia do token.
+    //   privadas token, cadeia e símbolo, em que token corresponde ao obejto
+    //   token propriamente dito, símbolo corresponde à sua categoria e cadeia
+    //   corresponde à cadeia do token.
     function obterSimbolo() {
 
         // Obtem o próximo token
@@ -130,7 +130,7 @@ function AnalisadorSintatico(input, analisadorSemantico, geradorCodigo) {
             }
 
             // Verificamos a categoria do token lido
-            //  para registrar os nomes de símbolo corretos.
+            //   para registrar os nomes de símbolo corretos.
             switch (token.id()) {
 
                 // Identificador (como nome de variável, de programa, procedimento)
@@ -416,7 +416,6 @@ function AnalisadorSintatico(input, analisadorSemantico, geradorCodigo) {
             // CORTE TRANSVERSAL PARA ANALISADOR SEMANTICO
             if (analisadorSemantico) {
                 var temp = analisadorSemantico.variavel({"cadeia":cadeia});
-
                 if (gerador) {
                     if (temp instanceof Simbolo) {
                         gerador.guardaVariavel(cadeia, temp.getTipo());
@@ -458,7 +457,6 @@ function AnalisadorSintatico(input, analisadorSemantico, geradorCodigo) {
                 // CORTE TRANSVERSAL PARA ANALISADOR SEMANTICO
                 if (analisadorSemantico) {
                     var temp = analisadorSemantico.variavel({"cadeia":cadeia});
-
                     if (gerador) {
                         if (temp instanceof Simbolo) {
                             gerador.guardaVariavel(cadeia, temp.getTipo());

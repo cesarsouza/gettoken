@@ -7,6 +7,8 @@
 //
 // ---------------------------------------------------------------------------------------
 //
+// 091120 - Erro abaixo ecorrigido
+//
 // 091120 - Vide caso de teste abaixo: linha undefiend.
 //
 // 091119 - O erro reportado abaixo já foi solucionado. Acredito que, de erros na análise
@@ -15,40 +17,6 @@
 // 091106 - Erro que ainda não é capturado: Chamada de procedimento que tem parâmetros mas
 //          nenhum parâmetro ou um número menor é passado
 //
-
-/*
-TESTAR ESTE CASO: LINHA UNDEFINED
-
-programa exemplo6;
-{ testa um programa sem inicio }
-
-var a: real;
-var b: inteiro;
-procedimento nomep(x: real);
-
-var c: real;
-inicio
-        le(a);
-        se a<x+c entao
-        inicio
-            a:= a+x;
-            escreve(a);
-        fim
-        senao c:= a+x;
-    fim;
-
-inicio {programa principal}
-    le(b);
-    nomep(b);
-fim.
-
-
-
-Analise terminada com erros
-Erro na linha 9: Esperado 'inicio' mas encontrado 'le'
-Erro na linha undefined: Parametro b incorreto. Esperado valor real mas encontrado valor inteiro.
-*/
-
 
 // Classe Analisador Semântico
 //   Esta classe é responsável por executar a etapa de análise semântica,
@@ -196,7 +164,6 @@ function AnalisadorSemantico() {
                 break;
         }
         variaveis = new Array();
-        //assinatura = new Array();
         if (procedimentoAtual.getAssinatura() == undefined) {
             procedimentoAtual.setAssinatura(new Array());
         }
@@ -227,7 +194,6 @@ function AnalisadorSemantico() {
                 break;
         }
         if (erroTipo) {
-            // Não se pode tirar o 'this.' daqui!
             error("Parametros com tipos diferentes.");
         }
     }
@@ -257,7 +223,9 @@ function AnalisadorSemantico() {
                 break;
         }
         if (procedimentoAtual && numeroEncontrado != procedimentoAtual.getAssinatura().length) {
-            error("Numero de argumentos incorreto.");
+            error("Numero de argumentos na chamada do procedimento '" +  procedimentoAtual.getCadeia() +
+                "' incorreto. Esperados " + procedimentoAtual.getAssinatura().length + " argumentos mas encontrados " +
+                numeroEncontrado + " argumentos.");
         }
     }
 
@@ -410,7 +378,9 @@ function AnalisadorSemantico() {
                     }
 
                     if (procedimentoAtual && w.getTipo() != procedimentoAtual.getAssinatura()[argumentoAtual++]) {
-                        error("Parametro " + w.getCadeia() + " incorreto. Esperado valor " + procedimentoAtual.getAssinatura()[argumentoAtual - 1] + " mas encontrado valor " + w.getTipo() + ".");
+                        if (procedimentoAtual.getAssinatura()[argumentoAtual - 1] != undefined) {
+                            error("Parametro '" + w.getCadeia() + "' incorreto. Esperado valor " + procedimentoAtual.getAssinatura()[argumentoAtual - 1] + " mas encontrado valor " + w.getTipo() + ".");
+                        }
                     }
                 }
 
@@ -458,7 +428,9 @@ function AnalisadorSemantico() {
                     }
 
                     if (procedimentoAtual && w.getTipo() != procedimentoAtual.getAssinatura()[argumentoAtual++]) {
-                        error("Parametro " + w.getCadeia() + " incorreto. Esperado valor " + procedimentoAtual.getAssinatura()[argumentoAtual - 1] + " mas encontrado valor " + w.getTipo() + ".");
+                        if (procedimentoAtual.getAssinatura()[argumentoAtual - 1] != undefined) {
+                            error("Parametro '" + w.getCadeia() + "' incorreto. Esperado valor " + procedimentoAtual.getAssinatura()[argumentoAtual - 1] + " mas encontrado valor " + w.getTipo() + ".");
+                        }
                     }
 
                 }

@@ -11,7 +11,7 @@ function Simbolo(simbolo) {
                          //   indica a qual procedimento a variável pertence
     var assinatura;      // apenas para procedimentos
                          //   indica os tipos dos parametros do procedimento
-                         //   vetor contendo os tipos dos parametros
+                         //   (vetor contendo os tipos dos parametros)
 
 
 
