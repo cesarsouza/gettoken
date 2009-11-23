@@ -8,8 +8,8 @@
 //
 //   Apenas programas corretos segundo a especificação ALG serão
 //     compilados. Qualquer erro, seja léxico, semântico ou sintático,
-//     ou seja, encontrado durante qualquer fase de análise impedirá a
-//     apresentação do código em ANSI C do programa gerado.
+//     ou seja, encontrado durante qualquer fase de análise, impedirá
+//     a apresentação do código em ANSI C do programa gerado.
 //
 function Gerador() {
 

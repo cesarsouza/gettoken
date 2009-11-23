@@ -61,11 +61,9 @@ function AnalisadorSemantico() {
     //   para facilitar o processamento. Estado indicado pela variavel abaixo.
     var estado = 0;
 
-    var procedimento = "";
     var cadeia = "";
     var tipo = "";
     var variaveis = undefined;
-    var assinatura = undefined;
     var erroTipo = false;
 
     // Variaveis usadas na checagem de argumentos de procedimentos
@@ -104,14 +102,10 @@ function AnalisadorSemantico() {
 
 
     // Atribui a linha atual da análise sintática
-    this.setLinha = function(l) {
-        linha = l;
-    }
+    this.setLinha = function(l) { linha = l; }
 
     // Retorna a lista de erros encontrados durante a análise.
-    this.errors = function() {
-        return error_list;
-    }
+    this.errors = function() { return error_list; }
 
 
 // TODO: Leo, onde é usado isto?
@@ -121,8 +115,8 @@ function AnalisadorSemantico() {
     this.getCadeia = function() { return this.cadeia; }
 
     // Métodos que indicam qual procedimento está sendo processado pelo analisador
-    this.setProcedimento = function(procedimento) { this.procedimento = procedimento; }
-    this.getProcedimento = function() { return this.procedimento; }
+    this.setProcedimento = function(procedimento) { procedimentoAtual = procedimento; }
+    this.getProcedimento = function() { return procedimentoAtual; }
 
 
    // TODO: Estas seriam as transicoes?
@@ -136,8 +130,6 @@ function AnalisadorSemantico() {
             case 3:
                 estado = 4;
                 break;
-            default:
-                break;
         }
         ignorar = false;
         variaveis = new Array();
@@ -150,8 +142,6 @@ function AnalisadorSemantico() {
             case 5:
                 estado = 2;
                 break;
-            default:
-                break;
         }
     }
 
@@ -159,8 +149,6 @@ function AnalisadorSemantico() {
         switch (estado) {
             case 2:
                 estado = 3;
-                break;
-            default:
                 break;
         }
         variaveis = new Array();
@@ -176,8 +164,6 @@ function AnalisadorSemantico() {
                 break;
             case 6:
                 estado = 9;
-            default:
-                break;
         }
         tipo = "";
         erroTipo = false;
@@ -190,8 +176,6 @@ function AnalisadorSemantico() {
                 break;
             case 9:
                 estado = 6;
-            default:
-                break;
         }
         if (erroTipo) {
             error("Parametros com tipos diferentes.");
@@ -205,8 +189,6 @@ function AnalisadorSemantico() {
                 break;
             case 6:
                 estado = 10;
-            default:
-                break;
         }
         argumentoAtual = 0;
         numeroEncontrado = 0;
@@ -219,13 +201,11 @@ function AnalisadorSemantico() {
                 break;
             case 10:
                 estado = 6;
-            default:
-                break;
         }
         if (procedimentoAtual && numeroEncontrado != procedimentoAtual.getAssinatura().length) {
             error("Numero de argumentos na chamada do procedimento '" +  procedimentoAtual.getCadeia() +
-                "' incorreto. Esperados " + procedimentoAtual.getAssinatura().length + " argumentos mas encontrados " +
-                numeroEncontrado + " argumentos.");
+                "' incorreto - esperados " + procedimentoAtual.getAssinatura().length + " argumentos mas encontrados " +
+                numeroEncontrado + ".");
         }
     }
 
@@ -278,11 +258,11 @@ function AnalisadorSemantico() {
                 }
                 if (estado == 3) {
                     v.setCategoria("parametro");
-                    v.setProcedimento(this.procedimento.getCadeia());
+                    v.setProcedimento(procedimentoAtual.getCadeia());
                 }
                 if (estado == 4) {
                     v.setEscopo("local");
-                    v.setProcedimento(this.procedimento.getCadeia());
+                    v.setProcedimento(procedimentoAtual.getCadeia());
                 }
 
                 // Se estamos na fase de declaração de variáveis ou declaração de parâmetros,
@@ -329,6 +309,8 @@ function AnalisadorSemantico() {
         var v = new Simbolo(variavel);
 
         switch (estado) {
+
+            // Verificações de variáveis feitas dentro de procedimentos
             case 5:
             case 7:
             case 8:
@@ -339,14 +321,16 @@ function AnalisadorSemantico() {
                     numeroEncontrado++;
                 }
 
-                v.setProcedimento(this.procedimento.getCadeia());
+                // Primeiro, verificamos se o símbolo está declarado dentro do escopo local
+                v.setProcedimento(procedimentoAtual.getCadeia());
                 w = tabelaSimbolos.verificar(v);
                 if (!w) {
+                    // Caso não esteja, verificamos se ele está no escopo global
                     v.setEscopo("global");
                     v.setProcedimento(undefined);
-                    // Primeiro, verificamos se o símbolo está definido
                     w = tabelaSimbolos.verificar(v);
                     if (!w) {
+                        // Caso não esteja, temos um erro de símbolo não declarado
                         if (v.getCategoria() == "procedimento") {
                             error("Procedimento '" + v.getCadeia() + "' nao declarado.");
                             ignorar = true;
@@ -386,6 +370,8 @@ function AnalisadorSemantico() {
 
                 return w;
                 break;
+
+            // Verificações de variáveis feitas dentro do corpo principal do programa
             case 6:
             case 9:
             case 10:
@@ -396,8 +382,10 @@ function AnalisadorSemantico() {
                     numeroEncontrado++;
                 }
 
+                // Verificamos se o símbolo está declarado no escopo global
                 w = tabelaSimbolos.verificar(v);
                 if (!w) {
+                    // Caso não esteja, temos um erro de símbolo não declarado
                     if (v.getCategoria() == "procedimento") {
                         error("Procedimento '" + v.getCadeia() + "' nao declarado.");
                         ignorar = true;
@@ -422,7 +410,7 @@ function AnalisadorSemantico() {
                 else if (estado == 10) {
                     // Verifica se os parametros passados correspondem aos parâmetros formais
 
-                    // Esta checagem impede que construções como p1(p1); sejam válidas
+                    // Esta checagem impede que construções como "p1(p1);" sejam válidas
                     if (w.getTipo() == undefined) {
                         w.setTipo("invalid");
                     }
@@ -443,20 +431,23 @@ function AnalisadorSemantico() {
     }
 
     // TODO: o que isto faz?
+    // Este método é chamado dentro da regra <variaveis> do analisador sintático.
+    // Ele existe pois, dependendo da fase da análise semântica em que estamos (declarações ou
+    //   verificações), a ação a ser tomada para o tratamento das variáveis é diferente.
     this.variavel = function(variavel) {
         switch (estado) {
+            // Declaração de variáveis (inserção na tabela de símbolos)
             case 1:
             case 3:
             case 4:
                 return this.inserir(variavel);
                 break;
+            // Verificação de variáveis (verificação na tabela de símbolos)
             case 5:
             case 6:
             case 7:
             case 9:
                 return this.verificar(variavel);
-                break;
-            default:
                 break;
         }
 

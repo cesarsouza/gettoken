@@ -90,8 +90,8 @@ function AnalisadorSintatico(input, analisadorSemantico, geradorCodigo) {
             var list = error_list.concat(analisadorSemantico.errors());
 
             // Ordena a lista por linha em que cada erro ocorre, para
-            //  preservar a ordem dos erros. Para isto, é utilizada a
-            //  a seguinte função de ordenação:
+            //   preservar a ordem dos erros. Para isto, é utilizada a
+            //   a seguinte função de ordenação:
             list.sort(function(a,b) { return a.line() - b.line(); });
 
             // Retorna a lista de erros sintáticos e a lista
@@ -124,8 +124,8 @@ function AnalisadorSintatico(input, analisadorSemantico, geradorCodigo) {
         if (token != null) {
 
             // Se o parser está guiando a análise semântica,
+            //   também passamos a linha do token atual para o analisador semântico
             if (analisadorSemantico) {
-                // também passamos a linha do token atual para o analisador semântico
                 analisadorSemantico.setLinha(analisadorLexico.line());
             }
 
@@ -202,10 +202,10 @@ function AnalisadorSintatico(input, analisadorSemantico, geradorCodigo) {
 
 
     // Empilha um erro na lista de erros
-    //  Ao chamar este método passando-se uma mensagem string do erro
-    //  encontrado, uma estrutura de erro, contendo a linha atual e a
-    //  natureza do erro (lexico, sintatico, semantico), é empilhada
-    //  na lista de erros encontrada na análise.
+    // Ao chamar este método passando-se uma mensagem string do erro
+    //   encontrado, uma estrutura de erro, contendo a linha atual e a
+    //   natureza do erro (lexico, sintatico, semantico), é empilhada
+    //   na lista de erros encontrada na análise.
     function error(mensagem) {
         if (!ignorando) {
             var error = new Error(mensagem, analisadorLexico.line(), "sintatico");
@@ -215,7 +215,7 @@ function AnalisadorSintatico(input, analisadorSemantico, geradorCodigo) {
 
 
     // Varre a entrada ate que um símbolo de sincronização seja encontrado
-    //   Este método é utilizado pelo modo pânico para garantir a sincronização
+    // Este método é utilizado pelo modo pânico para garantir a sincronização
     //   da entrada num ponto em que a análise sintática possa ser continuada.
     function varre(sincronizadores) {
         // Varre a entrada até encontrar um membro do conjunto de
@@ -516,7 +516,7 @@ function AnalisadorSintatico(input, analisadorSemantico, geradorCodigo) {
                 // CORTE TRANSVERSAL PARA ANALISADOR SEMANTICO
                 if (analisadorSemantico) {
                     var temp = analisadorSemantico.inserir({"cadeia":cadeia, "categoria":"procedimento"});
-                    analisadorSemantico.setProcedimento(temp);
+                    //analisadorSemantico.setProcedimento(temp);
                     if (gerador) {
                         gerador.genProcedimento(cadeia);
                     }
@@ -1135,7 +1135,6 @@ function AnalisadorSintatico(input, analisadorSemantico, geradorCodigo) {
             if (v instanceof Simbolo && v.getTipo() == "inteiro" && tipo == "real") {
                 error("Atribuicao de valor real a variavel inteira '" + v.getCadeia() + "'.");
             }
-
 
             // CORTE TRANSVERSAL PARA GERADOR DE CÓDIGO
             if (gerador) {
