@@ -61,11 +61,6 @@ function AnalisadorSintatico(input, analisadorSemantico, geradorCodigo) {
         // Inicia a análise a partir da regra inicial
         programa();
 
-        if (DEBUG) {
-            if (analisadorSemantico) {
-                analisadorSemantico.imprimir();
-            }
-        }
 
         // Verifica se houve erros durante a analise e retorna o estado de sucesso
         if (!analisadorSemantico) {
@@ -76,6 +71,7 @@ function AnalisadorSintatico(input, analisadorSemantico, geradorCodigo) {
         }
 
     }
+
 
     // Retorna a lista de erros encontrados durante a análise.
     //   caso a análise sintática esteja guiando outros analisadores, como o
@@ -279,7 +275,8 @@ function AnalisadorSintatico(input, analisadorSemantico, geradorCodigo) {
 
         // CORTE TRANSVERSAL PARA ANALISADOR SEMANTICO
         if (analisadorSemantico) {
-            // Sinaliza ao analisador semântico que o corpo do programa está começando
+            // Sinaliza ao analisador semântico que o
+            //  corpo do programa está começando
             analisadorSemantico.iniciarCorpo();
             if (gerador) {
                 gerador.iniciarMain();
@@ -344,8 +341,9 @@ function AnalisadorSintatico(input, analisadorSemantico, geradorCodigo) {
             obterSimbolo();
 
             // CORTE TRANSVERSAL PARA ANALISADOR SEMANTICO
-            // sinaliza ao analisador que um bloco de declaração de variáveis está se iniciando
             if (analisadorSemantico) {
+                // sinaliza ao analisador que um bloco de
+                // declaração de variáveis está sendo iniciado
                 analisadorSemantico.iniciarDeclaracao();
             } // FIM DO CORTE PARA ANALISADOR SEMANTICO
 
@@ -471,7 +469,6 @@ function AnalisadorSintatico(input, analisadorSemantico, geradorCodigo) {
             }
 
             if (simbolo != "," && !(simbolo in Seguidores["variaveis"])) {
-                //error("Esperado ',', ':' ou ')' mas encontrado '" + cadeia + "'");
                 if (simbolo in Primeiros["variaveis"]) {
                     error("Esperado ',' mas encontrado '" + cadeia + "'");
                 }
@@ -591,8 +588,9 @@ function AnalisadorSintatico(input, analisadorSemantico, geradorCodigo) {
     function lista_par(seguidores) {
 
         // CORTE TRANSVERSAL PARA ANALISADOR SEMANTICO
-        // sinaliza ao analisador que um bloco de declaração de parametros está se iniciando
         if (analisadorSemantico) {
+            // sinaliza ao analisador que um bloco de
+            // declaração de parametros está se iniciando
             analisadorSemantico.iniciarParametros();
         }
         // FIM DO CORTE TRANSVERSAL PARA ANALISADOR SEMANTICO
@@ -808,8 +806,7 @@ function AnalisadorSintatico(input, analisadorSemantico, geradorCodigo) {
                 varre(join("@ident", ";", ")", Seguidores["lista_arg"], seguidores));
             }
 
-/////////////////////////////////////////////////////////////////////////////////////////////////
-// gambiarra?
+            // Enquanto estivermos numa lista de identificadores
             while (simbolo == ";" || simbolo == "@ident") {
 
                 if (simbolo == ";")
@@ -977,17 +974,14 @@ function AnalisadorSintatico(input, analisadorSemantico, geradorCodigo) {
             // CORTE TRANSVERSAL PARA GERADOR DE CÓDIGO
             if (gerador) {
                 gerador.iniciarEnquanto();
-            }
-            // FIM DO CORTE TRANSVERSAL PARA GERADO DE CÓDIGO
+            } // FIM DO CORTE TRANSVERSAL PARA GERADO DE CÓDIGO
+
 
             // Chama a regra "condição"
-            condicao(join(seguidores, Primeiros["cmd"], Seguidores["cmd"]));
+            condicao(join(seguidores, Primeiros["cmd"], Seguidores["cmd"]),"faca");
 
-            if (simbolo != "faca") {
-                error("Esperado 'faca' mas encontrado '" + cadeia + "'");
-                //varre(join(Seguidores["cmd"], Primeiros["cmd"], seguidores));
-                varre(join(Primeiros["cmd"], seguidores));
-            }
+            // Neste caso não emitimos o erro para falta de "faca" porque
+            //  este ja foi tratado na arvore de expressao, condicao, fator, etc
             if (simbolo == "faca") {
                 obterSimbolo();
             }
@@ -1001,18 +995,14 @@ function AnalisadorSintatico(input, analisadorSemantico, geradorCodigo) {
             // CORTE TRANSVERSAL PARA GERADOR DE CÓDIGO
             if (gerador) {
                 gerador.iniciarSe();
-            }
-            // FIM DO CORTE TRANSVERSAL PARA GERADO DE CÓDIGO
-
-            print_list(join(seguidores, Primeiros["cmd"], Seguidores["cmd"]));
+            } // FIM DO CORTE TRANSVERSAL PARA GERADOR DE CÓDIGO
+            
 
             // Chama a regra "condição"
-            condicao(join(seguidores, Primeiros["cmd"], Seguidores["cmd"]));
+            condicao(join(seguidores, Primeiros["cmd"], Seguidores["cmd"]), "entao");
 
-            if (simbolo != "entao") {
-                error("Esperado 'entao' mas encontrado '" + cadeia + "'");
-                varre(join(Primeiros["cmd"], seguidores));
-            }
+            // Neste caso não emitimos o erro para falta de "entao" porque
+            //  este ja foi tratado na arvore de expressao, condicao, fator, etc
             if (simbolo == "entao") {
                 obterSimbolo();
             }
@@ -1031,34 +1021,14 @@ function AnalisadorSintatico(input, analisadorSemantico, geradorCodigo) {
                 var s;
 
                 // O método verificar sabe o escopo em que está a análise, devido aos estados da máquina
-
                 s = analisadorSemantico.verificar({"cadeia":cadeia});
+                
+                // TODO: verificar se isto esta sendo usado mesmo
                 analisadorSemantico.setProcedimento(s);
-
-/*
-
-                // Primeiro, verificamos se o identificador encontrado é uma variável local ou global
-                s = analisadorSemantico.verificar({"cadeia":cadeia});
-
-                // A variável 's' é uma variável
-                if (s) {
-                    analisadorSemantico.setSimbolo(s);
-                }
-                // Caso não seja, verificamos se é um procedimento
-                else {
-                    s = analisadorSemantico.verificar({"cadeia":cadeia, "categoria":"procedimento"});
-                    // Se for um procedimento, chamamos a transição da máquina de estados e setamos o símbolo atual
-                    if (s) {
-                        analisadorSemantico.setSimbolo(s);
-                    }
-                }
-
-*/
 
                 if (gerador) {
                     gerador.inserirIdentificador(cadeia);
                 }
-
             }
             // FIM DO CORTE PARA ANALISADOR SEMÂNTICO
 
@@ -1133,8 +1103,6 @@ function AnalisadorSintatico(input, analisadorSemantico, geradorCodigo) {
             // Chama a regra "cmd"
             cmd(join(seguidores, Seguidores["cont_se"]));
         }
-
-        // TODO: Não ta faltando um fim na gramática aqui?
     }
 
 
@@ -1203,9 +1171,6 @@ function AnalisadorSintatico(input, analisadorSemantico, geradorCodigo) {
         else {
             // CORTE TRANSVERSAL PARA ANÁLISE SEMÂNTICA E GERAÇÃO DE ÓDIGO
             if (analisadorSemantico) {
-//////////////////////////////////////////////////////////////////////////////////////////////////////
-                //if (analisadorSemantico.getProcedimento
-
                 if (gerador) {
                     gerador.inserirChamadaVazia();
                 }
@@ -1220,7 +1185,7 @@ function AnalisadorSintatico(input, analisadorSemantico, geradorCodigo) {
     //   19. <condicao>      ::= <expressao> <relacao> <expressao>
     //   20. <relacao>       ::= = | <> | >= | <= | > | <
     //
-    function condicao(seguidores) {
+    function condicao(seguidores, esperado) {
 
         // CORTE TRANSVERSAL PARA GERADOR DE CÓDIGO
         if (gerador) {
@@ -1229,7 +1194,7 @@ function AnalisadorSintatico(input, analisadorSemantico, geradorCodigo) {
         // FIM DO CORTE PARA GERADOR DE CÓDIGO
 
         // Chama a regra "expressao"
-        expressao(join(seguidores, Seguidores["condicao"], "=","<>",">=","<=",">","<"));
+        expressao(join(seguidores, Seguidores["condicao"], "=","<>",">=","<=",">","<"), esperado);
 
         if (!(simbolo in {"=":0,"<>":0,">=":0,"<=":0,">":0,"<":0})) {
             error("Esperado '=', '<>', '>=', '<=', '>' ou '<', mas encontrado '" + cadeia + "'");
@@ -1247,14 +1212,13 @@ function AnalisadorSintatico(input, analisadorSemantico, geradorCodigo) {
         }
 
         // Chama a regra "expressão"
-        expressao(join(seguidores, Seguidores["condicao"]));
+        expressao(join(seguidores, Seguidores["condicao"]),esperado);
 
         // CORTE TRANSVERSAL PARA GERADOR DE CÓDIGO
         if (gerador) {
             gerador.finalizarCondicao();
         }
         // FIM DO CORTE PARA GERADOR DE CÓDIGO
-
     }
 
 
@@ -1263,14 +1227,15 @@ function AnalisadorSintatico(input, analisadorSemantico, geradorCodigo) {
     //   21. <expressao>     ::= <termo> <outros_termos>
     //   22. <op_un>         ::= + | - | ?
     //
-    function expressao(seguidores) {
+    function expressao(seguidores, esperado) {
 
         var retorno;
 
-// TODO: Elucidar melhor tipo_termo1 e derivados
+
+        // TODO: Elucidar melhor tipo_termo1 e derivados
 
         // Chama a regra "termo"
-        tipo_termo1 = termo(join(Seguidores["expressao"], seguidores, "+", "-", "@ident"));
+        tipo_termo1 = termo(join(Seguidores["expressao"], seguidores, "+", "-", "@ident"), esperado);
 
         // Se simbolo não for um sinal nem estiver em seguidores
         //  de expressao, este é um erro. Algo como (a _+ b).
@@ -1279,7 +1244,7 @@ function AnalisadorSintatico(input, analisadorSemantico, geradorCodigo) {
             varre(join("+", "-", Seguidores["expressao"], seguidores));
 
             if (simbolo in Primeiros["expressao"]) {
-                expressao(seguidores);
+                expressao(seguidores, esperado);
             }
         }
 
@@ -1295,7 +1260,7 @@ function AnalisadorSintatico(input, analisadorSemantico, geradorCodigo) {
             obterSimbolo();
 
             // Chama a regra "termo"
-            tipo_termo2 = termo(join(Seguidores["expressao"], seguidores, "+", "-", "@ident"));
+            tipo_termo2 = termo(join(Seguidores["expressao"], seguidores, "+", "-", "@ident"),esperado);
 
             if (tipo_termo1 == "real" || tipo_termo2 == "real") {
                 retorno = "real";
@@ -1313,18 +1278,15 @@ function AnalisadorSintatico(input, analisadorSemantico, geradorCodigo) {
                 varre(join("+", "-", Seguidores["expressao"], seguidores));
 
                 if (simbolo in Primeiros["expressao"]) {
-                    expressao(seguidores);
+                    expressao(seguidores, esperado);
                 }
             }
         }
 
-
-//TODO: retorna o tipo da expressao?
-// nao pra pra tentar colocar isso na logica do analisador semantico tb?
+        // Retorna o tipo da expressão
         if (analisadorSemantico) {
             return retorno;
         }
-
     }
 
 
@@ -1335,7 +1297,7 @@ function AnalisadorSintatico(input, analisadorSemantico, geradorCodigo) {
     //   26. <mais_fatores>  ::= <op_mul> <fator> <mais_fatores> | @vazio
     //   27. <op_mul>        ::= * | /
     //
-    function termo(seguidores) {
+    function termo(seguidores, esperado) {
 
         var retorno;
 
@@ -1355,20 +1317,18 @@ function AnalisadorSintatico(input, analisadorSemantico, geradorCodigo) {
         }
 
         // Chama a regra "fator"
-        tipo_fator1 = fator(join(seguidores, Seguidores["termo"]));
+        tipo_fator1 = fator(join(seguidores, Seguidores["termo"]), esperado);
 
         // Se temos um erro sintático como 12 3 - 1, não temos como saver que operação iria
         //   ser realizada, e portanto não conseguimos determinar se seria um erro semântico
         //   ou não
         if (simbolo != "*" && simbolo != "/" && !(simbolo in Seguidores["termo"])) {
 
-            error("Esperado operador matematico, operador relacional, 'faca', 'entao', 'fim', 'senao' ou ')', mas encontrado '" + cadeia + "'");
-            //error("Esperado operador matematico mas encontrado '" + cadeia + "'");
-
+            error("Esperado operador matematico, operador relacional ou '"+ esperado +"', mas encontrado '" + cadeia + "'");
             varre(join("*", "/", Seguidores["termo"], seguidores));
 
             if (simbolo in Primeiros["termo"]) {
-                termo(seguidores);
+                termo(seguidores, esperado);
             }
         }
 
@@ -1388,7 +1348,7 @@ function AnalisadorSintatico(input, analisadorSemantico, geradorCodigo) {
             obterSimbolo();
 
             // Chama a regra "fator"
-            tipo_fator2 = fator(join(seguidores, Seguidores["termo"]));
+            tipo_fator2 = fator(join(seguidores, Seguidores["termo"]), esperado);
 
             if (operacao == "*") {
                 if (tipo_fator1 == "real" || tipo_fator2 == "real") {
@@ -1403,23 +1363,20 @@ function AnalisadorSintatico(input, analisadorSemantico, geradorCodigo) {
             }
 
             if (simbolo != "*" && simbolo != "/" && !(simbolo in Seguidores["termo"])) {
-                error("Esperado operador matematico, operador relacional, 'faca', 'entao', 'fim', 'senao' ou ')', mas encontrado '" + cadeia + "'");
-
-                // TODO: verificar este erro comentado
-                //error("Esperado operador matematico mas encontrado '" + cadeia + "'");
+                error("Esperado operador matematico, operador relacional ou '" + esperado + "', mas encontrado '" + cadeia + "'");
 
                 varre(join("*", "/", Seguidores["termo"], seguidores));
 
                 if (simbolo in Primeiros["termo"]) {
-                    termo(seguidores);
+                    termo(seguidores, esperado);
                 }
             }
         }
 
         if (analisadorSemantico) {
+            // Retorna o tipo da expressão
             return retorno;
         }
-
     }
 
 
@@ -1427,7 +1384,7 @@ function AnalisadorSintatico(input, analisadorSemantico, geradorCodigo) {
     // Procedimento para a regra "fator"
     //   28. <fator>         ::= ident | numero_int | numero_real | ( <expressao> )
     //
-    function fator(seguidores) {
+    function fator(seguidores, esperado) {
 
         var v;
         var retorno;
@@ -1444,6 +1401,7 @@ function AnalisadorSintatico(input, analisadorSemantico, geradorCodigo) {
         // FIM DO CORTE PARA GERADOR DE CÓDIGO
 
         if (simbolo == "@ident") {
+        
             if (analisadorSemantico) {
                 v = analisadorSemantico.verificar({"cadeia":cadeia});
             }
@@ -1467,7 +1425,7 @@ function AnalisadorSintatico(input, analisadorSemantico, geradorCodigo) {
             obterSimbolo();
 
             // Chama a regra "expressão"
-            tipo = expressao(join(seguidores, Seguidores["fator"]));
+            tipo = expressao(join(seguidores, Seguidores["fator"]), esperado);
 
             if (simbolo != ")") {
                 error("Esperado ')' mas encontrado '" + cadeia + "'");

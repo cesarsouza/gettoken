@@ -1,22 +1,7 @@
 // Copyright © 2009 César Roberto de Souza, Leonardo Sameshima Taba
 // ----------------------------------------------------------------
 //
-///////////////////////////////////////////////////////////////////////////////////////////////
-//
-// OBSERVAÇÕES:
-//
-// ---------------------------------------------------------------------------------------
-//
-// 091120 - Erro abaixo ecorrigido
-//
-// 091120 - Vide caso de teste abaixo: linha undefiend.
-//
-// 091119 - O erro reportado abaixo já foi solucionado. Acredito que, de erros na análise
-//          semântica, pegamos todos
-//
-// 091106 - Erro que ainda não é capturado: Chamada de procedimento que tem parâmetros mas
-//          nenhum parâmetro ou um número menor é passado
-//
+
 
 // Classe Analisador Semântico
 //   Esta classe é responsável por executar a etapa de análise semântica,
@@ -114,6 +99,7 @@ function AnalisadorSemantico() {
     this.setSimbolo = function(simbolo) { simboloAtual = simbolo; }
     this.getSimbolo = function() { return simboloAtual; }
 
+// TODO: verificar possivel mesclagem de set simbolo e getproc
     // Métodos que indicam qual procedimento está sendo processado pelo analisador
     this.setProcedimento = function(procedimento) { procedimentoChamado = procedimento; }
     this.getProcedimento = function() { return procedimentoChamado; }
@@ -293,6 +279,7 @@ function AnalisadorSemantico() {
                 if (v.getCadeia() != undefined) {
                     variaveis.push(v);
                 }
+                
                 // Quando encontramos um tipo, inserimos todas as variáveis que foram
                 //   guardadas anteriormente, com o tipo que encontramos agora
                 else if (v.getTipo() != undefined) {
@@ -300,6 +287,7 @@ function AnalisadorSemantico() {
                         var v2 = new Simbolo();
                         v2.setCadeia(variaveis[c].getCadeia());
                         v2.setProcedimento(variaveis[c].getProcedimento());
+                        
                         if (tabelaSimbolos.verificar(v2)) {
                             error("Erro na declaracao da variavel '" + v2.getCadeia() + "' - ja declarada.");
                             return null;
@@ -326,8 +314,6 @@ function AnalisadorSemantico() {
     //   Retorna o símbolo, se encontrado, ou null, caso não encontrado.
     this.verificar = function(variavel) {
 
-        trace("> analisadorSemantico.verificar()");
-
         var v = new Simbolo(variavel);
 
         switch (estado) {
@@ -346,25 +332,16 @@ function AnalisadorSemantico() {
                 // Primeiro, verificamos se o símbolo está declarado dentro do escopo local
                 v.setProcedimento(simboloAtual.getCadeia());
                 w = tabelaSimbolos.verificar(v);
+                
+                // Caso não esteja, verificamos se ele está no escopo global                
                 if (!w) {
-                    // Caso não esteja, verificamos se ele está no escopo global
                     v.setEscopo("global");
                     v.setProcedimento(undefined);
                     w = tabelaSimbolos.verificar(v);
+                    
+                    // Caso não esteja, temos um erro de símbolo não declarado
                     if (!w) {
-                        // Caso não esteja, temos um erro de símbolo não declarado
-
                         error("Simbolo '" + v.getCadeia() + "' nao declarado.");
-
-/*
-                        if (v.getCategoria() == "procedimento") {
-                            error("Procedimento '" + v.getCadeia() + "' nao declarado.");
-                            ignorar = true;
-                        }
-                        else {
-                            error("Variavel '" + v.getCadeia() + "' nao declarada.");
-                        }
-*/
                         return null;
                     }
                 }
@@ -411,20 +388,10 @@ function AnalisadorSemantico() {
 
                 // Verificamos se o símbolo está declarado no escopo global
                 w = tabelaSimbolos.verificar(v);
+                
+                // Caso não esteja, temos um erro de símbolo não declarado
                 if (!w) {
-                    // Caso não esteja, temos um erro de símbolo não declarado
-
                     error("Simbolo '" + v.getCadeia() + "' nao declarado.");
-
-/*
-                    if (v.getCategoria() == "procedimento") {
-                        error("Procedimento '" + v.getCadeia() + "' nao declarado.");
-                        ignorar = true;
-                    }
-                    else {
-                        error("Variavel '" + v.getCadeia() + "' nao declarada.");
-                    }
-*/
                     return null;
                 }
 
@@ -457,9 +424,7 @@ function AnalisadorSemantico() {
 
                 return w;
                 break;
-
         }
-
     }
 
 
@@ -483,7 +448,6 @@ function AnalisadorSemantico() {
                 return this.verificar(variavel);
                 break;
         }
-
     }
 
     // Remove um símbolo da tabela de síbolos
@@ -497,6 +461,7 @@ function AnalisadorSemantico() {
         alert(tabelaSimbolos);
     }
 
+    // Converte a tabela de simbolos para uma representacao em string
     this.toString = function() {
         return tabelaSimbolos;
     }

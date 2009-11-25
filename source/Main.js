@@ -2,7 +2,7 @@
 // ----------------------------------------------------------------
 
 var TRACE = false;
-var DEBUG = true;
+var DEBUG = false;
 
 /// <reference path="Analise\AnalisadorLexico.js" />
 /// <reference path="Analise\AnalisadorSintatico.js" />
@@ -21,7 +21,7 @@ include("source/Sintese/Gerador.js")
 
 
 
-// Ponto de entrada pricipal para o Gerador de Código Alvo
+// Ponto de entrada pricipal para o Gerador de Código Alvo (em C ANSI)
 //
 function mainGeracao(input) {
 
