@@ -61,13 +61,14 @@ function AnalisadorSemantico() {
     //   para facilitar o processamento. Estado indicado pela variavel abaixo.
     var estado = 0;
 
-    var cadeia = "";
     var tipo = "";
     var variaveis = undefined;
     var erroTipo = false;
 
     // Variaveis usadas na checagem de argumentos de procedimentos
+    var simboloAtual;
     var procedimentoAtual;
+    var procedimentoChamado;
     var argumentoAtual;
     var numeroEncontrado;
 
@@ -108,18 +109,23 @@ function AnalisadorSemantico() {
     this.errors = function() { return error_list; }
 
 
-// TODO: Leo, onde é usado isto?
 
-    // Métodos que indicam qual variável está sendo processado pelo analisador
-    this.setCadeia = function(cadeia) { this.cadeia = cadeia; }
-    this.getCadeia = function() { return this.cadeia; }
+    // Métodos que indicam qual símbolo está sendo processado pelo analisador
+    this.setSimbolo = function(simbolo) { simboloAtual = simbolo; }
+    this.getSimbolo = function() { return simboloAtual; }
 
     // Métodos que indicam qual procedimento está sendo processado pelo analisador
-    this.setProcedimento = function(procedimento) { procedimentoAtual = procedimento; }
-    this.getProcedimento = function() { return procedimentoAtual; }
+    this.setProcedimento = function(procedimento) { procedimentoChamado = procedimento; }
+    this.getProcedimento = function() { return procedimentoChamado; }
+
+    this.getProcedimentoAtual = function() { return procedimentoAtual; }
 
 
-   // TODO: Estas seriam as transicoes?
+   
+    // Transições da máquina de estados
+    // ------------------------------------------------------------------------
+
+    // Transição dc_v da máquina de estados
     this.iniciarDeclaracao = function() {
         switch (estado) {
             case 0:
@@ -135,6 +141,7 @@ function AnalisadorSemantico() {
         variaveis = new Array();
     }
 
+    // Transição dc_p da máquina de estados
     this.iniciarProcedimento = function() {
         switch (estado) {
             case 0:
@@ -145,6 +152,7 @@ function AnalisadorSemantico() {
         }
     }
 
+    // Transição dc_param da máquina de estados
     this.iniciarParametros = function() {
         switch (estado) {
             case 2:
@@ -152,11 +160,12 @@ function AnalisadorSemantico() {
                 break;
         }
         variaveis = new Array();
-        if (procedimentoAtual.getAssinatura() == undefined) {
-            procedimentoAtual.setAssinatura(new Array());
+        if (simboloAtual.getAssinatura() == undefined) {
+            simboloAtual.setAssinatura(new Array());
         }
     }
 
+    // Transição le/escreve da máquina de estados
     this.iniciarLeEscreve = function() {
         switch (estado) {
             case 5:
@@ -169,6 +178,7 @@ function AnalisadorSemantico() {
         erroTipo = false;
     }
 
+    // Transição terminar_le/escreve da máquina de estados
     this.terminarLeEscreve = function() {
         switch (estado) {
             case 7:
@@ -182,6 +192,7 @@ function AnalisadorSemantico() {
         }
     }
 
+    // Transição iniciar_chamada da máquina de estados
     this.iniciarChamada = function() {
         switch (estado) {
             case 5:
@@ -192,8 +203,14 @@ function AnalisadorSemantico() {
         }
         argumentoAtual = 0;
         numeroEncontrado = 0;
+
+        // Se o identificador que iniciou a chamada não existe, ignoramos os próximos erros
+        if (!simboloAtual) {
+            ignorar = true;
+        }
     }
 
+    // Transição terminar_chamada da máquina de estados
     this.terminarChamada = function() {
         switch (estado) {
             case 8:
@@ -202,13 +219,14 @@ function AnalisadorSemantico() {
             case 10:
                 estado = 6;
         }
-        if (procedimentoAtual && numeroEncontrado != procedimentoAtual.getAssinatura().length) {
-            error("Numero de argumentos na chamada do procedimento '" +  procedimentoAtual.getCadeia() +
-                "' incorreto - esperados " + procedimentoAtual.getAssinatura().length + " argumentos mas encontrados " +
-                numeroEncontrado + ".");
+        if (procedimentoChamado && numeroEncontrado != procedimentoChamado.getAssinatura().length) {
+            error("Numero de argumentos na chamada do procedimento '" +  procedimentoChamado.getCadeia() +
+                "' incorreto - esperados " + procedimentoChamado.getAssinatura().length + " argumentos " +
+                "mas encontrados " + numeroEncontrado + ".");
         }
     }
 
+    // Transição iniciar_corpo da máquina de estados
     this.iniciarCorpo = function() {
         switch (estado) {
             case 0:
@@ -226,6 +244,9 @@ function AnalisadorSemantico() {
     }
 
 
+    // Métodos de acesso a tabela de símbolos
+    // ------------------------------------------------------------------------
+
 
     // Insere um simbolo na tabela de símbolos
     //   Retorna o símbolo inserido em caso de sucesso ou null em caso de falha
@@ -240,8 +261,9 @@ function AnalisadorSemantico() {
             case 0:
             case 2:
                 if (estado == 2) {
-                    procedimentoAtual = v;
+                    simboloAtual = v;
                 }
+                v.setEscopo("global");
                 if (!tabelaSimbolos.inserir(v)) {
                     error("Erro na declaracao do procedimento '" + v.getCadeia() + "' - ja declarado.");
                     return null;
@@ -258,11 +280,11 @@ function AnalisadorSemantico() {
                 }
                 if (estado == 3) {
                     v.setCategoria("parametro");
-                    v.setProcedimento(procedimentoAtual.getCadeia());
+                    v.setProcedimento(simboloAtual.getCadeia());
                 }
                 if (estado == 4) {
                     v.setEscopo("local");
-                    v.setProcedimento(procedimentoAtual.getCadeia());
+                    v.setProcedimento(simboloAtual.getCadeia());
                 }
 
                 // Se estamos na fase de declaração de variáveis ou declaração de parâmetros,
@@ -287,8 +309,8 @@ function AnalisadorSemantico() {
                             v2.setTipo(v.getTipo());
                             v2.setCategoria(variaveis[c].getCategoria());
                             tabelaSimbolos.inserir(v2);
-                            if (estado == 3 && procedimentoAtual) {
-                                procedimentoAtual.getAssinatura().push(v.getTipo());
+                            if (estado == 3 && simboloAtual) {
+                                simboloAtual.getAssinatura().push(v.getTipo());
                             }
                         }
                     }
@@ -322,7 +344,7 @@ function AnalisadorSemantico() {
                 }
 
                 // Primeiro, verificamos se o símbolo está declarado dentro do escopo local
-                v.setProcedimento(procedimentoAtual.getCadeia());
+                v.setProcedimento(simboloAtual.getCadeia());
                 w = tabelaSimbolos.verificar(v);
                 if (!w) {
                     // Caso não esteja, verificamos se ele está no escopo global
@@ -331,6 +353,10 @@ function AnalisadorSemantico() {
                     w = tabelaSimbolos.verificar(v);
                     if (!w) {
                         // Caso não esteja, temos um erro de símbolo não declarado
+
+                        error("Simbolo '" + v.getCadeia() + "' nao declarado.");
+
+/*
                         if (v.getCategoria() == "procedimento") {
                             error("Procedimento '" + v.getCadeia() + "' nao declarado.");
                             ignorar = true;
@@ -338,6 +364,7 @@ function AnalisadorSemantico() {
                         else {
                             error("Variavel '" + v.getCadeia() + "' nao declarada.");
                         }
+*/
                         return null;
                     }
                 }
@@ -361,9 +388,9 @@ function AnalisadorSemantico() {
                         w.setTipo("invalid");
                     }
 
-                    if (procedimentoAtual && w.getTipo() != procedimentoAtual.getAssinatura()[argumentoAtual++]) {
-                        if (procedimentoAtual.getAssinatura()[argumentoAtual - 1] != undefined) {
-                            error("Parametro '" + w.getCadeia() + "' incorreto. Esperado valor " + procedimentoAtual.getAssinatura()[argumentoAtual - 1] + " mas encontrado valor " + w.getTipo() + ".");
+                    if (procedimentoChamado && w.getTipo() != procedimentoChamado.getAssinatura()[argumentoAtual++]) {
+                        if (procedimentoChamado.getAssinatura()[argumentoAtual - 1] != undefined) {
+                            error("Parametro '" + w.getCadeia() + "' incorreto. Esperado valor " + procedimentoChamado.getAssinatura()[argumentoAtual - 1] + " mas encontrado valor " + w.getTipo() + ".");
                         }
                     }
                 }
@@ -386,6 +413,10 @@ function AnalisadorSemantico() {
                 w = tabelaSimbolos.verificar(v);
                 if (!w) {
                     // Caso não esteja, temos um erro de símbolo não declarado
+
+                    error("Simbolo '" + v.getCadeia() + "' nao declarado.");
+
+/*
                     if (v.getCategoria() == "procedimento") {
                         error("Procedimento '" + v.getCadeia() + "' nao declarado.");
                         ignorar = true;
@@ -393,6 +424,7 @@ function AnalisadorSemantico() {
                     else {
                         error("Variavel '" + v.getCadeia() + "' nao declarada.");
                     }
+*/
                     return null;
                 }
 
@@ -415,9 +447,9 @@ function AnalisadorSemantico() {
                         w.setTipo("invalid");
                     }
 
-                    if (procedimentoAtual && w.getTipo() != procedimentoAtual.getAssinatura()[argumentoAtual++]) {
-                        if (procedimentoAtual.getAssinatura()[argumentoAtual - 1] != undefined) {
-                            error("Parametro '" + w.getCadeia() + "' incorreto. Esperado valor " + procedimentoAtual.getAssinatura()[argumentoAtual - 1] + " mas encontrado valor " + w.getTipo() + ".");
+                    if (procedimentoChamado && w.getTipo() != procedimentoChamado.getAssinatura()[argumentoAtual++]) {
+                        if (procedimentoChamado.getAssinatura()[argumentoAtual - 1] != undefined) {
+                            error("Parametro '" + w.getCadeia() + "' incorreto. Esperado valor " + procedimentoChamado.getAssinatura()[argumentoAtual - 1] + " mas encontrado valor " + w.getTipo() + ".");
                         }
                     }
 
@@ -430,7 +462,8 @@ function AnalisadorSemantico() {
 
     }
 
-    // TODO: o que isto faz?
+
+
     // Este método é chamado dentro da regra <variaveis> do analisador sintático.
     // Ele existe pois, dependendo da fase da análise semântica em que estamos (declarações ou
     //   verificações), a ação a ser tomada para o tratamento das variáveis é diferente.
@@ -452,7 +485,6 @@ function AnalisadorSemantico() {
         }
 
     }
-
 
     // Remove um símbolo da tabela de síbolos
     this.remover = function(variavel) {

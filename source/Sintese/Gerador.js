@@ -40,8 +40,8 @@ function Gerador() {
     // ************************************************************************
     // Métodos privados
     // ************************************************************************
- 
-    
+
+
     // Insere identação na linha atual do código gerado
     function identar() {
         for (var i = 0; i < identacao; i++) {
@@ -50,9 +50,8 @@ function Gerador() {
             }
         }
     }
-    
-    
-    
+
+
 
     // ************************************************************************
     // Métodos publicos
@@ -63,12 +62,10 @@ function Gerador() {
     this.codigo = function () {
         return codigo;
     }
-    
-
 
     // Inicia a geração do código. Coloca um cabeçalho (nome do programa) e
     //   insere o #include <stdio.h>
-    this.genStart = function (cadeia) {
+    this.iniciar = function (cadeia) {
         codigo += "/* programa " + cadeia + " */\n\n";
         codigo += "#include <stdio.h>\n\n";
     }
@@ -91,7 +88,7 @@ function Gerador() {
     }
 
     // Gera declaração de variáveis ou parâmetros
-    this.genDeclaracao = function (tipo) {
+    this.iniciarDeclaracao = function (tipo) {
         identar();
         if (tipo == "inteiro") {
             tipo = "int";
@@ -111,13 +108,13 @@ function Gerador() {
     }
 
     // Inicia a geração de um procedimento
-    this.genProcedimento = function (cadeia) {
+    this.iniciarProcedimento = function (cadeia) {
         codigo += "\n";
         codigo += "void " + cadeia + " (";
     }
 
     // Gera a declaração de parâmetros de uma função
-    this.genParametros = function (tipo) {
+    this.inserirParametros = function (tipo) {
         identar();
 
         if (tipo == "inteiro") {
@@ -134,18 +131,14 @@ function Gerador() {
     }
 
     // Finaliza a declaração de parâmetros de uma função
-    this.finalizaParametros = function () {
-        identar();
+    this.finalizarParametros = function () {
         // Retiramos a ultima virgula e espaço que sobram ao final
         codigo = codigo.substr(0, codigo.length - 2);
-        codigo += ") {\n";
+        codigo += ")\n{\n";
         identacao++;
     }
 
     // Finaliza uma função
-/////////////////////////////////////////////////////////////////////////////////////////////////
-    // Perceber que é igual ao finalizar bloco
-/////////////////////////////////////////////////////////////////////////////////////////////////
     this.finalizarProcedimento = function () {
         identacao--;
         identar();
@@ -154,7 +147,7 @@ function Gerador() {
 
     // Inicia a função principal
     this.iniciarMain = function () {
-        codigo += "\nint main (int argc, char **argv) {\n\n";
+        codigo += "\nint main (int argc, char **argv)\n{\n\n";
         identacao++;
     }
 
@@ -228,13 +221,13 @@ function Gerador() {
     // Transforma uma instrução "enquanto" em uma instrução "while"
     this.iniciarEnquanto = function () {
         identar();
-        codigo += "while (";
+        codigo += "while ";
     }
 
     // Transforma uma instrução "se" em uma instrução "if"
     this.iniciarSe = function () {
         identar();
-        codigo += "if (";
+        codigo += "if ";
     }
 
     // Transforma uma instrução "senao" em uma instrução "else"
@@ -243,9 +236,13 @@ function Gerador() {
         codigo += "else\n";
     }
 
+    this.iniciarCondicao = function () {
+        codigo += "(";
+    }
+
     // Insere um identificador no código (pode ser uma atribuição de variável ou
     //   chamada de função)
-    this.genIdentificador = function (cadeia) {
+    this.inserirIdentificador = function (cadeia) {
         identar();
         codigo += cadeia;
     }
@@ -268,7 +265,7 @@ function Gerador() {
     }
 
     // Escreve os argumentos de chamadas de função
-    this.incluirArgumento = function (cadeia) {
+    this.inserirArgumento = function (cadeia) {
         codigo += cadeia + ", ";
     }
 
@@ -278,12 +275,12 @@ function Gerador() {
         codigo += ");\n";
     }
 
-    
-    this.iniciarCondicao = function () {
-//TODO: este metodo nao faz nada?
+    // Insere uma lista de parâmetros vazia (necessária na linguagem C, quando não mandamos parâmetros)
+    this.inserirChamadaVazia = function () {
+        codigo += "();\n";
     }
 
-    //
+    // Finaliza uma condição
     this.finalizarCondicao = function () {
         codigo = codigo.substr(0, codigo.length - 1);
         codigo += ")\n";
