@@ -300,7 +300,6 @@ function Gerador() {
         codigo += "}\n";
     }
 
-//TODO: bonita expressam em latim!
     // As expressões são transcritas ipsis litteris no código gerado
     this.expressao = function (cadeia) {
         codigo += cadeia + " ";

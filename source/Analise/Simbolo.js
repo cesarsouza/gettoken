@@ -5,13 +5,11 @@ function Simbolo(simbolo) {
 
     var cadeia;          // cadeia que identifica o simbolo
     var tipo;            // tipo do simbolo, como inteiro, real (se aplicável)
-    var escopo;          // local ou global
-    var categoria;       // variavel, parametro, programa, procedimento
-    var procedimento;    // apenas para parâmetros e variáveis locais
-                         //   indica a qual procedimento a variável pertence
-    var assinatura;      // apenas para procedimentos
+    var escopo;          // nome do procedimento (para local) ou null (global)
+    var categoria;       // categoria como: variavel, programa ou procedimento
+    var assinatura;      // assinatura, apenas para procedimentos:
                          //   indica os tipos dos parametros do procedimento
-                         //   (vetor contendo os tipos dos parametros)
+                         //   (lista contendo os tipos dos parametros aceitos)
 
 
 
@@ -24,7 +22,6 @@ function Simbolo(simbolo) {
         this.tipo          = simbolo.tipo;
         this.escopo        = simbolo.escopo;
         this.categoria     = simbolo.categoria;
-        this.procedimento  = simbolo.procedimento;
         this.assinatura    = simbolo.assinatura;
     }
 
@@ -34,7 +31,6 @@ function Simbolo(simbolo) {
         this.tipo         = simbolo["tipo"];
         this.escopo       = simbolo["escopo"];
         this.categoria    = simbolo["categoria"];
-        this.procedimento = simbolo["procedimento"];
         this.assinatura   = simbolo["assinatura"];
      }
 
@@ -51,14 +47,12 @@ function Simbolo(simbolo) {
     this.setTipo         = function(tipo)         { this.tipo         = tipo; }
     this.setEscopo       = function(escopo)       { this.escopo       = escopo; }
     this.setCategoria    = function(categoria)    { this.categoria    = categoria; }
-    this.setProcedimento = function(procedimento) { this.procedimento = procedimento; }
     this.setAssinatura   = function(assinatura)   { this.assinatura   = assinatura; }
 
     this.getCadeia       = function() { return this.cadeia; }
     this.getTipo         = function() { return this.tipo; }
     this.getEscopo       = function() { return this.escopo; }
     this.getCategoria    = function() { return this.categoria; }
-    this.getProcedimento = function() { return this.procedimento; }
     this.getAssinatura   = function() { return this.assinatura; }
 
 
@@ -67,7 +61,6 @@ function Simbolo(simbolo) {
             "   tipo = " + this.tipo +
             "   escopo = " + this.escopo +
             "   categoria = " + this.categoria +
-            "   procedimento = " + this.procedimento +
             "   assinatura = " + this.assinatura;
     }
 

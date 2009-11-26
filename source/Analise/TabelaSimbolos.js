@@ -1,12 +1,12 @@
-﻿// Classe TabelaSimbolos
+﻿// Copyright © 2009 César Roberto de Souza, Leonardo Sameshima Taba
+// ----------------------------------------------------------------
+
+
+// Classe TabelaSimbolos
 //   Implementação da tabela de símbolos como uma tabela hash (estrutura intrínseca do
 //   JavaScript) juntamente com um vetor dinâmico para tratar os casos de colisão
 //
 function TabelaSimbolos() {
-
-// TODO: Definir melhor o nome de todas as classes. Porque, por exemplo, temos
-//   classe Token, classe Errors, clase Keywords, todas em ingles... mas também
-//   temos classe Simbolo, classes Analisadores...
 
 /*
 
@@ -160,9 +160,6 @@ function TabelaSimbolos() {
                 achou = false;
             }
             if (simbolo.getCategoria() != undefined && simbolo.getCategoria() != tabela[linha][i].getCategoria()) {
-                achou = false;
-            }
-            if (simbolo.getProcedimento() != undefined && simbolo.getProcedimento() != tabela[linha][i].getProcedimento()) {
                 achou = false;
             }
             if (simbolo.getAssinatura() != undefined && simbolo.getAssinatura() != tabela[linha][i].getAssinatura()) {

@@ -2,6 +2,24 @@
 // ----------------------------------------------------------------
 //
 
+/*
+26/11/2009 - cesarsouza
+Falhando verificacao de tipos (acho que regrediu nas mudancas de ontem)
+PS: vide mudancas em AnalisadorSintatico, ln 1129
+                     AnalisadorSemantico, ln 447
+
+    programa fibonacci;
+
+    var a : inteiro;
+    var b: real;
+
+    inicio
+        a := b;
+    fim.
+
+*/
+
+
 
 // Classe Analisador Semântico
 //   Esta classe é responsável por executar a etapa de análise semântica,
@@ -88,7 +106,7 @@ function AnalisadorSemantico() {
 
 
     // Atribui a linha atual da análise sintática
-    this.setLinha = function(l) { linha = l; }
+    this.setLinha = function(lin) { linha = lin; }
 
     // Retorna a lista de erros encontrados durante a análise.
     this.errors = function() { return error_list; }
@@ -238,8 +256,6 @@ function AnalisadorSemantico() {
     //   Retorna o símbolo inserido em caso de sucesso ou null em caso de falha
     this.inserir = function(simbolo) {
 
-        trace("> analisadorSemantico.inserir()");
-
         var v = new Simbolo(simbolo);
 
         switch (estado) {
@@ -262,15 +278,14 @@ function AnalisadorSemantico() {
             case 3:
             case 4:
                 if (estado == 1) {
-                    v.setEscopo("global");
+                    v.setEscopo(null);
                 }
                 if (estado == 3) {
                     v.setCategoria("parametro");
-                    v.setProcedimento(simboloAtual.getCadeia());
+                    v.setEscopo(simboloAtual.getCadeia());
                 }
                 if (estado == 4) {
-                    v.setEscopo("local");
-                    v.setProcedimento(simboloAtual.getCadeia());
+                    v.setEscopo(simboloAtual.getCadeia());
                 }
 
                 // Se estamos na fase de declaração de variáveis ou declaração de parâmetros,
@@ -286,7 +301,7 @@ function AnalisadorSemantico() {
                     for (var c in variaveis) {
                         var v2 = new Simbolo();
                         v2.setCadeia(variaveis[c].getCadeia());
-                        v2.setProcedimento(variaveis[c].getProcedimento());
+                        v2.setEscopo(variaveis[c].getEscopo());
                         
                         if (tabelaSimbolos.verificar(v2)) {
                             error("Erro na declaracao da variavel '" + v2.getCadeia() + "' - ja declarada.");
@@ -307,7 +322,6 @@ function AnalisadorSemantico() {
                 break;
 
         }
-
     }
 
     // Verifica se um símbolo está atualmente na tabela de símbolos.
@@ -330,13 +344,12 @@ function AnalisadorSemantico() {
                 }
 
                 // Primeiro, verificamos se o símbolo está declarado dentro do escopo local
-                v.setProcedimento(simboloAtual.getCadeia());
+                v.setEscopo(simboloAtual.getCadeia());
                 w = tabelaSimbolos.verificar(v);
                 
                 // Caso não esteja, verificamos se ele está no escopo global                
                 if (!w) {
-                    v.setEscopo("global");
-                    v.setProcedimento(undefined);
+                    v.setEscopo(null);
                     w = tabelaSimbolos.verificar(v);
                     
                     // Caso não esteja, temos um erro de símbolo não declarado
@@ -427,6 +440,22 @@ function AnalisadorSemantico() {
         }
     }
 
+
+    // Este método verifica se o tipo do símbolo atual comporta uma atribuição
+    //  do tipo passado como parâmetro, e adiciona uma mensagem de erro a lista
+    //  de erros caso não sejam.
+    this.compativel = function(tipo) {
+        alert("analisador semantico, line 329");
+        alert("simbolo atual: " + simboloAtual);
+        alert("tipo comparado: " + tipo);
+
+        if (simboloAtual instanceof Simbolo &&
+               simboloAtual.getTipo() == "inteiro" &&
+               tipo == "real") {
+
+            error("Atribuicao de valor real a variavel inteira '" + simbolo.getCadeia() + "'.");
+        }
+    }
 
 
     // Este método é chamado dentro da regra <variaveis> do analisador sintático.

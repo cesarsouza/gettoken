@@ -204,3 +204,12 @@ function debug(msg) {
         alert(msg);
     }
 }
+
+// Função auxiliar de debug para imprimir uma lista em tela
+function print_list(objeto) {
+    var texto = '';
+    for (o in objeto) {
+        texto += o + "\n";
+    }
+    alert(texto);
+}

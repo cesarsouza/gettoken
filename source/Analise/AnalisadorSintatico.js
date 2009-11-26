@@ -320,8 +320,7 @@ function AnalisadorSintatico(input, analisadorSemantico, geradorCodigo) {
         // CORTE TRANSVERSAL PARA GERADOR DE CÓDIGO
         if (gerador) {
             gerador.finalizarMain();
-        }
-        // FIM DO CORTE PARA GERADOR DE CÓDIGO
+        } // FIM DO CORTE PARA GERADOR DE CÓDIGO
     }
 
 
@@ -424,8 +423,6 @@ function AnalisadorSintatico(input, analisadorSemantico, geradorCodigo) {
                 }
             } // FIM DO CORTE PARA ANALISADOR SEMANTICO
 
-
-
             obterSimbolo();
         }
 
@@ -501,8 +498,8 @@ function AnalisadorSintatico(input, analisadorSemantico, geradorCodigo) {
             // CORTE TRANSVERSAL PARA ANALISADOR SEMANTICO
             if (analisadorSemantico) {
                 analisadorSemantico.iniciarProcedimento();
-            }
-            // FIM DO CORTE PARA ANALISADOR SEMANTICO
+            } // FIM DO CORTE PARA ANALISADOR SEMANTICO
+            
 
             if (simbolo != "@ident") {
                 error("Esperado identificador mas encontrado '" + cadeia + "'");
@@ -533,10 +530,8 @@ function AnalisadorSintatico(input, analisadorSemantico, geradorCodigo) {
                 lista_par(join(seguidores, Seguidores["dc_p"], Primeiros["corpo_p"], Primeiros["cmd"]));
 
                 if (simbolo != ")") {
-                    //error("Esperado ')' mas encontrado '" + cadeia + "'");
                     varre(join(")", Seguidores["dc_p"], Primeiros["corpo_p"], seguidores));
                 }
-
                 if (simbolo == ")") {
                     obterSimbolo();
                 }
@@ -568,8 +563,7 @@ function AnalisadorSintatico(input, analisadorSemantico, geradorCodigo) {
                 if (gerador) {
                     gerador.finalizarProcedimento();
                 }
-            }
-            // FIM DO CORTE TRANSVERSAL PARA ANALISADOR SEMANTICO E GERADOR DE CÓDIGO
+            } // FIM DO CORTE TRANSVERSAL PARA ANALISADOR SEMANTICO E GERADOR DE CÓDIGO
 
             if (!(simbolo in Primeiros["dc_p"]) && !(simbolo in Seguidores["dc_p"]) && !(simbolo in seguidores)) {
                 error("Esperado 'procedimento' ou 'inicio' mas encontrado '" + cadeia + "'");
@@ -592,8 +586,8 @@ function AnalisadorSintatico(input, analisadorSemantico, geradorCodigo) {
             // sinaliza ao analisador que um bloco de
             // declaração de parametros está se iniciando
             analisadorSemantico.iniciarParametros();
-        }
-        // FIM DO CORTE TRANSVERSAL PARA ANALISADOR SEMANTICO
+        } // FIM DO CORTE TRANSVERSAL PARA ANALISADOR SEMANTICO
+        
 
         // Chama a regra "variaveis"
         variaveis(join(seguidores, Seguidores["lista_par"], ":", "real", "inteiro"));
@@ -618,8 +612,7 @@ function AnalisadorSintatico(input, analisadorSemantico, geradorCodigo) {
                 if (gerador) {
                     gerador.inserirParametros(simbolo);
                 }
-            }
-            // FIM DO CORTE PARA ANALISADOR SEMANTICO
+            } // FIM DO CORTE PARA ANALISADOR SEMANTICO
 
             obterSimbolo();
         }
@@ -680,7 +673,6 @@ function AnalisadorSintatico(input, analisadorSemantico, geradorCodigo) {
                 lista_par(seguidores);
             }
         }
-
     }
 
 
@@ -795,8 +787,7 @@ function AnalisadorSintatico(input, analisadorSemantico, geradorCodigo) {
                     if (gerador) {
                         gerador.inserirArgumento(cadeia);
                     }
-                }
-                // FIM DO CORTE PARA ANALISADOR SEMANTICO
+                } // FIM DO CORTE PARA ANALISADOR SEMANTICO
 
                 obterSimbolo();
             }
@@ -824,8 +815,7 @@ function AnalisadorSintatico(input, analisadorSemantico, geradorCodigo) {
                         if (gerador) {
                             gerador.inserirArgumento(cadeia);
                         }
-                    }
-                    // FIM DO CORTE PARA ANALISADOR SEMANTICO
+                    } // FIM DO CORTE PARA ANALISADOR SEMANTICO
 
                     obterSimbolo();
                 }
@@ -988,6 +978,7 @@ function AnalisadorSintatico(input, analisadorSemantico, geradorCodigo) {
 
             // Chama a regra "cmd"
             cmd(join(seguidores, Seguidores["cmd"]));
+            
         }
         else if (simbolo == "se") {
             obterSimbolo();
@@ -1012,30 +1003,32 @@ function AnalisadorSintatico(input, analisadorSemantico, geradorCodigo) {
 
             // Chama a regra "cont_se"
             cont_se(join(seguidores, Seguidores["cmd"]));
+            
         }
         else if (simbolo == "@ident") {
 
             // CORTE TRANSVERSAL PARA ANALISADOR SEMÂNTICO
             if (analisadorSemantico) {
 
-                var s;
+                var s; // símbolo
 
-                // O método verificar sabe o escopo em que está a análise, devido aos estados da máquina
+                // O método "verificar" sabe o escopo em que está a análise,
+                //   pois tem conhecimento quanto aos estados da máquina semântica
                 s = analisadorSemantico.verificar({"cadeia":cadeia});
                 
-                // TODO: verificar se isto esta sendo usado mesmo
+                // TODO: verificar se isto esta sendo usado mesmo (setProcedimentoAtual?)
                 analisadorSemantico.setProcedimento(s);
 
                 if (gerador) {
                     gerador.inserirIdentificador(cadeia);
                 }
-            }
-            // FIM DO CORTE PARA ANALISADOR SEMÂNTICO
-
+            }  // FIM DO CORTE PARA ANALISADOR SEMÂNTICO
+           
             obterSimbolo();
 
             // Chama a regra "cont_ident"
             cont_ident(join(seguidores, Seguidores["cmd"]));
+            
         }
         else if (simbolo == "inicio") {
             obterSimbolo();
@@ -1097,8 +1090,8 @@ function AnalisadorSintatico(input, analisadorSemantico, geradorCodigo) {
             // CORTE TRANSVERSAL PARA GERADOR DE CÓDIGO
             if (gerador) {
                 gerador.iniciarSenao();
-            }
-            // FIM DO CORTE PARA GERADOR DE CÓDIGO
+            } // FIM DO CORTE PARA GERADOR DE CÓDIGO
+            
 
             // Chama a regra "cmd"
             cmd(join(seguidores, Seguidores["cont_se"]));
@@ -1125,23 +1118,20 @@ function AnalisadorSintatico(input, analisadorSemantico, geradorCodigo) {
             // CORTE TRANSVERSAL PARA GERADOR DE CÓDIGO
             if (gerador) {
                 gerador.iniciarAtribuicao();
-            }
-            // FIM DO CORTE PARA GERADOR DE CÓDIGO
-
+            } // FIM DO CORTE PARA GERADOR DE CÓDIGO
+            
             // Chama a regra "expressão"
             tipo = expressao(join(seguidores, Seguidores["cont_ident"]));
 
-        // TODO: Verificar estas instrucoes
             // CORTE TRANSVERSAL PARA ANÁLISE SEMÂNTICA E GERADOR DE CÓDIGO
             if (analisadorSemantico) {
-                if (analisadorSemantico.getSimbolo() instanceof Simbolo && analisadorSemantico.getSimbolo().getTipo() == "inteiro" && tipo == "real") {
-                    error("Atribuicao de valor real a variavel inteira '" + v.getCadeia() + "'.");
-                }
+                
+                analisadorSemantico.compativel(tipo);
+                
                 if (gerador) {
                     gerador.finalizarAtribuicao();
                 }
-            }
-            // FIM DO CORTE PARA ANÁLISE SEMÂNTICA E GERADOR DE CÓDIGO
+            }  // FIM DO CORTE PARA ANÁLISE SEMÂNTICA E GERADOR DE CÓDIGO
 
         }
         else if (simbolo in Primeiros["lista_arg"]) {
@@ -1152,9 +1142,8 @@ function AnalisadorSintatico(input, analisadorSemantico, geradorCodigo) {
                 if (gerador) {
                     gerador.iniciarChamada();
                 }
-            }
-            // FIM DO CORTE PARA ANALISADOR SEMÂNTICO E GERADOR DE CÓDIGO
-
+            } // FIM DO CORTE PARA ANALISADOR SEMÂNTICO E GERADOR DE CÓDIGO
+            
             // Chama a regra "lista_arg"
             lista_arg(join(seguidores, Seguidores["cont_ident"]));
 
@@ -1174,8 +1163,7 @@ function AnalisadorSintatico(input, analisadorSemantico, geradorCodigo) {
                 if (gerador) {
                     gerador.inserirChamadaVazia();
                 }
-            }
-            // FIM DO CORTE TRANSVERSAL PARA ANÁLISE SEMÂNTICA E GERAÇÃO DE CÓDIGO
+            } // FIM DO CORTE TRANSVERSAL PARA ANÁLISE SEMÂNTICA E GERAÇÃO DE CÓDIGO
         }
     }
 
@@ -1190,8 +1178,8 @@ function AnalisadorSintatico(input, analisadorSemantico, geradorCodigo) {
         // CORTE TRANSVERSAL PARA GERADOR DE CÓDIGO
         if (gerador) {
             gerador.iniciarCondicao();
-        }
-        // FIM DO CORTE PARA GERADOR DE CÓDIGO
+        } // FIM DO CORTE PARA GERADOR DE CÓDIGO
+        
 
         // Chama a regra "expressao"
         expressao(join(seguidores, Seguidores["condicao"], "=","<>",">=","<=",">","<"), esperado);
@@ -1205,8 +1193,7 @@ function AnalisadorSintatico(input, analisadorSemantico, geradorCodigo) {
             // CORTE TRANSVERSAL PARA GERADOR DE CÓDIGO
             if (gerador) {
                 gerador.expressao(simbolo);
-            }
-            // FIM DO CORTE PARA GERADOR DE CÓDIGO
+            } // FIM DO CORTE PARA GERADOR DE CÓDIGO
 
             obterSimbolo();
         }
@@ -1217,8 +1204,7 @@ function AnalisadorSintatico(input, analisadorSemantico, geradorCodigo) {
         // CORTE TRANSVERSAL PARA GERADOR DE CÓDIGO
         if (gerador) {
             gerador.finalizarCondicao();
-        }
-        // FIM DO CORTE PARA GERADOR DE CÓDIGO
+        } // FIM DO CORTE PARA GERADOR DE CÓDIGO
     }
 
 
@@ -1231,8 +1217,14 @@ function AnalisadorSintatico(input, analisadorSemantico, geradorCodigo) {
 
         var retorno;
 
-
-        // TODO: Elucidar melhor tipo_termo1 e derivados
+        // Quando analisamos expressões, devemos tomar cuidado para
+        //  retornar seu tipo correto. Expressões que misturam termos
+        //  reais e inteiros são do tipo real. Expressões apenas de
+        //  inteiros são inteiras e expressões apenas de reais, reais.
+        //
+        // Para isto, as regras que lidam com expressões e termos, caso
+        //  a análise semântica esteja em curso, retornam o tipo de retorno
+        //  esperado de suas combinações de tipos.
 
         // Chama a regra "termo"
         tipo_termo1 = termo(join(Seguidores["expressao"], seguidores, "+", "-", "@ident"), esperado);
@@ -1253,20 +1245,27 @@ function AnalisadorSintatico(input, analisadorSemantico, geradorCodigo) {
         // Enquanto houver "+" ou "-"
         while (simbolo == "+" || simbolo == "-") {
 
+            // CORTE TRANSVERSAL PARA GERADOR DE CÓDIGO
             if (gerador) {
                 gerador.expressao(cadeia);
-            }
+            } // FIM DO CORTE PARA GERADOR DE CÓDIGO
 
             obterSimbolo();
 
             // Chama a regra "termo"
             tipo_termo2 = termo(join(Seguidores["expressao"], seguidores, "+", "-", "@ident"),esperado);
 
-            if (tipo_termo1 == "real" || tipo_termo2 == "real") {
-                retorno = "real";
-            }
-            else {
-                retorno = "inteiro";
+            // Se a análise semântica está em curso,
+            if (analisadorSemantico) {
+                if (tipo_termo1 == "real" || tipo_termo2 == "real") {
+                    // real + inteiro = real
+                    // inteiro + real = real
+                    retorno = "real";
+                }
+                else {
+                    // inteiro + inteiro = inteiro
+                    retorno = "inteiro";
+                }
             }
 
             if (simbolo != "+" && simbolo != "-" && !(simbolo in Seguidores["expressao"])) {
@@ -1283,9 +1282,8 @@ function AnalisadorSintatico(input, analisadorSemantico, geradorCodigo) {
             }
         }
 
-        // Retorna o tipo da expressão
         if (analisadorSemantico) {
-            return retorno;
+            return retorno;  // retorna o tipo da expressão.
         }
     }
 
@@ -1310,8 +1308,7 @@ function AnalisadorSintatico(input, analisadorSemantico, geradorCodigo) {
             // CORTE TRANSVERSAL PARA GERADOR DE CÓDIGO
             if (gerador) {
                 gerador.expressao(cadeia);
-            }
-            // FIM DO CORTE PARA GERADOR DE CÓDIGO
+            } // FIM DO CORTE PARA GERADOR DE CÓDIGO
 
             obterSimbolo();
         }
@@ -1321,7 +1318,7 @@ function AnalisadorSintatico(input, analisadorSemantico, geradorCodigo) {
 
         // Se temos um erro sintático como 12 3 - 1, não temos como saver que operação iria
         //   ser realizada, e portanto não conseguimos determinar se seria um erro semântico
-        //   ou não
+        //   ou não.
         if (simbolo != "*" && simbolo != "/" && !(simbolo in Seguidores["termo"])) {
 
             error("Esperado operador matematico, operador relacional ou '"+ esperado +"', mas encontrado '" + cadeia + "'");
@@ -1340,8 +1337,8 @@ function AnalisadorSintatico(input, analisadorSemantico, geradorCodigo) {
             // CORTE TRANSVERSAL PARA GERADOR DE CÓDIGO
             if (gerador) {
                 gerador.expressao(cadeia);
-            }
-            // FIM DO CORTE PARA GERADOR DE CÓDIGO
+            } // FIM DO CORTE PARA GERADOR DE CÓDIGO
+            
 
             operacao = simbolo;
 
@@ -1374,8 +1371,7 @@ function AnalisadorSintatico(input, analisadorSemantico, geradorCodigo) {
         }
 
         if (analisadorSemantico) {
-            // Retorna o tipo da expressão
-            return retorno;
+            return retorno;  // retorna o tipo da expressão.
         }
     }
 
@@ -1397,8 +1393,7 @@ function AnalisadorSintatico(input, analisadorSemantico, geradorCodigo) {
         // CORTE TRANSVERSAL PARA GERADOR DE CÓDIGO
         if (gerador) {
             gerador.expressao(cadeia);
-        }
-        // FIM DO CORTE PARA GERADOR DE CÓDIGO
+        } // FIM DO CORTE PARA GERADOR DE CÓDIGO
 
         if (simbolo == "@ident") {
         
@@ -1439,13 +1434,11 @@ function AnalisadorSintatico(input, analisadorSemantico, geradorCodigo) {
             }
 
             retorno = tipo;
-
         }
 
         if (analisadorSemantico) {
-            return retorno;
+            return retorno; // retorna o tipo da expressão.
         }
-
     }
 
 
@@ -1475,15 +1468,6 @@ function AnalisadorSintatico(input, analisadorSemantico, geradorCodigo) {
         }
 
         return list;
-    }
-
-    // Funcao de debug para imprimir uma lista em tela
-    function print_list(objeto) {
-        var texto = '';
-        for (o in objeto) {
-            texto += o + "\n";
-        }
-        alert(texto);
     }
 
 

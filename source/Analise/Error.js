@@ -22,7 +22,7 @@ function Error(mensagem, linha, fase) {
        return lin;
     }
 
-    this.phase = function() { //TODO: acho que o termo correto é "step"
+    this.stage = function() { 
         return fase;
     }
 
