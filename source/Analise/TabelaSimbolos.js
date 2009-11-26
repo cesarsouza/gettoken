@@ -150,6 +150,8 @@ function TabelaSimbolos() {
         for (var i in tabela[linha]) {
             var achou = true;
 
+            // Precisamos usar "!= undefined" ao invés de !simbolo pois alguns campos realmente
+            //  podem ser null propositalmente, como o caso do escopo, em que null indica global.
             if (simbolo.getCadeia() != undefined && simbolo.getCadeia() != tabela[linha][i].getCadeia()) {
                 achou = false;
             }

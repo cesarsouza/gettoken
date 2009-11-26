@@ -69,11 +69,13 @@ function AnalisadorSemantico() {
     var erroTipo = false;
 
     // Variaveis usadas na checagem de argumentos de procedimentos
-    var simboloAtual;
-    var procedimentoAtual;
-    var procedimentoChamado;
-    var argumentoAtual;
-    var numeroEncontrado;
+    var simboloAtual;        // seria o simbolo que estamos processando
+    var procedimentoAtual;   // procedimento atual seria o escopo atual
+    
+    var procedimentoChamado; // seria o procedimento que estamos chamando
+    var argumentoAtual;      // argumento que estamos processando
+    var numeroEncontrado;    // numero de argumentos encontrados na chamada
+                             //   do procedimento que estamos analisando
 
     // Linha atual da análise sintática (para gerar erros na linha correta)
     var linha = 0;
@@ -117,7 +119,7 @@ function AnalisadorSemantico() {
     this.setSimbolo = function(simbolo) { simboloAtual = simbolo; }
     this.getSimbolo = function() { return simboloAtual; }
 
-// TODO: verificar possivel mesclagem de set simbolo e getproc
+// TODO: Tem algo errado com a usagem de setProcedimento, getProcedimentoAtual, etc
     // Métodos que indicam qual procedimento está sendo processado pelo analisador
     this.setProcedimento = function(procedimento) { procedimentoChamado = procedimento; }
     this.getProcedimento = function() { return procedimentoChamado; }
@@ -265,7 +267,7 @@ function AnalisadorSemantico() {
                 if (estado == 2) {
                     simboloAtual = v;
                 }
-                v.setEscopo("global");
+                v.setEscopo(null);
                 if (!tabelaSimbolos.inserir(v)) {
                     error("Erro na declaracao do procedimento '" + v.getCadeia() + "' - ja declarado.");
                     return null;

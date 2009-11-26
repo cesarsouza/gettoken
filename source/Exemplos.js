@@ -146,3 +146,16 @@ inicio\n\
     le(a, b, c);\n\
     p1(a; b; c);\n\
 fim.";
+
+
+exemplo[8] =
+
+"programa teste;\n\
+\n\
+var a,b : inteiro;\n\
+var c : real \n\
+\n\
+inicio\n\
+    c := a;\n\
+    c := a+b\n\
+fim.";
