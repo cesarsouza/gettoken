@@ -3,21 +3,8 @@
 //
 
 /*
-26/11/2009 - cesarsouza
-EDIT: acho que agora está funcionando :P
-
-Falhando verificacao de tipos (acho que regrediu nas mudancas de ontem)
-PS: vide mudancas em AnalisadorSintatico, ln 1129
-                     AnalisadorSemantico, ln 447
-
-    programa fibonacci;
-
-    var a : inteiro;
-    var b: real;
-
-    inicio
-        a := b;
-    fim.
+28/11/2009 - cesarsouza
+Nao esta mais verificando os parametros do procedimento, tipos nem numero
 
 */
 
@@ -121,12 +108,10 @@ function AnalisadorSemantico() {
     this.setSimbolo = function(simbolo) { simboloAtual = simbolo; }
     this.getSimbolo = function() { return simboloAtual; }
 
-// TODO: Tem algo errado com a usagem de setProcedimento, getProcedimentoAtual, etc
-    // Métodos que indicam qual procedimento está sendo processado pelo analisador
-  //  this.setProcedimento = function(procedimento) { procedimentoChamado = procedimento; }
-  //  this.getProcedimento = function() { return procedimentoChamado; }
-
+    // TODO: Onde deveria ser setado quem é o procedimento atual? Acho que esta
+    //  faltando esta instrucao... Sera q removemos por engano?
     this.getProcedimentoAtual = function() { return procedimentoAtual; }
+    this.setProcedimentoAtual = function(simbolo) { procedimentoAtual = simbolo; }
 
 
    
@@ -348,8 +333,11 @@ function AnalisadorSemantico() {
                 }
 
                 // Primeiro, verificamos se o símbolo está declarado dentro do escopo local
-                v.setEscopo(simboloAtual.getCadeia());
-                w = tabelaSimbolos.verificar(v);
+                if (simboloAtual != null)
+                {
+                   v.setEscopo(simboloAtual.getCadeia());
+                   w = tabelaSimbolos.verificar(v);
+                }
                 
                 // Caso não esteja, verificamos se ele está no escopo global                
                 if (!w) {

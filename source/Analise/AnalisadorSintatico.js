@@ -509,7 +509,10 @@ function AnalisadorSintatico(input, analisadorSemantico, geradorCodigo) {
 
                 // CORTE TRANSVERSAL PARA ANALISADOR SEMANTICO
                 if (analisadorSemantico) {
-                    analisadorSemantico.inserir({"cadeia":cadeia, "categoria":"procedimento"});
+                    var s = analisadorSemantico.inserir({"cadeia":cadeia, "categoria":"procedimento"});
+                    
+                    analisadorSemantico.setProcedimentoAtual(s);
+                    
                     if (gerador) {
                         gerador.iniciarProcedimento(cadeia);
                     }
@@ -557,9 +560,16 @@ function AnalisadorSintatico(input, analisadorSemantico, geradorCodigo) {
 
             // CORTE TRANSVERSAL PARA ANALISADOR SEMÂNTICO E GERADOR DE CÓDIGO
             if (analisadorSemantico) {
+                var s = analisadorSemantico.getProcedimentoAtual();
+                
+                // TODO: isto nao pode ser null! se estamos no corpo
+                //  de um procedimento, deve retornar o procedimento!
+                //alert(s);
+                
                 // Removemos as variáveis locais do procedimento
-                analisadorSemantico.remover({"escopo":"local", "procedimento":analisadorSemantico.getSimbolo().getCadeia()});
-                analisadorSemantico.remover({"categoria":"parametro", "procedimento":analisadorSemantico.getSimbolo().getCadeia()});
+                analisadorSemantico.remover({"escopo":s.getCadeia()});
+                
+                
                 if (gerador) {
                     gerador.finalizarProcedimento();
                 }
@@ -1016,7 +1026,6 @@ function AnalisadorSintatico(input, analisadorSemantico, geradorCodigo) {
                 //   pois tem conhecimento quanto aos estados da máquina semântica
                 s = analisadorSemantico.verificar({"cadeia":cadeia});
                 
-                // TODO: verificar se isto esta sendo usado mesmo (setProcedimentoAtual?)
                 analisadorSemantico.setSimbolo(s);
 
                 if (gerador) {
