@@ -4,6 +4,8 @@
 
 /*
 26/11/2009 - cesarsouza
+EDIT: acho que agora está funcionando :P
+
 Falhando verificacao de tipos (acho que regrediu nas mudancas de ontem)
 PS: vide mudancas em AnalisadorSintatico, ln 1129
                      AnalisadorSemantico, ln 447
@@ -121,8 +123,8 @@ function AnalisadorSemantico() {
 
 // TODO: Tem algo errado com a usagem de setProcedimento, getProcedimentoAtual, etc
     // Métodos que indicam qual procedimento está sendo processado pelo analisador
-    this.setProcedimento = function(procedimento) { procedimentoChamado = procedimento; }
-    this.getProcedimento = function() { return procedimentoChamado; }
+  //  this.setProcedimento = function(procedimento) { procedimentoChamado = procedimento; }
+  //  this.getProcedimento = function() { return procedimentoChamado; }
 
     this.getProcedimentoAtual = function() { return procedimentoAtual; }
 
@@ -447,15 +449,15 @@ function AnalisadorSemantico() {
     //  do tipo passado como parâmetro, e adiciona uma mensagem de erro a lista
     //  de erros caso não sejam.
     this.compativel = function(tipo) {
-        alert("analisador semantico, line 329");
-        alert("simbolo atual: " + simboloAtual);
-        alert("tipo comparado: " + tipo);
+       // alert("analisador semantico, line 329");
+       // alert("simbolo atual: " + simboloAtual);
+       // alert("tipo comparado: " + tipo);
 
         if (simboloAtual instanceof Simbolo &&
                simboloAtual.getTipo() == "inteiro" &&
                tipo == "real") {
 
-            error("Atribuicao de valor real a variavel inteira '" + simbolo.getCadeia() + "'.");
+            error("Atribuicao de valor real a variavel inteira '" + simboloAtual.getCadeia() + "'.");
         }
     }
 

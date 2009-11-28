@@ -1017,7 +1017,7 @@ function AnalisadorSintatico(input, analisadorSemantico, geradorCodigo) {
                 s = analisadorSemantico.verificar({"cadeia":cadeia});
                 
                 // TODO: verificar se isto esta sendo usado mesmo (setProcedimentoAtual?)
-                analisadorSemantico.setProcedimento(s);
+                analisadorSemantico.setSimbolo(s);
 
                 if (gerador) {
                     gerador.inserirIdentificador(cadeia);
