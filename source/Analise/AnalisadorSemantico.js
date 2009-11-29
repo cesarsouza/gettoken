@@ -2,13 +2,6 @@
 // ----------------------------------------------------------------
 //
 
-/*
-28/11/2009 - cesarsouza
-Nao esta mais verificando os parametros do procedimento, tipos nem numero
-
-*/
-
-
 
 // Classe Analisador Semântico
 //   Esta classe é responsável por executar a etapa de análise semântica,
@@ -194,11 +187,17 @@ function AnalisadorSemantico() {
             case 6:
                 estado = 10;
         }
+        
+        // Estamos iniciando uma chamada
         argumentoAtual = 0;
         numeroEncontrado = 0;
+        
+        // Iremos chamar o simbolo atual
+        procedimentoChamado = simboloAtual;
 
-        // Se o identificador que iniciou a chamada não existe, ignoramos os próximos erros
+        // Se o identificador que iniciou a chamada não existe
         if (!simboloAtual) {
+            // devemos ignorar os próximos erros
             ignorar = true;
         }
     }
