@@ -152,6 +152,59 @@
                          </p>
                          </div>
 
+                         <h2><a href="javascript:;" onMouseDown="toggleSlide('content-analise-semantica');">
+                             Análise Semântica
+                         </a></h2>
+                         <div id="content-analise-semantica" style="display:none; overflow:hidden; height:420px;">
+			             <p>
+			                A análise semântica é o terceiro passo na construção de um compilador, e é a última etapa de análise.
+			             </p>
+			             <p>
+			                A classe <a href="source/Analise/AnalisadorSemantico.js" target="_blank">AnalisadorSemantico</a> é principal
+			                responsável por realizar as operações de análise semântica sobre o código de entrada fornecido. Entretanto,
+			                é a classe <a href="source/Analise/AnalisadorSintatico.js" target="_blank">AnalisadorSintatico</a> quem conduz
+			                a análise semântica. Isso ocorre pois a semântica tem um forte acoplamento com a sintaxe – de fato, a semântica
+			                é dirigida pela sintaxe. Portanto, a classe <b>AnalisadorSemantico</b> é implementada como uma propriedade
+			                da classe <b>AnalisadorSintatico</b>.
+			             </p>
+			             <p>
+			                O analisador semântico foi implementado como uma <a href="http://pt.wikipedia.org/wiki/M%C3%A1quina_de_estados_finitos" target="_blank">máquina de estados</a>, cuja representação pode ser vista
+			                a seguir. Essa abordagem foi escolhida por facilitar o processamento semântico, que é sensível ao contexto,
+			                e por fornecer um maior <a href="http://pt.wikipedia.org/wiki/Orienta%C3%A7%C3%A3o_a_objetos" target="_blank">desacoplamento e isolamento</a> na implementação. As principais operações implementadas
+			                são inserção, verificação e remoção de <a href="source/Analise/Simbolo.js" target="_blank">símbolos</a> (variáveis ou procedimentos), mapeadas respectivamente nos
+			                métodos inserir, verificar e remover.
+			             </p>
+			             <p>
+			                Internamente, a classe AnalisadorSintatico utiliza a classe <a href="source/Analise/TabelaSimbolos.js"
+			                target="_blank">TabelaSimbolos</a>, que é a tabela de símbolos em que são guardadas as informações sobre
+			                as variáveis e procedimentos (<a href="source/Analise/Simbolo.js" target="_blank">Símbolos</a>) declarados.
+			             </p>
+			             </div>
+
+                         <h2><a href="javascript:;" onMouseDown="toggleSlide('content-geracao-codigo');">
+                             Geração de Código
+                         </a></h2>
+                         <div id="content-geracao-codigo" style="display:none; overflow:hidden; height:330px;">
+			             <p>
+			                Na produção de um compilador, subseqüente a fase de análise vêm as etapas de geração e otimização
+			                de código intermediário e alvo, que aqui foram condensadas em uma única etapa de geração de código.
+			             </p>
+			             <p>
+			                A geração de código alvo é implementada na classe <a href="source/Sintese/Gerador.js" target="_blank">Gerador</a>.
+			                Assim como a análise semântica, a geração de código também é dirigida pela sintaxe. Logo, a classe Gerador é também
+			                uma propriedade da classe <a href="source/Analise/AnalisadorSintatico.js" target="_blank">AnalisadorSintatico</a>.
+			             </p>
+                         <p>
+                            Todavia, o gerador de código é mais simples que o analisador semântico e, por isso, não foi implantado
+                            como uma máquina de estados. Sua estrutura é composta por diversos métodos sucintos que, conforme são
+                            chamados, constroem instrução por instrução o programa no código alvo, que em nosso caso é 
+                            <a href="http://en.wikipedia.org/wiki/ANSI_C" target="_blank">ANSI C</a>.
+                            Os únicos métodos que têm funcionamento um pouco complexo são os relativos a listas de variáveis, que
+                            precisam guardar nomes e tipos, já que as declarações de variáveis na linguagem ALG têm formato invertido
+                            das declarações em linguagem C.
+                         </p>
+			             </div>
+			             
                      </div>
                  </div>
               </form>

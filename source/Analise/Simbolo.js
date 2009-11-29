@@ -1,4 +1,8 @@
-﻿// Classe Simbolo
+﻿// Copyright © 2009 César Roberto de Souza, Leonardo Sameshima Taba
+// ----------------------------------------------------------------
+
+
+// Classe Simbolo
 //  Representa um símbolo que pode ser guardado na tabela de símbolos.
 //
 function Simbolo(simbolo) {
