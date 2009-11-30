@@ -510,7 +510,6 @@ function AnalisadorSintatico(input, analisadorSemantico, geradorCodigo) {
                 // CORTE TRANSVERSAL PARA ANALISADOR SEMANTICO
                 if (analisadorSemantico) {
                     var s = analisadorSemantico.inserir({"cadeia":cadeia, "categoria":"procedimento"});
-                    
                     analisadorSemantico.setProcedimentoAtual(s);
                     
                     if (gerador) {
@@ -564,10 +563,12 @@ function AnalisadorSintatico(input, analisadorSemantico, geradorCodigo) {
                 
                 // TODO: isto nao pode ser null! se estamos no corpo
                 //  de um procedimento, deve retornar o procedimento!
-                //alert(s);
+                // Leo: Isto só é null quando tentamos inserir um procedimento que já havia sido inserido.
+                //      Fiz uma modificação no método remover do analisadorSemantico para corrigir isto.
+                // alert(s);
                 
                 // Removemos as variáveis locais do procedimento
-                analisadorSemantico.remover({"escopo":s.getCadeia()});
+                analisadorSemantico.remover(s);
                 
                 
                 if (gerador) {
@@ -1121,6 +1122,7 @@ function AnalisadorSintatico(input, analisadorSemantico, geradorCodigo) {
             varre(join(":=", Primeiros["lista_arg"], Seguidores["cont_ident"], seguidores));
         }
 
+        // Atribuição de valor à uma variável
         if (simbolo == ":=") {
             obterSimbolo();
 
@@ -1143,6 +1145,7 @@ function AnalisadorSintatico(input, analisadorSemantico, geradorCodigo) {
             }  // FIM DO CORTE PARA ANÁLISE SEMÂNTICA E GERADOR DE CÓDIGO
 
         }
+        // Chamada de procedimento
         else if (simbolo in Primeiros["lista_arg"]) {
 
             // CORTE TRANSVERSAL PARA ANALISADOR SEMÂNTICO E GERADOR DE CÓDIGO
@@ -1165,13 +1168,15 @@ function AnalisadorSintatico(input, analisadorSemantico, geradorCodigo) {
             } // FIM DO CORTE PARA ANÁLISE SEMÂNTICA E GERAÇÃO DE CÓDIGO
 
         }
-        // Se a produção <cont_ident> for vazia
+        // Se a produção <cont_ident> for vazia, foi chamado um procedimento que não recebe parâmetros
         else {
             // CORTE TRANSVERSAL PARA ANÁLISE SEMÂNTICA E GERAÇÃO DE ÓDIGO
             if (analisadorSemantico) {
+                analisadorSemantico.iniciarChamada();
                 if (gerador) {
                     gerador.inserirChamadaVazia();
                 }
+                analisadorSemantico.terminarChamada();
             } // FIM DO CORTE TRANSVERSAL PARA ANÁLISE SEMÂNTICA E GERAÇÃO DE CÓDIGO
         }
     }

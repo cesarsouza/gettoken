@@ -103,8 +103,8 @@ function AnalisadorSemantico() {
 
     // TODO: Onde deveria ser setado quem é o procedimento atual? Acho que esta
     //  faltando esta instrucao... Sera q removemos por engano?
-    this.getProcedimentoAtual = function() { return procedimentoAtual; }
     this.setProcedimentoAtual = function(simbolo) { procedimentoAtual = simbolo; }
+    this.getProcedimentoAtual = function() { return procedimentoAtual; }
 
 
    
@@ -211,7 +211,8 @@ function AnalisadorSemantico() {
             case 10:
                 estado = 6;
         }
-        if (procedimentoChamado && numeroEncontrado != procedimentoChamado.getAssinatura().length) {
+        if (procedimentoChamado && procedimentoChamado.getAssinatura() != undefined &&
+            numeroEncontrado != procedimentoChamado.getAssinatura().length) {
             error("Numero de argumentos na chamada do procedimento '" +  procedimentoChamado.getCadeia() +
                 "' incorreto - esperados " + procedimentoChamado.getAssinatura().length + " argumentos " +
                 "mas encontrados " + numeroEncontrado + ".");
@@ -331,10 +332,12 @@ function AnalisadorSemantico() {
                     numeroEncontrado++;
                 }
 
+                //alert("verificando simbolo " + v + "\n\n" + tabelaSimbolos);
+
                 // Primeiro, verificamos se o símbolo está declarado dentro do escopo local
-                if (simboloAtual != null)
+                if (procedimentoAtual != null)
                 {
-                   v.setEscopo(simboloAtual.getCadeia());
+                   v.setEscopo(procedimentoAtual.getCadeia());
                    w = tabelaSimbolos.verificar(v);
                 }
                 
@@ -350,8 +353,8 @@ function AnalisadorSemantico() {
                     }
                 }
 
+                // Verifica se todas as variaveis utilizadas na leitura ou na escrita têm o mesmo tipo
                 if (estado == 7) {
-                    // Verifica se todas as variaveis utilizadas na leitura ou na escrita têm o mesmo tipo
                     if (tipo == "") {
                         tipo = w.getTipo();
                     }
@@ -361,8 +364,8 @@ function AnalisadorSemantico() {
                         }
                     }
                 }
+                // Verifica se os parametros passados correspondem aos parâmetros formais
                 else if (estado == 8) {
-                    // Verifica se os parametros passados correspondem aos parâmetros formais
 
                     // Esta checagem impede que construções como p1(p1); sejam válidas
                     if (w.getTipo() == undefined) {
@@ -399,8 +402,8 @@ function AnalisadorSemantico() {
                     return null;
                 }
 
+                // Verifica se todas as variaveis utilizadas na leitura ou na escrita têm o mesmo tipo
                 if (estado == 9) {
-                    // Verifica se todas as variaveis utilizadas na leitura ou na escrita têm o mesmo tipo
                     if (tipo == "") {
                         tipo = w.getTipo();
                     }
@@ -410,8 +413,8 @@ function AnalisadorSemantico() {
                         }
                     }
                 }
+                // Verifica se os parametros passados correspondem aos parâmetros formais
                 else if (estado == 10) {
-                    // Verifica se os parametros passados correspondem aos parâmetros formais
 
                     // Esta checagem impede que construções como "p1(p1);" sejam válidas
                     if (w.getTipo() == undefined) {
@@ -472,8 +475,10 @@ function AnalisadorSemantico() {
 
     // Remove um símbolo da tabela de síbolos
     this.remover = function(variavel) {
-        var v = new Simbolo(variavel);
-        tabelaSimbolos.remover(v);
+        if (variavel instanceof Simbolo) {
+            var v = new Simbolo({"escopo":variavel.getCadeia()});
+            tabelaSimbolos.remover(v);
+        }
     }
 
     // Imprime a tabela de símbolos (for debugging pourposes)
