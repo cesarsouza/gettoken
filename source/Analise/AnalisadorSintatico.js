@@ -1420,7 +1420,7 @@ function AnalisadorSintatico(input, analisadorSemantico, geradorCodigo) {
         if (simbolo == "@ident") {
         
             if (analisadorSemantico) {
-                v = analisadorSemantico.verificar({"cadeia":cadeia});
+                v = analisadorSemantico.verificar({"cadeia":cadeia, "categoria":"variavel"});
             }
 
             obterSimbolo();

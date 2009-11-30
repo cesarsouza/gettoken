@@ -1,0 +1,314 @@
+{ checa uso de variáveis e procedimentos não declarados }
+
+programa p1;
+
+procedimento proc1;
+inicio
+    proc2; { ERRO }
+fim;
+
+inicio
+   a := 1; { ERRO }
+   proc3(a); { ERRO }
+fim.
+
+
+
+
+
+
+
+
+
+{ checa uso de variáveis e procedimentos declarados mais de uma vez }
+
+programa p1;
+
+var c, c : real;   { ERRO }
+var c : inteiro;   { ERRO }
+var b : inteiro;
+var b : inteiro;   { ERRO }
+
+procedimento proc1;
+var a, a : real;    { ERRO }
+var a : real;       { ERRO }
+inicio
+    a := 1;
+fim;
+
+procedimento proc1;     { para este procedimento que já foi declarado, deveríamos relatar erros de   } { ERRO }
+var a : inteiro;        { declaração de suas variáveis locais? A variável b repetida na linha abaixo }
+var b, b : real;        { é mostrada como erro. Para corrigir isto, bastaria ignorar os erros se um  }
+inicio                  { procedimento já foi declarado. Aliás, eu vou fazer isto, já que acredito   }
+fim;                    { que sejá o comportamento correto. OBS: ainda não corrigi }
+
+procedimento proc2;
+var a : inteiro;
+inicio
+    b := 2;
+fim;
+
+procedimento proc2(a, a : real; b : real); { ERRO }
+inicio
+fim;
+
+inicio
+   c := 1;
+   proc1;
+fim.
+
+
+
+
+
+
+
+
+
+
+
+
+{ checa incompatibilidade entre parâmetros formais e parâmetros passados }
+
+programa p1;
+
+var c : real;
+var b : inteiro;
+
+procedimento proc1(c : inteiro; d : real);
+var b : inteiro;
+inicio
+    b := 2;
+    d := c + b;
+fim;
+
+procedimento proc2(a : real);
+inicio
+    b := 2;
+    proc1(c; c);  { ERRO }
+    proc1(b; a);
+fim;
+
+inicio
+    proc1(c; b);  { 2 ERROS }
+    proc2;        { ERRO }
+    proc2(b);     { ERRO }
+    proc1(b; c);
+    proc2(c);
+    proc2(c; c);  { ERRO }
+    proc2(b; c; b; c);  { 2 ERROS }
+fim.
+
+
+
+
+
+
+
+
+
+
+
+
+{ checa uso de variáveis de escopos inadequados }
+
+programa p1;
+
+var c : real;
+var b : inteiro;
+
+procedimento proc1(c : inteiro; d : real);
+var b : inteiro;
+inicio
+    b := 2;
+    d := c + b;
+fim;
+
+procedimento proc2(a : real);
+var x : inteiro;
+inicio
+    b := 2;
+fim;
+
+inicio
+    proc2(c);
+    a := 1,0;            { Variável 'a' é parâmetro do procedimento 'proc2' }
+    x := 20;             { variável 'x' é variável local do proceidmento 'proc2' }
+fim.
+
+
+
+
+
+
+{ atribuição de real à inteiros }
+
+programa p1;
+
+var c : real;
+var b : inteiro;
+var local : inteiro;
+
+procedimento proc1(c : inteiro; d : real; e : inteiro);
+var b : inteiro;
+var z : real;
+inicio
+    b := 2;
+    b := 2,0;   { ERRO }
+    b := 140 * 2 - 1 + 10 * (10 + 10494 - 112390);
+    b := 124091204 / 2 - ((1230 / 2344) - 12312) / 2;  { ERRO }
+    d := c + b + z;
+    c := b;
+    c := z; { ERRO }
+fim;
+
+procedimento proc2(a : real);
+inicio
+    b := a;    { ERRO }
+fim;
+
+inicio
+    proc1(b; c; b);
+    proc2(c);
+    c := 1203902194 / 1294891284921 / 129489218498219 / 19284921894 - (192839128739891283 * 1287381273);
+    local := c;  { ERRO }
+    local := 3,1415929 * 100;   { ERRO }
+fim.
+
+
+
+
+
+
+
+
+
+
+
+
+
+{ comando le/escreve com variáveis de tipos diferentes }
+
+programa p1;
+
+var c : real;
+var b : inteiro;
+var local : inteiro;
+
+procedimento proc1 (c : inteiro; d : real; e : inteiro);
+var b : inteiro;
+var z : real;
+inicio
+    le(c, e);
+    le(c, d, e);  { ERRO }
+    le(b, c, e);
+    le(d, z);
+    le(d, b);  { ERRO }
+fim;
+
+inicio
+    proc1(b; c; b);
+    le(b, c, b);        { ERRO }
+    le(b, b);
+    le(local, b);
+    le(local, c);       { ERRO }
+    escreve(b, c, b);  { ERRO }
+    escreve(b, b, b);
+    escreve(b, local);
+fim.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+programa teste;
+
+var a : inteiro;
+
+procedimento p1 (a : inteiro; b : real);
+inicio
+
+fim;
+
+procedimento p2 (c : real; d : inteiro);
+inicio
+    p1(d; c);
+fim;
+
+procedimento p3;
+var a : real;
+var b : inteiro;
+inicio
+    p2(a; b);
+fim;
+
+inicio
+    a;              { deveria dar erro AQUI, e não na linha p2(a; b)! } { AGORA ESTÁ CORRIGIDO, mas não está dando erro aqui onde deveria dar }
+{AGORA ESTÁ CERTO}
+fim.
+
+
+
+
+
+
+programa teste;
+
+procedimento a; inicio fim;
+
+inicio
+    a := 1;
+fim.
+
+
+
+
+programa teste;
+
+var a : inteiro;
+
+inicio
+    a;
+fim.
+
+
+
+
+programa teste;
+
+var a : inteiro;
+
+procedimento p1; inicio fim;
+
+inicio
+    a := a + p1;
+fim.
+
+
+
+
+
+
+
+
+
+
+
+programa teste;
+
+inicio
+    x;
+    a;
+    b;
+    c;
+    z;
+fim.
