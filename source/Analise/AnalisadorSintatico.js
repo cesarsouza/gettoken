@@ -61,7 +61,6 @@ function AnalisadorSintatico(input, analisadorSemantico, geradorCodigo) {
         // Inicia a análise a partir da regra inicial
         programa();
 
-
         // Verifica se houve erros durante a analise e retorna o estado de sucesso
         if (!analisadorSemantico) {
             return (error_list.length == 0);
@@ -451,7 +450,7 @@ function AnalisadorSintatico(input, analisadorSemantico, geradorCodigo) {
 
                 // CORTE TRANSVERSAL PARA ANALISADOR SEMANTICO
                 if (analisadorSemantico) {
-                    var temp = analisadorSemantico.variavel({"cadeia":cadeia});
+                    var temp = analisadorSemantico.variavel({"cadeia":cadeia, "categoria":"variavel"});
                     if (gerador) {
                         if (temp instanceof Simbolo) {
                             gerador.guardaVariavel(cadeia, temp.getTipo());
@@ -509,7 +508,7 @@ function AnalisadorSintatico(input, analisadorSemantico, geradorCodigo) {
 
                 // CORTE TRANSVERSAL PARA ANALISADOR SEMANTICO
                 if (analisadorSemantico) {
-                    var s = analisadorSemantico.inserir({"cadeia":cadeia, "categoria":"procedimento"});
+                    var s = analisadorSemantico.inserir({"cadeia":cadeia, "categoria":"procedimento", "assinatura":new Array()});
                     analisadorSemantico.setProcedimentoAtual(s);
                     
                     if (gerador) {
@@ -1137,7 +1136,7 @@ function AnalisadorSintatico(input, analisadorSemantico, geradorCodigo) {
             // FIM DO CORTE PARA ANÁLISE SEMÂNTICA E GERADOR DE CÓDIGO
             
             // Chama a regra "expressão"
-            tipo = expressao(join(seguidores, Seguidores["cont_ident"]));
+            tipo = expressao(join(seguidores, Seguidores["cont_ident"]), ";");
 
             // CORTE TRANSVERSAL PARA ANÁLISE SEMÂNTICA E GERADOR DE CÓDIGO
             if (analisadorSemantico) {

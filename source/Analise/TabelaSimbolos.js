@@ -164,9 +164,9 @@ function TabelaSimbolos() {
             if (simbolo.getCategoria() != undefined && simbolo.getCategoria() != tabela[linha][i].getCategoria()) {
                 achou = false;
             }
-            if (simbolo.getAssinatura() != undefined && simbolo.getAssinatura() != tabela[linha][i].getAssinatura()) {
-                achou = false;
-            }
+            //if (simbolo.getAssinatura() != undefined && simbolo.getAssinatura() != tabela[linha][i].getAssinatura()) {
+                //achou = false;
+            //}
 
             // Retorna o primeiro simbolo que casar com o que procuramos
             if (achou) {

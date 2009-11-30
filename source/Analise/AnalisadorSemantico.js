@@ -146,9 +146,9 @@ function AnalisadorSemantico() {
                 break;
         }
         variaveis = new Array();
-        if (simboloAtual.getAssinatura() == undefined) {
-            simboloAtual.setAssinatura(new Array());
-        }
+//        if (simboloAtual.getAssinatura() == undefined) {
+//            simboloAtual.setAssinatura(new Array());
+//        }
     }
 
     // Transição le/escreve da máquina de estados
@@ -217,6 +217,7 @@ function AnalisadorSemantico() {
                 "' incorreto - esperados " + procedimentoChamado.getAssinatura().length + " argumentos " +
                 "mas encontrados " + numeroEncontrado + ".");
         }
+        ignorar = false;
     }
 
     // Transição iniciar_corpo da máquina de estados
@@ -257,6 +258,7 @@ function AnalisadorSemantico() {
                 v.setEscopo(null);
                 if (!tabelaSimbolos.inserir(v)) {
                     error("Erro na declaracao do procedimento '" + v.getCadeia() + "' - ja declarado.");
+                    ignorar = true;
                     return null;
                 }
                 return v;
@@ -269,12 +271,17 @@ function AnalisadorSemantico() {
                 if (estado == 1) {
                     v.setEscopo(null);
                 }
-                if (estado == 3) {
+                if (estado == 3 || estado == 4) {
                     //v.setCategoria("parametro");
-                    v.setEscopo(simboloAtual.getCadeia());
-                }
-                if (estado == 4) {
-                    v.setEscopo(simboloAtual.getCadeia());
+                    if (procedimentoAtual instanceof Simbolo) {
+                        v.setEscopo(procedimentoAtual.getCadeia());
+                    }
+                    // Se procedimentoAtual é null, então estamos dentro da declaração de um procedimento
+                    //   que já foi declarado. Portanto, devemos ignorar as declarações de variáveis que
+                    //   ocorrem dentro dele
+                    else {
+                        return null;
+                    }
                 }
 
                 // Se estamos na fase de declaração de variáveis ou declaração de parâmetros,
@@ -291,10 +298,38 @@ function AnalisadorSemantico() {
                         var v2 = new Simbolo();
                         v2.setCadeia(variaveis[c].getCadeia());
                         v2.setEscopo(variaveis[c].getEscopo());
-                        
+
                         if (tabelaSimbolos.verificar(v2)) {
                             error("Erro na declaracao da variavel '" + v2.getCadeia() + "' - ja declarada.");
-                            return null;
+                            //return null;
+                            continue;
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/*
+Checar este exemplo:
+programa P2;
+{exemplo 2}
+var a: real;
+var b: inteiro;
+procedimento nomep(x: real;a: inteiro);
+var a, c: inteiro;
+inicio
+le(c,a);
+se a<x+c entao
+inicio
+a:= c+x;
+escreve(a);
+fim
+senao c:= a*x;
+fim;
+inicio {programa principal}
+le(b);
+nomep(b);
+fim.
+
+Se estivesse return null ali, a variável c local ao procedimento nomep não estaria definida. Acredito que
+  esse seja um comportamento adequado, mas assim também está funcionando bem.
+*/
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
                         }
                         else {
                             v2.setTipo(v.getTipo());

@@ -304,8 +304,10 @@ function Gerador() {
         codigo += "}\n";
     }
 
-    // As expressões são transcritas ipsis litteris no código gerado
+    // As expressões são transcritas ipsis litteris no código gerado, com exceção de
+    //   números reais, onde a vírgula deve ser substituída pelo ponto.
     this.expressao = function (cadeia) {
+        cadeia = cadeia.replace(",", ".");
         codigo += cadeia + " ";
     }
 
