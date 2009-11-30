@@ -46,6 +46,7 @@ function AnalisadorSemantico() {
     //   para facilitar o processamento. Estado indicado pela variavel abaixo.
     var estado = 0;
 
+    var identificador = "";
     var tipo = "";
     var variaveis = undefined;
     var erroTipo = false;
@@ -101,8 +102,7 @@ function AnalisadorSemantico() {
     this.setSimbolo = function(simbolo) { simboloAtual = simbolo; }
     this.getSimbolo = function() { return simboloAtual; }
 
-    // TODO: Onde deveria ser setado quem é o procedimento atual? Acho que esta
-    //  faltando esta instrucao... Sera q removemos por engano?
+    // Métodos que indicam o escopo atual (em qual procedimento estamos atualmente)
     this.setProcedimentoAtual = function(simbolo) { procedimentoAtual = simbolo; }
     this.getProcedimentoAtual = function() { return procedimentoAtual; }
 
@@ -270,7 +270,7 @@ function AnalisadorSemantico() {
                     v.setEscopo(null);
                 }
                 if (estado == 3) {
-                    v.setCategoria("parametro");
+                    //v.setCategoria("parametro");
                     v.setEscopo(simboloAtual.getCadeia());
                 }
                 if (estado == 4) {
@@ -297,7 +297,6 @@ function AnalisadorSemantico() {
                             return null;
                         }
                         else {
-                            v2.setEscopo(variaveis[c].getEscopo());
                             v2.setTipo(v.getTipo());
                             v2.setCategoria(variaveis[c].getCategoria());
                             tabelaSimbolos.inserir(v2);
@@ -434,10 +433,24 @@ function AnalisadorSemantico() {
         }
     }
 
+    // Verifica a categoria do símbolo atual. Este método é usado somente
+    //   na regra <cont_ident>, devido ao fato de que quando encontramos
+    //   um identificador, não sabemos de antemão se ele é uma variável
+    //   ou um procedimento.
+    this.verificarCategoria = function(categoria) {
+        if (simboloAtual instanceof Simbolo && simboloAtual.getCategoria() != categoria) {
+            if (categoria == "procedimento") {
+                error("Procedimento " + simboloAtual.getCadeia() + " nao declarado.");
+            }
+            else {
+                error("Variavel " + simboloAtual.getCadeia() + " nao declarada.");
+            }
+        }
+    }
 
     // Este método verifica se o tipo do símbolo atual comporta uma atribuição
-    //  do tipo passado como parâmetro, e adiciona uma mensagem de erro a lista
-    //  de erros caso não sejam.
+    //   do tipo passado como parâmetro, e adiciona uma mensagem de erro a lista
+    //   de erros caso não sejá compatível.
     this.compativel = function(tipo) {
        // alert("analisador semantico, line 329");
        // alert("simbolo atual: " + simboloAtual);
@@ -450,7 +463,6 @@ function AnalisadorSemantico() {
             error("Atribuicao de valor real a variavel inteira '" + simboloAtual.getCadeia() + "'.");
         }
     }
-
 
     // Este método é chamado dentro da regra <variaveis> do analisador sintático.
     // Ele existe pois, dependendo da fase da análise semântica em que estamos (declarações ou

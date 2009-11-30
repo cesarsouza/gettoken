@@ -412,7 +412,7 @@ function AnalisadorSintatico(input, analisadorSemantico, geradorCodigo) {
 
             // CORTE TRANSVERSAL PARA ANALISADOR SEMANTICO
             if (analisadorSemantico) {
-                var temp = analisadorSemantico.variavel({"cadeia":cadeia});
+                var temp = analisadorSemantico.variavel({"cadeia":cadeia, "categoria":"variavel"});
                 if (gerador) {
                     if (temp instanceof Simbolo) {
                         gerador.guardaVariavel(cadeia, temp.getTipo());
@@ -1126,10 +1126,15 @@ function AnalisadorSintatico(input, analisadorSemantico, geradorCodigo) {
         if (simbolo == ":=") {
             obterSimbolo();
 
-            // CORTE TRANSVERSAL PARA GERADOR DE CÓDIGO
-            if (gerador) {
-                gerador.iniciarAtribuicao();
-            } // FIM DO CORTE PARA GERADOR DE CÓDIGO
+            // CORTE TRANSVERSAL PARA ANÁLISE SEMÂNTICA E GERADOR DE CÓDIGO
+            if (analisadorSemantico) {
+                // Asseguramos que o símbolo sendo verificado é uma variável
+                analisadorSemantico.verificarCategoria("variavel");
+                if (gerador) {
+                    gerador.iniciarAtribuicao();
+                }
+            }
+            // FIM DO CORTE PARA ANÁLISE SEMÂNTICA E GERADOR DE CÓDIGO
             
             // Chama a regra "expressão"
             tipo = expressao(join(seguidores, Seguidores["cont_ident"]));
@@ -1150,6 +1155,8 @@ function AnalisadorSintatico(input, analisadorSemantico, geradorCodigo) {
 
             // CORTE TRANSVERSAL PARA ANALISADOR SEMÂNTICO E GERADOR DE CÓDIGO
             if (analisadorSemantico) {
+                // Asseguramos que o símbolo sendo verificado é um procedimento
+                analisadorSemantico.verificarCategoria("procedimento");
                 analisadorSemantico.iniciarChamada();
                 if (gerador) {
                     gerador.iniciarChamada();
@@ -1172,6 +1179,8 @@ function AnalisadorSintatico(input, analisadorSemantico, geradorCodigo) {
         else {
             // CORTE TRANSVERSAL PARA ANÁLISE SEMÂNTICA E GERAÇÃO DE ÓDIGO
             if (analisadorSemantico) {
+                // Asseguramos que o símbolo sendo verificado é um procedimento
+                analisadorSemantico.verificarCategoria("procedimento");
                 analisadorSemantico.iniciarChamada();
                 if (gerador) {
                     gerador.inserirChamadaVazia();

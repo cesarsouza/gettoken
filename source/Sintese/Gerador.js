@@ -33,7 +33,9 @@ function Gerador() {
     var listaVariaveis = undefined;
     var listaTipos = undefined;
 
-
+    // Variável booelana que é verdadeira quando existem parâmetros em
+    //   uma declaração de procedimento
+    var houveramParametros = false;
 
 
 
@@ -110,13 +112,12 @@ function Gerador() {
     // Inicia a geração de um procedimento
     this.iniciarProcedimento = function (cadeia) {
         codigo += "\n";
-        codigo += "void " + cadeia + " (";
+        codigo = codigo + "void " + cadeia + " (";
+        houveramParametros = false;
     }
 
     // Gera a declaração de parâmetros de uma função
     this.inserirParametros = function (tipo) {
-        identar();
-
         if (tipo == "inteiro") {
             tipo = "int";
         }
@@ -128,12 +129,15 @@ function Gerador() {
             codigo += tipo + " " + listaVariaveis[v] + ", ";
         }
         listaVariaveis = undefined;
+        houveramParametros = true;
     }
 
     // Finaliza a declaração de parâmetros de uma função
     this.finalizarParametros = function () {
         // Retiramos a ultima virgula e espaço que sobram ao final
-        codigo = codigo.substr(0, codigo.length - 2);
+        if (houveramParametros) {
+            codigo = codigo.substr(0, codigo.length - 2);
+        }
         codigo += ")\n{\n";
         identacao++;
     }
