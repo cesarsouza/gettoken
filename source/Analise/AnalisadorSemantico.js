@@ -403,7 +403,7 @@ Se estivesse return null ali, a variável c local ao procedimento nomep não estar
 
                     // Esta checagem impede que construções como p1(p1); sejam válidas
                     if (w.getTipo() == undefined) {
-                        w.setTipo("invalid");
+                        w.setTipo("invalido");
                     }
 
                     if (procedimentoChamado && w.getTipo() != procedimentoChamado.getAssinatura()[argumentoAtual++]) {
@@ -452,7 +452,7 @@ Se estivesse return null ali, a variável c local ao procedimento nomep não estar
 
                     // Esta checagem impede que construções como "p1(p1);" sejam válidas
                     if (w.getTipo() == undefined) {
-                        w.setTipo("invalid");
+                        w.setTipo("invalido");
                     }
 
                     if (procedimentoChamado && w.getTipo() != procedimentoChamado.getAssinatura()[argumentoAtual++]) {
