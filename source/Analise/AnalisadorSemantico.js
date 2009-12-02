@@ -300,36 +300,8 @@ function AnalisadorSemantico() {
                         v2.setEscopo(variaveis[c].getEscopo());
 
                         if (tabelaSimbolos.verificar(v2)) {
-                            error("Erro na declaracao da variavel '" + v2.getCadeia() + "' - ja declarada.");
-                            //return null;
+                            error("Variavel de nome '" + v2.getCadeia() + "' ja declarada neste escopo.");
                             continue;
-////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/*
-Checar este exemplo:
-programa P2;
-{exemplo 2}
-var a: real;
-var b: inteiro;
-procedimento nomep(x: real;a: inteiro);
-var a, c: inteiro;
-inicio
-le(c,a);
-se a<x+c entao
-inicio
-a:= c+x;
-escreve(a);
-fim
-senao c:= a*x;
-fim;
-inicio {programa principal}
-le(b);
-nomep(b);
-fim.
-
-Se estivesse return null ali, a variável c local ao procedimento nomep não estaria definida. Acredito que
-  esse seja um comportamento adequado, mas assim também está funcionando bem.
-*/
-////////////////////////////////////////////////////////////////////////////////////////////////////////////
                         }
                         else {
                             v2.setTipo(v.getTipo());
